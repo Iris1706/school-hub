@@ -4,7 +4,7 @@
     { "name": "專案管理", "url": "https://example.com/project" }
   ],
   "Google試算表": [
-    { "name": "月結算表", "url": "https://docs.google.com/spreadsheets/d/xxxxx" },
+    { "name": "老師資訊", "url": "https://docs.google.com/spreadsheets/d/1phGSQFmbcvfynQV7sfWo8Ec5vqugg7Tbflfe6XDWNU0/edit?gid=180827774#gid=180827774" },
     { "name": "庫存追蹤表", "url": "https://docs.google.com/spreadsheets/d/xxxxx" }
   ]
 }
