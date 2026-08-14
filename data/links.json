@@ -1,0 +1,10 @@
+{
+  "工具系統": [
+    { "name": "公司信箱", "url": "https://mail.example.com" },
+    { "name": "專案管理", "url": "https://example.com/project" }
+  ],
+  "Google試算表": [
+    { "name": "月結算表", "url": "https://docs.google.com/spreadsheets/d/xxxxx" },
+    { "name": "庫存追蹤表", "url": "https://docs.google.com/spreadsheets/d/xxxxx" }
+  ]
+}
