@@ -1,10 +1,19 @@
 {
   "工具系統": [
-    { "name": "公司信箱", "url": "https://mail.example.com" },
-    { "name": "專案管理", "url": "https://example.com/project" }
+    { "name": "高雄市修繕系統", "url": "https://repair.kh.edu.tw/index.htm" },
+    { "name": "Apple 校務管理系統(ASM)", "url": "https://school.apple.com/#/main/users" },
+    { "name": "iPadOS通道狀態", "url": "https://mrmad.com.tw/ios-firmware#google_vignette" },
+    { "name": "RAM", "url": "https://rma0.studioarma.com/rma/?m=login&op=form" },
+    { "name": "Jamf RADAR", "url": "https://radar.wandera.com/login" }
   ],
+  
   "Google試算表": [
+    { "name": "Iris行程表", "url": "https://docs.google.com/spreadsheets/d/1Di6ooL-u-AKtGL6McYSBZKu-npQZWkmVbmOe9oY-Sgw/edit?gid=0#gid=0" } 
     { "name": "老師資訊", "url": "https://docs.google.com/spreadsheets/d/1phGSQFmbcvfynQV7sfWo8Ec5vqugg7Tbflfe6XDWNU0/edit?gid=180827774#gid=180827774" },
-    { "name": "庫存追蹤表", "url": "https://docs.google.com/spreadsheets/d/xxxxx" }
+    { "name": "高雄 URL 統整", "url": "https://docs.google.com/spreadsheets/d/1qiVDzrG4BlyWAIzW_euG6S132qLvvonwYDDaDOmQjgY/edit?gid=0#gid=0" },
+    { "name": "報修紀錄", "url": "https://docs.google.com/spreadsheets/d/1C90cBIevBadMUh8A6E3qsLwl_El4Tlgd9mrOtXLQs5w/edit?gid=0#gid=0" },
+    { "name": "維修紀錄", "url": "https://docs.google.com/spreadsheets/d/1pXxjMXKAgmxa0cRA1XgqVKQUe6OuvCWloUVKA4KZtwc/edit?gid=183656605#gid=183656605" },
+    { "name": "驗證碼", "url": "https://docs.google.com/spreadsheets/d/102pIS7m3xKv73cPj-mBzbN0iE0jNlpR93vdYGevdwk4/edit?gid=0#gid=0" }
+
   ]
 }
