@@ -5,11 +5,14 @@ import { Phone, Smartphone, Mail } from "lucide-react";
 
 const ICONS = { phone: Phone, mobile: Smartphone, mail: Mail };
 
+const TITLE_FIELD = "學校資訊";
+
 const FIELD_GROUPS = [
   {
     title: "基本資料",
     fields: [
       { key: "學校代碼", label: "學校代碼" },
+      { key: "行政區合併學校名稱", label: "行政區合併學校名稱", full: true },
       { key: "學校名稱", label: "學校名稱" },
       { key: "地址", label: "地址", full: true },
     ],
@@ -55,7 +58,7 @@ const FIELD_GROUPS = [
 ];
 
 const ALL_FIELDS = FIELD_GROUPS.flatMap((g) => g.fields);
-const HEADER_FIELDS = new Set(["學校代碼", "學校名稱"]);
+const HEADER_FIELDS = new Set(["學校代碼", TITLE_FIELD]);
 
 export default function SchoolInfoPage() {
   const [schools, setSchools] = useState([]);
@@ -93,7 +96,7 @@ export default function SchoolInfoPage() {
   }, []);
 
   const filtered = useMemo(
-    () => schools.filter((s) => (s["學校名稱"] || "").includes(search)),
+    () => schools.filter((s) => (s[TITLE_FIELD] || "").includes(search)),
     [schools, search]
   );
 
@@ -147,12 +150,12 @@ export default function SchoolInfoPage() {
         </p>
       )}
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 12 }}>
         {filtered.map((s) => (
           <div className="card" key={s.__row}>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 10 }}>
-              <p style={{ fontWeight: 500, fontSize: 15, margin: 0 }}>{s["學校名稱"]}</p>
-              <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{s["學校代碼"]}</span>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginBottom: 8 }}>
+              <p style={{ fontWeight: 500, fontSize: 14, margin: 0 }}>{s[TITLE_FIELD]}</p>
+              <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{s["學校代碼"]}</span>
             </div>
 
             {FIELD_GROUPS.map((group) => {
@@ -163,12 +166,12 @@ export default function SchoolInfoPage() {
               return (
                 <div
                   key={group.title}
-                  style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid var(--border)" }}
+                  style={{ marginTop: 6, paddingTop: 6, borderTop: "1px solid var(--border)" }}
                 >
-                  <p style={{ fontSize: 11, color: "var(--text-muted)", margin: "0 0 4px" }}>
+                  <p style={{ fontSize: 10, color: "var(--text-muted)", margin: "0 0 3px" }}>
                     {group.title}
                   </p>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 3, fontSize: 13, color: "var(--text-secondary)" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 2, fontSize: 12, color: "var(--text-secondary)" }}>
                     {visible.map((f) => {
                       const Icon = f.icon ? ICONS[f.icon] : null;
                       return (
@@ -234,63 +237,4 @@ function EditModal({ school, saving, onClose, onSave }) {
 
         {FIELD_GROUPS.map((group) => (
           <div key={group.title} style={{ marginBottom: 14 }}>
-            <p style={{ fontSize: 11, color: "var(--text-muted)", margin: "0 0 6px" }}>{group.title}</p>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 12px", fontSize: 12 }}>
-              {group.fields.map((f) => (
-                <label key={f.key} style={{ gridColumn: f.full ? "1 / 3" : "auto" }}>
-                  {f.label || f.key}
-                  <input
-                    type="text"
-                    value={form[f.key] || ""}
-                    onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}
-                    style={{ width: "100%", marginTop: 2 }}
-                  />
-                </label>
-              ))}
-            </div>
-          </div>
-        ))}
-
-        <div style={{ display: "flex", gap: 8, marginTop: 4, justifyContent: "flex-end" }}>
-          <button disabled={saving} onClick={() => onSave(form)}>
-            {saving ? "儲存中..." : "儲存"}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function HistoryModal({ code, entries, onClose }) {
-  return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(0,0,0,0.4)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 10,
-      }}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <div className="card" style={{ width: 420, maxHeight: "80vh", overflow: "auto", background: "var(--surface-1)" }}>
-        <p style={{ fontWeight: 500, fontSize: 14, margin: "0 0 12px" }}>修改歷程 — {code}</p>
-        {entries.length === 0 && <p style={{ fontSize: 13, color: "var(--text-muted)" }}>目前沒有異動紀錄。</p>}
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {entries.map((e, i) => (
-            <div key={i} style={{ fontSize: 12, borderBottom: "1px solid var(--border)", paddingBottom: 6 }}>
-              <div style={{ color: "var(--text-muted)" }}>{new Date(e.time).toLocaleString("zh-TW")}</div>
-              <div>
-                {e.field}：{e.oldValue || "（空）"} → {e.newValue || "（空）"}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
+            <p style={{ fontSize: 11, color:
