@@ -5,7 +5,7 @@ import { Phone, Smartphone, Mail } from "lucide-react";
 
 const ICONS = { phone: Phone, mobile: Smartphone, mail: Mail };
 
-const TITLE_FIELD = "學校資訊";
+const TITLE_FIELD = "行政區合併學校名稱";
 
 const FIELD_GROUPS = [
   {
@@ -237,4 +237,63 @@ function EditModal({ school, saving, onClose, onSave }) {
 
         {FIELD_GROUPS.map((group) => (
           <div key={group.title} style={{ marginBottom: 14 }}>
-            <p style={{ fontSize: 11, color:
+            <p style={{ fontSize: 11, color: "var(--text-muted)", margin: "0 0 6px" }}>{group.title}</p>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 12px", fontSize: 12 }}>
+              {group.fields.map((f) => (
+                <label key={f.key} style={{ gridColumn: f.full ? "1 / 3" : "auto" }}>
+                  {f.label || f.key}
+                  <input
+                    type="text"
+                    value={form[f.key] || ""}
+                    onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}
+                    style={{ width: "100%", marginTop: 2 }}
+                  />
+                </label>
+              ))}
+            </div>
+          </div>
+        ))}
+
+        <div style={{ display: "flex", gap: 8, marginTop: 4, justifyContent: "flex-end" }}>
+          <button disabled={saving} onClick={() => onSave(form)}>
+            {saving ? "儲存中..." : "儲存"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HistoryModal({ code, entries, onClose }) {
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.4)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 10,
+      }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="card" style={{ width: 420, maxHeight: "80vh", overflow: "auto", background: "var(--surface-1)" }}>
+        <p style={{ fontWeight: 500, fontSize: 14, margin: "0 0 12px" }}>修改歷程 — {code}</p>
+        {entries.length === 0 && <p style={{ fontSize: 13, color: "var(--text-muted)" }}>目前沒有異動紀錄。</p>}
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {entries.map((e, i) => (
+            <div key={i} style={{ fontSize: 12, borderBottom: "1px solid var(--border)", paddingBottom: 6 }}>
+              <div style={{ color: "var(--text-muted)" }}>{new Date(e.time).toLocaleString("zh-TW")}</div>
+              <div>
+                {e.field}：{e.oldValue || "（空）"} → {e.newValue || "（空）"}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
