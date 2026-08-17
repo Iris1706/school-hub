@@ -1,16 +1,23 @@
 import { getSheetsClient } from "@/lib/googleSheets";
 
-export async function GET() {
+export async function GET(request) {
   try {
     const sheets = getSheetsClient();
 
     // 行程表的 Google Sheet ID
     const SCHEDULE_SHEET_ID = "1QnrYP7dDl12oMyD613Sm5cccZDjqeOwj3ho9bZSTsfs";
 
-    // 根據當前月份動態構造 Sheet 名稱（例如 2026/8、2026/9）
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth() + 1;
+    // 從查詢參數或使用當前月份
+    const url = new URL(request.url);
+    let year = parseInt(url.searchParams.get("year"));
+    let month = parseInt(url.searchParams.get("month"));
+
+    if (!year || !month) {
+      const now = new Date();
+      year = now.getFullYear();
+      month = now.getMonth() + 1;
+    }
+
     const sheetName = `${year}/${month}`;
 
     // 先讀取員編-姓名映射表（A5:B13）

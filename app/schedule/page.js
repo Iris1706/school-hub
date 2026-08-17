@@ -24,7 +24,9 @@ export default function SchedulePage() {
   async function loadWeeklyStatus() {
     setStatusLoading(true);
     try {
-      const res = await fetch("/api/weekly-status");
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth() + 1;
+      const res = await fetch(`/api/weekly-status?year=${year}&month=${month}`);
       const json = await res.json();
       if (json.error) throw new Error(json.error);
       setEmployees(json.data || []);
@@ -39,7 +41,9 @@ export default function SchedulePage() {
   async function loadSchedules() {
     setLoading(true);
     try {
-      const res = await fetch("/api/daily-schedule");
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth() + 1;
+      const res = await fetch(`/api/daily-schedule?year=${year}&month=${month}`);
       const json = await res.json();
       if (json.error) throw new Error(json.error);
       setSchedules(json.data || []);
@@ -113,16 +117,37 @@ export default function SchedulePage() {
             boxShadow: "0 4px 16px rgba(99, 102, 241, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.5)",
           }}
         >
-          <h3
-            style={{
-              margin: "0 0 12px",
-              fontSize: 14,
-              fontWeight: 600,
-              color: "var(--text-primary)",
-            }}
-          >
-            本月員工排班表
-          </h3>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+            <h3
+              style={{
+                margin: 0,
+                fontSize: 14,
+                fontWeight: 600,
+                color: "var(--text-primary)",
+              }}
+            >
+              本月員工排班表
+            </h3>
+            <div style={{ display: "flex", gap: 6 }}>
+              <button
+                className="secondary"
+                onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1))}
+                style={{ padding: "4px 8px", fontSize: 12 }}
+              >
+                ←
+              </button>
+              <div style={{ fontSize: 12, color: "var(--text-muted)", padding: "4px 8px", minWidth: 60, textAlign: "center" }}>
+                {currentDate.getFullYear()}/{String(currentDate.getMonth() + 1).padStart(2, "0")}
+              </div>
+              <button
+                className="secondary"
+                onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1))}
+                style={{ padding: "4px 8px", fontSize: 12 }}
+              >
+                →
+              </button>
+            </div>
+          </div>
           <table
             style={{
               borderCollapse: "collapse",
@@ -335,39 +360,17 @@ export default function SchedulePage() {
 
         {/* 本週行程清單 */}
         <div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-            <h3
-              style={{
-                margin: 0,
-                fontSize: 16,
-                fontWeight: 600,
-                paddingBottom: 10,
-                borderBottom: "2px solid var(--accent)",
-                flex: 1,
-              }}
-            >
-              📋 {selectedDate ? `${formatDate(selectedDate)} 的行程` : "本週行程"}
-            </h3>
-            <div style={{ display: "flex", gap: 6, marginLeft: 16 }}>
-              <button
-                className="secondary"
-                onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1))}
-                style={{ padding: "4px 8px", fontSize: 12 }}
-              >
-                ←
-              </button>
-              <div style={{ fontSize: 12, color: "var(--text-muted)", padding: "4px 8px", minWidth: 60, textAlign: "center" }}>
-                {currentDate.getFullYear()} 年 {currentDate.getMonth() + 1} 月
-              </div>
-              <button
-                className="secondary"
-                onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1))}
-                style={{ padding: "4px 8px", fontSize: 12 }}
-              >
-                →
-              </button>
-            </div>
-          </div>
+          <h3
+            style={{
+              margin: "0 0 12px",
+              fontSize: 16,
+              fontWeight: 600,
+              paddingBottom: 10,
+              borderBottom: "2px solid var(--accent)",
+            }}
+          >
+            📋 {selectedDate ? `${formatDate(selectedDate)} 的行程` : "本週行程"}
+          </h3>
 
           {loading && <p style={{ color: "var(--text-muted)" }}>讀取中...</p>}
           {error && <p style={{ color: "var(--danger)" }}>讀取失敗：{error}</p>}
