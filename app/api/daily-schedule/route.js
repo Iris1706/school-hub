@@ -1,13 +1,22 @@
-import { getSheetsClient, SPREADSHEET_ID } from "@/lib/googleSheets";
+import { getSheetsClient } from "@/lib/googleSheets";
 
 export async function GET() {
   try {
     const sheets = getSheetsClient();
 
+    // 行程表的 Google Sheet ID
+    const SCHEDULE_SHEET_ID = "1Di6ooL-u-AKtGL6McYSBZKu-npQZWkmVbmOe9oY-Sgw";
+
+    // 根據當前月份動態構造 Sheet 名稱（例如 2026/8、2026/9）
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+    const sheetName = `${year}/${month}`;
+
     // 讀取行程表資料（B20:M 欄）
     const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: SPREADSHEET_ID,
-      range: "'每日行程'!B20:M200", // 讀取行程表
+      spreadsheetId: SCHEDULE_SHEET_ID,
+      range: `'${sheetName}'!B20:M200`, // 讀取當月的行程表
     });
 
     const rows = response.data.values || [];
