@@ -92,9 +92,29 @@ export default function SchedulePage() {
   };
 
   // 根據選定日期篩選行程
-  const filteredSchedules = selectedDate
-    ? schedules.filter((s) => s.date && formatDate(new Date(s.date)) === formatDate(selectedDate))
-    : schedules;
+  const filteredSchedules = useMemo(() => {
+    if (selectedDate) {
+      // 如果選定了日期，只顯示該日期的行程
+      return schedules.filter((s) => s.date && formatDate(new Date(s.date)) === formatDate(selectedDate));
+    } else {
+      // 沒有選定日期時，只顯示當週行程
+      const today = new Date();
+      const weekStart = new Date(today);
+      weekStart.setDate(today.getDate() - today.getDay());
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6);
+
+      return schedules.filter((s) => {
+        if (!s.date) return false;
+        try {
+          const scheduleDate = new Date(s.date);
+          return scheduleDate >= weekStart && scheduleDate <= weekEnd && s.date.trim() !== "";
+        } catch {
+          return false;
+        }
+      });
+    }
+  }, [schedules, selectedDate]);
 
   const days = getDaysInMonth(currentDate);
   const dayNames = ["日", "一", "二", "三", "四", "五", "六"];
