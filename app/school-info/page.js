@@ -150,15 +150,11 @@ export default function SchoolInfoPage() {
         </p>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 12 }}>
-        {filtered.map((s) => (
-          <div className="card" key={s.__row}>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginBottom: 8 }}>
-              <p style={{ fontWeight: 500, fontSize: 14, margin: 0 }}>{s[TITLE_FIELD]}</p>
-              <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{s["學校代碼"]}</span>
-            </div>
-
-            {FIELD_GROUPS.map((group) => {
+      {search && (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          {filtered.map((s) => (
+            <div className="card" key={s.__row}>
+              {FIELD_GROUPS.map((group) => {
               const visible = group.fields.filter(
                 (f) => !HEADER_FIELDS.has(f.key) && (s[f.key] || "").trim() !== ""
               );
@@ -196,12 +192,13 @@ export default function SchoolInfoPage() {
                 修改歷程
               </button>
             </div>
-          </div>
-        ))}
-        {!loading && !error && filtered.length === 0 && (
-          <p style={{ color: "var(--text-muted)" }}>沒有符合的學校。</p>
-        )}
-      </div>
+            </div>
+          ))}
+        </div>
+      )}
+      {search && !loading && !error && filtered.length === 0 && (
+        <p style={{ color: "var(--text-muted)" }}>沒有符合的學校。</p>
+      )}
 
       {editing && (
         <EditModal school={editing} saving={saving} onClose={() => setEditing(null)} onSave={saveEdits} />
