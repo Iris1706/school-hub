@@ -124,49 +124,56 @@ export default function SchedulePage() {
             style={{
               borderCollapse: "collapse",
               fontSize: 11,
-              border: "1px solid var(--accent)",
+              border: "1px solid rgba(200, 200, 200, 0.3)",
             }}
           >
             <thead>
-              <tr style={{ background: "rgba(99, 102, 241, 0.1)", borderBottom: "1px solid var(--accent)" }}>
-                <th style={{ padding: 6, fontWeight: 600, color: "var(--text-primary)", borderRight: "1px solid var(--accent)", borderBottom: "1px solid var(--accent)", minWidth: 80, textAlign: "center" }}>
+              <tr style={{ background: "rgba(248, 247, 245, 1)", borderBottom: "1px solid rgba(200, 200, 200, 0.3)" }}>
+                <th style={{ padding: 8, fontWeight: 600, color: "var(--text-primary)", borderRight: "1px solid rgba(200, 200, 200, 0.3)", minWidth: 70, textAlign: "center", fontSize: 12 }}>
                   員工編號
                 </th>
-                <th style={{ padding: 6, fontWeight: 600, color: "var(--text-primary)", borderRight: "1px solid var(--accent)", borderBottom: "1px solid var(--accent)", minWidth: 80, textAlign: "center" }}>
+                <th style={{ padding: 8, fontWeight: 600, color: "var(--text-primary)", borderRight: "1px solid rgba(200, 200, 200, 0.3)", minWidth: 120, textAlign: "left", fontSize: 12 }}>
                   姓名
                 </th>
-                {dates.map((date) => (
-                  <th
-                    key={date}
-                    style={{
-                      padding: 6,
-                      fontWeight: 600,
-                      color: "var(--text-primary)",
-                      borderRight: "1px solid var(--accent)",
-                      borderBottom: "1px solid var(--accent)",
-                      minWidth: 35,
-                      textAlign: "center",
-                    }}
-                  >
-                    {date}
-                  </th>
-                ))}
+                {dates.map((date) => {
+                  const dayOfWeek = new Date(currentDate.getFullYear(), currentDate.getMonth(), date).getDay();
+                  const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                  return (
+                    <th
+                      key={date}
+                      style={{
+                        padding: 8,
+                        fontWeight: 600,
+                        color: isWeekend ? "#c41e3a" : "var(--text-primary)",
+                        borderRight: "1px solid rgba(200, 200, 200, 0.3)",
+                        background: isWeekend ? "rgba(196, 30, 58, 0.08)" : "transparent",
+                        minWidth: 40,
+                        textAlign: "center",
+                        fontSize: 12,
+                      }}
+                    >
+                      {date}
+                    </th>
+                  );
+                })}
               </tr>
-              <tr style={{ background: "rgba(99, 102, 241, 0.05)", borderBottom: "1px solid var(--accent)" }}>
-                <th style={{ padding: 6, fontWeight: 600, color: "var(--text-muted)", borderRight: "1px solid var(--accent)", borderBottom: "1px solid var(--accent)", minWidth: 80 }}></th>
-                <th style={{ padding: 6, fontWeight: 600, color: "var(--text-muted)", borderRight: "1px solid var(--accent)", borderBottom: "1px solid var(--accent)", minWidth: 80 }}></th>
-                {dates.map((date, idx) => {
+              <tr style={{ background: "rgba(248, 247, 245, 0.5)", borderBottom: "1px solid rgba(200, 200, 200, 0.3)" }}>
+                <th style={{ padding: 6, fontWeight: 500, color: "rgba(100, 100, 100, 0.6)", borderRight: "1px solid rgba(200, 200, 200, 0.3)", minWidth: 70 }}></th>
+                <th style={{ padding: 6, fontWeight: 500, color: "rgba(100, 100, 100, 0.6)", borderRight: "1px solid rgba(200, 200, 200, 0.3)", minWidth: 120 }}></th>
+                {dates.map((date) => {
                   const dayName = ["日", "一", "二", "三", "四", "五", "六"][(new Date(currentDate.getFullYear(), currentDate.getMonth(), date).getDay())];
+                  const dayOfWeek = new Date(currentDate.getFullYear(), currentDate.getMonth(), date).getDay();
+                  const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
                   return (
                     <th
                       key={`day-${date}`}
                       style={{
-                        padding: 6,
-                        fontWeight: 600,
-                        color: "var(--text-muted)",
-                        borderRight: "1px solid var(--accent)",
-                        borderBottom: "1px solid var(--accent)",
-                        minWidth: 35,
+                        padding: 4,
+                        fontWeight: 500,
+                        color: isWeekend ? "#c41e3a" : "rgba(100, 100, 100, 0.6)",
+                        borderRight: "1px solid rgba(200, 200, 200, 0.3)",
+                        background: isWeekend ? "rgba(196, 30, 58, 0.08)" : "transparent",
+                        minWidth: 40,
                         textAlign: "center",
                         fontSize: 10,
                       }}
@@ -179,35 +186,37 @@ export default function SchedulePage() {
             </thead>
             <tbody>
               {employees.map((emp) => (
-                <tr key={emp.employeeId} style={{ borderBottom: "1px solid var(--accent)" }}>
-                  <td style={{ padding: 6, borderRight: "1px solid var(--accent)", borderBottom: "1px solid var(--accent)", color: "var(--text-primary)", fontWeight: 600, textAlign: "center", whiteSpace: "nowrap" }}>
+                <tr key={emp.employeeId} style={{ borderBottom: "1px solid rgba(200, 200, 200, 0.3)" }}>
+                  <td style={{ padding: 8, borderRight: "1px solid rgba(200, 200, 200, 0.3)", borderBottom: "1px solid rgba(200, 200, 200, 0.3)", color: "var(--text-primary)", fontWeight: 600, textAlign: "center", whiteSpace: "nowrap" }}>
                     {emp.employeeId}
                   </td>
-                  <td style={{ padding: 6, borderRight: "1px solid var(--accent)", borderBottom: "1px solid var(--accent)", color: "var(--text-primary)", fontWeight: 500, textAlign: "right" }}>
+                  <td style={{ padding: 8, borderRight: "1px solid rgba(200, 200, 200, 0.3)", borderBottom: "1px solid rgba(200, 200, 200, 0.3)", color: "var(--text-primary)", fontWeight: 500, textAlign: "left" }}>
                     {emp.employeeName}
                   </td>
                   {emp.dailyStatus.slice(0, dates.length).map((status, idx) => {
+                    const dayOfWeek = new Date(currentDate.getFullYear(), currentDate.getMonth(), dates[idx]).getDay();
+                    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
                     const getBgColor = () => {
-                      if (!status) return "transparent";
-                      if (status.includes("排休")) return "#FFF4CC"; // 黃色
+                      if (!status) return isWeekend ? "rgba(196, 30, 58, 0.05)" : "transparent";
+                      if (status.includes("排休")) return isWeekend ? "rgba(196, 30, 58, 0.08)" : "#FFF4CC"; // 黃色
                       if (status.includes("駐點")) return "#D4EDDA"; // 綠色
                       if (status.includes("巡檢")) return "#D1ECF1"; // 藍色
                       if (status.includes("上午") || status.includes("下午")) return "#E6D5F5"; // 紫色
                       if (status.includes("(外)")) return "#F8D7DA"; // 紅色
                       if (status.includes("病假")) return "#E2E3E5"; // 灰色
-                      return "transparent";
+                      return isWeekend ? "rgba(196, 30, 58, 0.05)" : "transparent";
                     };
 
                     return (
                       <td
                         key={idx}
                         style={{
-                          padding: 6,
-                          borderRight: "1px solid var(--accent)",
-                          borderBottom: "1px solid var(--accent)",
+                          padding: 8,
+                          borderRight: "1px solid rgba(200, 200, 200, 0.3)",
+                          borderBottom: "1px solid rgba(200, 200, 200, 0.3)",
                           backgroundColor: getBgColor(),
                           textAlign: "center",
-                          color: "var(--text-primary)",
+                          color: isWeekend && !status ? "rgba(100, 100, 100, 0.3)" : "var(--text-primary)",
                           fontSize: 10,
                         }}
                       >
