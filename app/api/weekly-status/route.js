@@ -1,5 +1,7 @@
 import { getSheetsClient } from "@/lib/googleSheets";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request) {
   try {
     const sheets = getSheetsClient();
