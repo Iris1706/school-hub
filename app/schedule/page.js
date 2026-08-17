@@ -129,10 +129,10 @@ export default function SchedulePage() {
           >
             <thead>
               <tr style={{ background: "rgba(99, 102, 241, 0.1)", borderBottom: "1px solid var(--accent)" }}>
-                <th style={{ padding: 6, fontWeight: 600, color: "var(--text-primary)", borderRight: "1px solid var(--accent)", minWidth: 50, textAlign: "center" }}>
+                <th style={{ padding: 6, fontWeight: 600, color: "var(--text-primary)", borderRight: "1px solid var(--accent)", borderBottom: "1px solid var(--accent)", minWidth: 80, textAlign: "center" }}>
                   員工編號
                 </th>
-                <th style={{ padding: 6, fontWeight: 600, color: "var(--text-primary)", borderRight: "1px solid var(--accent)", minWidth: 80, textAlign: "center" }}>
+                <th style={{ padding: 6, fontWeight: 600, color: "var(--text-primary)", borderRight: "1px solid var(--accent)", borderBottom: "1px solid var(--accent)", minWidth: 80, textAlign: "center" }}>
                   姓名
                 </th>
                 {dates.map((date) => (
@@ -143,6 +143,7 @@ export default function SchedulePage() {
                       fontWeight: 600,
                       color: "var(--text-primary)",
                       borderRight: "1px solid var(--accent)",
+                      borderBottom: "1px solid var(--accent)",
                       minWidth: 35,
                       textAlign: "center",
                     }}
@@ -151,14 +152,38 @@ export default function SchedulePage() {
                   </th>
                 ))}
               </tr>
+              <tr style={{ background: "rgba(99, 102, 241, 0.05)", borderBottom: "1px solid var(--accent)" }}>
+                <th style={{ padding: 6, fontWeight: 600, color: "var(--text-muted)", borderRight: "1px solid var(--accent)", borderBottom: "1px solid var(--accent)", minWidth: 80 }}></th>
+                <th style={{ padding: 6, fontWeight: 600, color: "var(--text-muted)", borderRight: "1px solid var(--accent)", borderBottom: "1px solid var(--accent)", minWidth: 80 }}></th>
+                {dates.map((date, idx) => {
+                  const dayName = ["日", "一", "二", "三", "四", "五", "六"][(new Date(currentDate.getFullYear(), currentDate.getMonth(), date).getDay())];
+                  return (
+                    <th
+                      key={`day-${date}`}
+                      style={{
+                        padding: 6,
+                        fontWeight: 600,
+                        color: "var(--text-muted)",
+                        borderRight: "1px solid var(--accent)",
+                        borderBottom: "1px solid var(--accent)",
+                        minWidth: 35,
+                        textAlign: "center",
+                        fontSize: 10,
+                      }}
+                    >
+                      {dayName}
+                    </th>
+                  );
+                })}
+              </tr>
             </thead>
             <tbody>
               {employees.map((emp) => (
                 <tr key={emp.employeeId} style={{ borderBottom: "1px solid var(--accent)" }}>
-                  <td style={{ padding: 6, borderRight: "1px solid var(--accent)", color: "var(--text-primary)", fontWeight: 600, textAlign: "center" }}>
+                  <td style={{ padding: 6, borderRight: "1px solid var(--accent)", borderBottom: "1px solid var(--accent)", color: "var(--text-primary)", fontWeight: 600, textAlign: "center", whiteSpace: "nowrap" }}>
                     {emp.employeeId}
                   </td>
-                  <td style={{ padding: 6, borderRight: "1px solid var(--accent)", color: "var(--text-primary)", fontWeight: 500, textAlign: "center" }}>
+                  <td style={{ padding: 6, borderRight: "1px solid var(--accent)", borderBottom: "1px solid var(--accent)", color: "var(--text-primary)", fontWeight: 500, textAlign: "right" }}>
                     {emp.employeeName}
                   </td>
                   {emp.dailyStatus.slice(0, dates.length).map((status, idx) => {
@@ -179,6 +204,7 @@ export default function SchedulePage() {
                         style={{
                           padding: 6,
                           borderRight: "1px solid var(--accent)",
+                          borderBottom: "1px solid var(--accent)",
                           backgroundColor: getBgColor(),
                           textAlign: "center",
                           color: "var(--text-primary)",
