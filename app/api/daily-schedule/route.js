@@ -5,7 +5,7 @@ export async function GET() {
     const sheets = getSheetsClient();
 
     // 行程表的 Google Sheet ID
-    const SCHEDULE_SHEET_ID = "1Di6ooL-u-AKtGL6McYSBZKu-npQZWkmVbmOe9oY-Sgw";
+    const SCHEDULE_SHEET_ID = "1QnrYP7dDl12oMyD613Sm5cccZDjqeOwj3ho9bZSTsfs";
 
     // 根據當前月份動態構造 Sheet 名稱（例如 2026/8、2026/9）
     const now = new Date();

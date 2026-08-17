@@ -15,6 +15,8 @@ export default function SchedulePage() {
   useEffect(() => {
     loadSchedules();
     loadWeeklyStatus();
+    // 預設選中今天
+    setSelectedDate(new Date());
   }, []);
 
   async function loadWeeklyStatus() {
@@ -176,13 +178,14 @@ export default function SchedulePage() {
         <div
           style={{
             background: "linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%)",
-            borderLeft: "3px solid var(--accent)",
-            padding: 16,
+            border: "1px solid var(--accent)",
+            padding: 12,
             borderRadius: 8,
+            width: "fit-content",
           }}
         >
-          <div style={{ marginBottom: 14, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>{monthName}</h3>
+          <div style={{ marginBottom: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <h3 style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>{monthName}</h3>
             <div style={{ display: "flex", gap: 6 }}>
               <button
                 className="secondary"
@@ -202,16 +205,16 @@ export default function SchedulePage() {
           </div>
 
           {/* 星期頭 */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 4, marginBottom: 8 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 2, marginBottom: 4 }}>
             {dayNames.map((day) => (
               <div
                 key={day}
                 style={{
                   textAlign: "center",
-                  fontSize: 12,
+                  fontSize: 11,
                   color: "var(--text-muted)",
                   fontWeight: 500,
-                  padding: 6,
+                  padding: 4,
                 }}
               >
                 {day}
@@ -220,7 +223,7 @@ export default function SchedulePage() {
           </div>
 
           {/* 日期網格 */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 4 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 2 }}>
             {days.map((date, index) => {
               const isThisMonth = date !== null;
               const isToday = isThisMonth && formatDate(date) === formatDate(new Date());
@@ -235,10 +238,14 @@ export default function SchedulePage() {
                   key={index}
                   onClick={() => isThisMonth && setSelectedDate(date)}
                   style={{
-                    padding: 8,
+                    padding: 6,
                     textAlign: "center",
-                    borderRadius: 6,
-                    fontSize: 12,
+                    borderRadius: 4,
+                    fontSize: 11,
+                    minHeight: 28,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                     background: isSelected
                       ? "var(--accent)"
                       : isToday
