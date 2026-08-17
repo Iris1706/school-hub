@@ -1,9 +1,236 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
 export default function SchedulePage() {
+  const [schedules, setSchedules] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentDate, setCurrentDate] = useState(new Date());
+
+  useEffect(() => {
+    loadSchedules();
+  }, []);
+
+  async function loadSchedules() {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/daily-schedule");
+      const json = await res.json();
+      if (json.error) throw new Error(json.error);
+      setSchedules(json.data || []);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // 取得月份的日期
+  const getDaysInMonth = (date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+
+    const days = [];
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      days.push(null);
+    }
+    for (let i = 1; i <= daysInMonth; i++) {
+      days.push(new Date(year, month, i));
+    }
+    return days;
+  };
+
+  // 判斷是否為當週
+  const isCurrentWeek = (date) => {
+    const today = new Date();
+    const weekStart = new Date(today);
+    weekStart.setDate(today.getDate() - today.getDay());
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+    return date >= weekStart && date <= weekEnd;
+  };
+
+  // 格式化日期
+  const formatDate = (date) => {
+    return date.toISOString().split("T")[0];
+  };
+
+  const days = getDaysInMonth(currentDate);
+  const dayNames = ["日", "一", "二", "三", "四", "五", "六"];
+  const monthName = `${currentDate.getFullYear()} 年 ${currentDate.getMonth() + 1} 月`;
+
   return (
     <div>
       <h1 className="page-title">每日行程</h1>
-      <div className="stub-panel">
-        月曆行程功能尚未串接，之後會讀取班表 Google 試算表並以月曆呈現，外出週次下方列出當週清單。
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1.5fr", gap: 20 }}>
+        {/* 月曆 */}
+        <div
+          style={{
+            background: "linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%)",
+            borderLeft: "3px solid var(--accent)",
+            padding: 16,
+            borderRadius: 8,
+          }}
+        >
+          <div style={{ marginBottom: 14, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>{monthName}</h3>
+            <div style={{ display: "flex", gap: 6 }}>
+              <button
+                className="secondary"
+                onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1))}
+                style={{ padding: "4px 8px", fontSize: 12 }}
+              >
+                ←
+              </button>
+              <button
+                className="secondary"
+                onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1))}
+                style={{ padding: "4px 8px", fontSize: 12 }}
+              >
+                →
+              </button>
+            </div>
+          </div>
+
+          {/* 星期頭 */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 4, marginBottom: 8 }}>
+            {dayNames.map((day) => (
+              <div
+                key={day}
+                style={{
+                  textAlign: "center",
+                  fontSize: 12,
+                  color: "var(--text-muted)",
+                  fontWeight: 500,
+                  padding: 6,
+                }}
+              >
+                {day}
+              </div>
+            ))}
+          </div>
+
+          {/* 日期網格 */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 4 }}>
+            {days.map((date, index) => {
+              const isThisMonth = date !== null;
+              const isToday = isThisMonth && formatDate(date) === formatDate(new Date());
+              const isThisWeek = isThisMonth && isCurrentWeek(date);
+              const hasSchedule =
+                isThisMonth &&
+                schedules.some((s) => s.date && formatDate(new Date(s.date)) === formatDate(date));
+
+              return (
+                <div
+                  key={index}
+                  style={{
+                    padding: 8,
+                    textAlign: "center",
+                    borderRadius: 6,
+                    fontSize: 12,
+                    background: isToday
+                      ? "var(--accent)"
+                      : isThisWeek
+                        ? "rgba(99, 102, 241, 0.1)"
+                        : "transparent",
+                    color: isToday
+                      ? "white"
+                      : isThisMonth
+                        ? "var(--text-primary)"
+                        : "var(--text-muted)",
+                    fontWeight: isToday ? 600 : 400,
+                    border: hasSchedule ? "1px solid var(--accent)" : "1px solid transparent",
+                  }}
+                >
+                  {isThisMonth ? date.getDate() : ""}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 本週行程清單 */}
+        <div>
+          <h3
+            style={{
+              margin: "0 0 12px",
+              fontSize: 16,
+              fontWeight: 600,
+              paddingBottom: 10,
+              borderBottom: "2px solid var(--accent)",
+            }}
+          >
+            📋 本週行程
+          </h3>
+
+          {loading && <p style={{ color: "var(--text-muted)" }}>讀取中...</p>}
+          {error && <p style={{ color: "var(--danger)" }}>讀取失敗：{error}</p>}
+
+          {!loading && schedules.length === 0 && (
+            <p style={{ color: "var(--text-muted)", textAlign: "center", padding: 20 }}>本週沒有行程安排</p>
+          )}
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {schedules.map((schedule, index) => (
+              <div
+                key={index}
+                style={{
+                  background: "linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%)",
+                  borderLeft: "3px solid var(--accent)",
+                  padding: 12,
+                  borderRadius: 6,
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
+                  <p
+                    style={{
+                      fontWeight: 600,
+                      fontSize: 14,
+                      margin: 0,
+                      color: "var(--text-primary)",
+                    }}
+                  >
+                    {schedule.date}
+                  </p>
+                  <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{schedule.time}</span>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 13, color: "var(--text-secondary)" }}>
+                  {schedule.event && (
+                    <div>
+                      <span style={{ color: "var(--text-muted)", fontWeight: 500 }}>事件：</span>
+                      {schedule.event}
+                    </div>
+                  )}
+                  {schedule.person && (
+                    <div>
+                      <span style={{ color: "var(--text-muted)", fontWeight: 500 }}>人員：</span>
+                      {schedule.person}
+                    </div>
+                  )}
+                  {schedule.location && (
+                    <div>
+                      <span style={{ color: "var(--text-muted)", fontWeight: 500 }}>地點：</span>
+                      {schedule.location}
+                    </div>
+                  )}
+                  {schedule.note && (
+                    <div>
+                      <span style={{ color: "var(--text-muted)", fontWeight: 500 }}>備註：</span>
+                      {schedule.note}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
