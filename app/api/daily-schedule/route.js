@@ -13,6 +13,20 @@ export async function GET() {
     const month = now.getMonth() + 1;
     const sheetName = `${year}/${month}`;
 
+    // 先讀取員編-姓名映射表（A5:B13）
+    const employeeMapRes = await sheets.spreadsheets.values.get({
+      spreadsheetId: SCHEDULE_SHEET_ID,
+      range: `'${sheetName}'!A5:B13`,
+    });
+
+    const employeeMapRows = employeeMapRes.data.values || [];
+    const employeeMap = {}; // 姓名 -> 員編
+    employeeMapRows.forEach((row) => {
+      if (row[0] && row[1]) {
+        employeeMap[row[1].trim()] = row[0]; // row[1]=姓名, row[0]=員編
+      }
+    });
+
     // 讀取行程表資料（B20:M 欄）
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SCHEDULE_SHEET_ID,
@@ -26,17 +40,21 @@ export async function GET() {
 
     // 欄位對應：B=日期, C=人員, D=區域, E=地點, F=時間, G=事件, H=備註, I=台數, J=提醒
     const headers = rows[0];
-    const schedules = rows.slice(1).map((row) => ({
-      date: row[0] || "", // B 列：日期
-      person: row[1] || "", // C 列：人員
-      region: row[2] || "", // D 列：區域
-      location: row[3] || "", // E 列：地點
-      time: row[4] || "", // F 列：時間
-      event: row[5] || "", // G 列：事件
-      note: row[6] || "", // H 列：備註
-      devices: row[7] || "", // I 列：台數
-      reminder: row[8] || "", // J 列：提醒
-    }));
+    const schedules = rows.slice(1).map((row) => {
+      const personName = row[1] || "";
+      return {
+        date: row[0] || "", // B 列：日期
+        employeeId: employeeMap[personName.trim()] || "", // 根據姓名查找員編
+        person: personName, // C 列：人員
+        region: row[2] || "", // D 列：區域
+        location: row[3] || "", // E 列：地點
+        time: row[4] || "", // F 列：時間
+        event: row[5] || "", // G 列：事件
+        note: row[6] || "", // H 列：備註
+        devices: row[7] || "", // I 列：台數
+        reminder: row[8] || "", // J 列：提醒
+      };
+    });
 
     // 過濾當週的行程（根據日期）
     const today = new Date();

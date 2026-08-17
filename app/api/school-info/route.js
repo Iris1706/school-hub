@@ -14,7 +14,7 @@ export async function GET() {
     const sheets = getSheetsClient();
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: `${SCHOOL_INFO_TAB}!A1:Z1000`,
+      range: `'${SCHOOL_INFO_TAB}'!A1:Z1000`,
     });
     const rows = res.data.values || [];
     const headers = rows[0] || [];
@@ -45,13 +45,13 @@ export async function POST(request) {
 
     const headerRes = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: `${SCHOOL_INFO_TAB}!A1:Z1`,
+      range: `'${SCHOOL_INFO_TAB}'!A1:Z1`,
     });
     const headers = headerRes.data.values[0] || [];
 
     const currentRes = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: `${SCHOOL_INFO_TAB}!A${row}:Z${row}`,
+      range: `'${SCHOOL_INFO_TAB}'!A${row}:Z${row}`,
     });
     const currentValues = currentRes.data.values ? currentRes.data.values[0] : [];
     const schoolCodeIndex = headers.indexOf("學校代碼");
@@ -67,7 +67,7 @@ export async function POST(request) {
       if (oldValue === newValue) return;
 
       dataUpdates.push({
-        range: `${SCHOOL_INFO_TAB}!${columnLetter(colIndex)}${row}`,
+        range: `'${SCHOOL_INFO_TAB}'!${columnLetter(colIndex)}${row}`,
         values: [[newValue]],
       });
       historyRows.push([
@@ -89,7 +89,7 @@ export async function POST(request) {
     if (historyRows.length > 0) {
       await sheets.spreadsheets.values.append({
         spreadsheetId: SPREADSHEET_ID,
-        range: `${HISTORY_TAB}!A:E`,
+        range: `'${HISTORY_TAB}'!A:E`,
         valueInputOption: "RAW",
         requestBody: { values: historyRows },
       });

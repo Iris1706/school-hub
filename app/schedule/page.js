@@ -311,60 +311,53 @@ export default function SchedulePage() {
             </p>
           )}
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {filteredSchedules.map((schedule, index) => (
-              <div
-                key={index}
-                style={{
-                  background: "linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%)",
-                  borderLeft: "3px solid var(--accent)",
-                  padding: 12,
-                  borderRadius: 6,
-                }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
-                  <p
-                    style={{
-                      fontWeight: 600,
-                      fontSize: 14,
-                      margin: 0,
-                      color: "var(--text-primary)",
-                    }}
-                  >
-                    {schedule.date}
-                  </p>
-                  <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{schedule.time}</span>
-                </div>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 13, color: "var(--text-secondary)" }}>
-                  {schedule.event && (
-                    <div>
-                      <span style={{ color: "var(--text-muted)", fontWeight: 500 }}>事件：</span>
-                      {schedule.event}
-                    </div>
-                  )}
-                  {schedule.person && (
-                    <div>
-                      <span style={{ color: "var(--text-muted)", fontWeight: 500 }}>人員：</span>
+          {!loading && filteredSchedules.length > 0 && (
+            <table style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              fontSize: 13,
+              border: "1px solid var(--accent)",
+            }}>
+              <thead>
+                <tr style={{ background: "rgba(99, 102, 241, 0.1)", borderBottom: "1px solid var(--accent)" }}>
+                  <th style={{ padding: 10, textAlign: "left", fontWeight: 600, borderRight: "1px solid var(--accent)" }}>日期</th>
+                  <th style={{ padding: 10, textAlign: "left", fontWeight: 600, borderRight: "1px solid var(--accent)" }}>時間</th>
+                  <th style={{ padding: 10, textAlign: "left", fontWeight: 600, borderRight: "1px solid var(--accent)" }}>員編</th>
+                  <th style={{ padding: 10, textAlign: "left", fontWeight: 600, borderRight: "1px solid var(--accent)" }}>姓名</th>
+                  <th style={{ padding: 10, textAlign: "left", fontWeight: 600, borderRight: "1px solid var(--accent)" }}>地點</th>
+                  <th style={{ padding: 10, textAlign: "left", fontWeight: 600, borderRight: "1px solid var(--accent)" }}>事件</th>
+                  <th style={{ padding: 10, textAlign: "left", fontWeight: 600 }}>備註</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredSchedules.map((schedule, index) => (
+                  <tr key={index} style={{ borderBottom: "1px solid var(--accent)" }}>
+                    <td style={{ padding: 10, borderRight: "1px solid var(--accent)", color: "var(--text-primary)" }}>
+                      {schedule.date}
+                    </td>
+                    <td style={{ padding: 10, borderRight: "1px solid var(--accent)", color: "var(--text-secondary)" }}>
+                      {schedule.time}
+                    </td>
+                    <td style={{ padding: 10, borderRight: "1px solid var(--accent)", color: "var(--text-primary)", fontWeight: 500 }}>
+                      {schedule.employeeId}
+                    </td>
+                    <td style={{ padding: 10, borderRight: "1px solid var(--accent)", color: "var(--text-secondary)" }}>
                       {schedule.person}
-                    </div>
-                  )}
-                  {schedule.location && (
-                    <div>
-                      <span style={{ color: "var(--text-muted)", fontWeight: 500 }}>地點：</span>
+                    </td>
+                    <td style={{ padding: 10, borderRight: "1px solid var(--accent)", color: "var(--text-secondary)" }}>
                       {schedule.location}
-                    </div>
-                  )}
-                  {schedule.note && (
-                    <div>
-                      <span style={{ color: "var(--text-muted)", fontWeight: 500 }}>備註：</span>
+                    </td>
+                    <td style={{ padding: 10, borderRight: "1px solid var(--accent)", color: "var(--text-secondary)" }}>
+                      {schedule.event}
+                    </td>
+                    <td style={{ padding: 10, color: "var(--text-secondary)" }}>
                       {schedule.note}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>
