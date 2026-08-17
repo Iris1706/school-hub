@@ -56,25 +56,25 @@ export async function GET() {
       };
     });
 
-    // 過濾當週的行程（根據日期）
-    const today = new Date();
-    const weekStart = new Date(today);
-    weekStart.setDate(today.getDate() - today.getDay()); // 取週一
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekStart.getDate() + 6); // 取週日
-
-    const weekSchedules = schedules.filter((s) => {
+    // 返回所有行程（不再限制於當週）
+    const allSchedules = schedules.filter((s) => {
       if (!s.date) return false;
       try {
-        const scheduleDate = new Date(s.date);
-        return scheduleDate >= weekStart && scheduleDate <= weekEnd && s.date.trim() !== "";
+        return s.date.trim() !== "";
       } catch {
         return false;
       }
     });
 
+    // 計算當週日期供參考
+    const today = new Date();
+    const weekStart = new Date(today);
+    weekStart.setDate(today.getDate() - today.getDay());
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+
     return Response.json({
-      data: weekSchedules,
+      data: allSchedules,
       weekStart: weekStart.toISOString().split("T")[0],
       weekEnd: weekEnd.toISOString().split("T")[0],
     });

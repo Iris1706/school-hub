@@ -200,14 +200,14 @@ export default function SchedulePage() {
                     const dayOfWeek = new Date(currentDate.getFullYear(), currentDate.getMonth(), date).getDay();
                     const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
                     const getBgColor = () => {
-                      if (!status) return isWeekend ? "rgba(196, 30, 58, 0.05)" : "transparent";
-                      if (status.includes("排休")) return isWeekend ? "rgba(196, 30, 58, 0.08)" : "#FFF4CC"; // 黃色
+                      if (!status) return "#7a7a7a"; // 深灰色 - 沒有排班內容
+                      if (status.includes("排休")) return "#FFF4CC"; // 黃色
                       if (status.includes("駐點")) return "#D4EDDA"; // 綠色
                       if (status.includes("巡檢")) return "#D1ECF1"; // 藍色
                       if (status.includes("上午") || status.includes("下午")) return "#E6D5F5"; // 紫色
                       if (status.includes("(外)")) return "#F8D7DA"; // 紅色
                       if (status.includes("病假")) return "#E2E3E5"; // 灰色
-                      return isWeekend ? "rgba(196, 30, 58, 0.05)" : "transparent";
+                      return "#7a7a7a"; // 深灰色 - 預設
                     };
 
                     return (
