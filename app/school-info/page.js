@@ -153,40 +153,45 @@ export default function SchoolInfoPage() {
       {search && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           {filtered.map((s) => (
-            <div className="card" key={s.__row}>
-              {FIELD_GROUPS.map((group) => {
-              const visible = group.fields.filter(
-                (f) => !HEADER_FIELDS.has(f.key) && (s[f.key] || "").trim() !== ""
-              );
-              if (visible.length === 0) return null;
-              return (
-                <div
-                  key={group.title}
-                  style={{ marginTop: 6, paddingTop: 6, borderTop: "1px solid var(--border)" }}
-                >
-                  <p style={{ fontSize: 10, color: "var(--text-muted)", margin: "0 0 3px" }}>
-                    {group.title}
-                  </p>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 2, fontSize: 12, color: "var(--text-secondary)" }}>
-                    {visible.map((f) => {
-                      const Icon = f.icon ? ICONS[f.icon] : null;
-                      return (
-                        <div key={f.key} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                          {Icon ? (
-                            <Icon size={13} style={{ color: "var(--text-muted)", flexShrink: 0 }} />
-                          ) : (
-                            <span>{f.label}：</span>
-                          )}
-                          <span>{s[f.key]}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
+            <div className="card" key={s.__row} style={{ background: "linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)", borderLeft: "3px solid var(--accent)" }}>
+              <div style={{ marginBottom: 14 }}>
+                <p style={{ fontWeight: 600, fontSize: 16, margin: "0 0 4px", color: "var(--text-primary)" }}>
+                  {s[TITLE_FIELD]}
+                </p>
+                <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
+                  {s["學校代碼"]}
+                </span>
+              </div>
 
-            <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {FIELD_GROUPS.map((group) => {
+                const visible = group.fields.filter(
+                  (f) => !HEADER_FIELDS.has(f.key) && (s[f.key] || "").trim() !== ""
+                );
+                if (visible.length === 0) return null;
+                return (
+                  <div key={group.title}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 13, color: "var(--text-secondary)" }}>
+                      {visible.map((f) => {
+                        const Icon = f.icon ? ICONS[f.icon] : null;
+                        return (
+                          <div key={f.key} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                            {Icon ? (
+                              <Icon size={14} style={{ color: "var(--accent)", flexShrink: 0, marginTop: 2 }} />
+                            ) : (
+                              <span style={{ color: "var(--text-muted)", minWidth: "60px" }}>{f.label}</span>
+                            )}
+                            <span style={{ flex: 1 }}>{s[f.key]}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+              </div>
+
+              <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
               <button onClick={() => setEditing(s)}>編輯</button>
               <button className="secondary" onClick={() => openHistory(s["學校代碼"])}>
                 修改歷程
