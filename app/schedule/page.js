@@ -15,9 +15,11 @@ export default function SchedulePage() {
   useEffect(() => {
     loadSchedules();
     loadWeeklyStatus();
-    // 預設選中今天
-    setSelectedDate(new Date());
-  }, []);
+    // 預設選中今天（僅首次加載）
+    if (selectedDate === null) {
+      setSelectedDate(new Date());
+    }
+  }, [currentDate]);
 
   async function loadWeeklyStatus() {
     setStatusLoading(true);
@@ -118,7 +120,7 @@ export default function SchedulePage() {
               color: "var(--text-primary)",
             }}
           >
-            📊 本月員工排班表
+            本月員工排班表
           </h3>
           <table
             style={{
@@ -132,7 +134,7 @@ export default function SchedulePage() {
                 <th style={{ padding: 8, fontWeight: 600, color: "var(--text-primary)", borderRight: "1px solid rgba(200, 200, 200, 0.3)", minWidth: 70, textAlign: "center", fontSize: 12 }}>
                   員工編號
                 </th>
-                <th style={{ padding: 8, fontWeight: 600, color: "var(--text-primary)", borderRight: "1px solid rgba(200, 200, 200, 0.3)", minWidth: 120, textAlign: "left", fontSize: 12 }}>
+                <th style={{ padding: 8, fontWeight: 600, color: "var(--text-primary)", borderRight: "1px solid rgba(200, 200, 200, 0.3)", minWidth: 120, textAlign: "center", fontSize: 12 }}>
                   姓名
                 </th>
                 {dates.map((date) => {
@@ -190,11 +192,12 @@ export default function SchedulePage() {
                   <td style={{ padding: 8, borderRight: "1px solid rgba(200, 200, 200, 0.3)", borderBottom: "1px solid rgba(200, 200, 200, 0.3)", color: "var(--text-primary)", fontWeight: 600, textAlign: "center", whiteSpace: "nowrap" }}>
                     {emp.employeeId}
                   </td>
-                  <td style={{ padding: 8, borderRight: "1px solid rgba(200, 200, 200, 0.3)", borderBottom: "1px solid rgba(200, 200, 200, 0.3)", color: "var(--text-primary)", fontWeight: 500, textAlign: "left" }}>
+                  <td style={{ padding: 8, borderRight: "1px solid rgba(200, 200, 200, 0.3)", borderBottom: "1px solid rgba(200, 200, 200, 0.3)", color: "var(--text-primary)", fontWeight: 500, textAlign: "center" }}>
                     {emp.employeeName}
                   </td>
-                  {emp.dailyStatus.slice(0, dates.length).map((status, idx) => {
-                    const dayOfWeek = new Date(currentDate.getFullYear(), currentDate.getMonth(), dates[idx]).getDay();
+                  {dates.map((date, idx) => {
+                    const status = emp.dailyStatus[idx] || "";
+                    const dayOfWeek = new Date(currentDate.getFullYear(), currentDate.getMonth(), date).getDay();
                     const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
                     const getBgColor = () => {
                       if (!status) return isWeekend ? "rgba(196, 30, 58, 0.05)" : "transparent";
@@ -237,12 +240,12 @@ export default function SchedulePage() {
           style={{
             background: "linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%)",
             border: "1px solid var(--accent)",
-            padding: 12,
+            padding: 8,
             borderRadius: 8,
             width: "fit-content",
           }}
         >
-          <div style={{ marginBottom: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ marginBottom: 6, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <h3 style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>{monthName}</h3>
             <div style={{ display: "flex", gap: 6 }}>
               <button
