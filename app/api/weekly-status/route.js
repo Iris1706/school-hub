@@ -11,10 +11,10 @@ export async function GET() {
     const month = now.getMonth() + 1;
     const sheetName = `${year}/${month}`;
 
-    // 讀取員工狀態表（A6:AG13 欄）
+    // 讀取完整排班表（A5:AG13）
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SCHEDULE_SHEET_ID,
-      range: `'${sheetName}'!A6:AG13`,
+      range: `'${sheetName}'!A5:AG13`,
     });
 
     const rows = response.data.values || [];
@@ -22,65 +22,38 @@ export async function GET() {
       return Response.json({ data: [] });
     }
 
-    // 取得當週日期
-    const today = new Date();
-    const weekStart = new Date(today);
-    weekStart.setDate(today.getDate() - today.getDay());
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekStart.getDate() + 6);
-
-    // 從表頭(第一行)取得日期，對應到當週
+    // 第一行是日期和其他信息
     const headers = rows[0];
-    let weekDayIndices = [];
 
-    // 查找當週五個工作日(一到五)在表中的欄位位置
-    for (let i = 1; i < headers.length && weekDayIndices.length < 5; i++) {
-      try {
-        const dateStr = headers[i];
-        if (!dateStr) continue;
-
-        const scheduleDate = new Date(dateStr);
-        const dayOfWeek = scheduleDate.getDay();
-
-        // 只包含一到五(工作日)
-        if (dayOfWeek >= 1 && dayOfWeek <= 5 && scheduleDate >= weekStart && scheduleDate <= weekEnd) {
-          weekDayIndices.push({ colIndex: i, date: dateStr, dayOfWeek });
-        }
-      } catch {
-        continue;
-      }
-    }
-
-    // 排序以確保順序正確
-    weekDayIndices.sort((a, b) => a.dayOfWeek - b.dayOfWeek);
-
-    // 解析員工狀態
+    // 解析員工排班數據
     const employees = [];
     for (let rowIdx = 1; rowIdx < rows.length; rowIdx++) {
       const row = rows[rowIdx];
-      const employeeName = row[0];
+      if (!row || row.length === 0) continue;
 
-      if (!employeeName || employeeName.trim() === "") continue;
+      const employeeId = row[0] || ""; // A列：員工編號
+      const employeeName = row[1] || ""; // B列：姓名
 
-      const statusByDay = [];
-      for (const { colIndex } of weekDayIndices) {
-        const status = row[colIndex] || "";
-        statusByDay.push(status);
-      }
+      if (!employeeId || !employeeName) continue;
+
+      // C列開始是每天的狀態（日期1-31）
+      const dailyStatus = row.slice(2); // 從第3個元素開始（C列）
 
       employees.push({
-        name: employeeName,
-        status: statusByDay,
+        employeeId,
+        employeeName,
+        dailyStatus, // 31天的狀態
       });
     }
 
-    const dayLabels = ["一", "二", "三", "四", "五"];
+    // 日期數組（1-31）
+    const dates = Array.from({ length: 31 }, (_, i) => i + 1);
 
     return Response.json({
       data: employees,
-      dayLabels,
-      weekStart: weekStart.toISOString().split("T")[0],
-      weekEnd: weekEnd.toISOString().split("T")[0],
+      dates,
+      month,
+      year,
     });
   } catch (error) {
     console.error("讀取員工狀態失敗：", error);

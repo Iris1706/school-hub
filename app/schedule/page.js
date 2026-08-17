@@ -9,7 +9,7 @@ export default function SchedulePage() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [employees, setEmployees] = useState([]);
-  const [dayLabels, setDayLabels] = useState([]);
+  const [dates, setDates] = useState([]);
   const [statusLoading, setStatusLoading] = useState(true);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export default function SchedulePage() {
       const json = await res.json();
       if (json.error) throw new Error(json.error);
       setEmployees(json.data || []);
-      setDayLabels(json.dayLabels || []);
+      setDates(json.dates || []);
     } catch (err) {
       console.error("讀取員工狀態失敗：", err.message);
     } finally {
@@ -98,12 +98,12 @@ export default function SchedulePage() {
     <div>
       <h1 className="page-title">每日行程</h1>
 
-      {/* 本週員工狀態表 */}
+      {/* 本月員工排班表 */}
       {!statusLoading && employees.length > 0 && (
         <div
           style={{
             background: "linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%)",
-            borderLeft: "3px solid var(--accent)",
+            border: "1px solid var(--accent)",
             padding: 16,
             borderRadius: 8,
             marginBottom: 20,
@@ -118,54 +118,77 @@ export default function SchedulePage() {
               color: "var(--text-primary)",
             }}
           >
-            📊 本週人員狀態
+            📊 本月員工排班表
           </h3>
           <table
             style={{
-              width: "100%",
               borderCollapse: "collapse",
-              fontSize: 12,
+              fontSize: 11,
+              border: "1px solid var(--accent)",
             }}
           >
             <thead>
-              <tr style={{ borderBottom: "1px solid var(--accent)" }}>
-                <th style={{ textAlign: "left", padding: 8, fontWeight: 600, color: "var(--text-primary)" }}>
-                  人員
+              <tr style={{ background: "rgba(99, 102, 241, 0.1)", borderBottom: "1px solid var(--accent)" }}>
+                <th style={{ padding: 6, fontWeight: 600, color: "var(--text-primary)", borderRight: "1px solid var(--accent)", minWidth: 50, textAlign: "center" }}>
+                  員工編號
                 </th>
-                {dayLabels.map((day) => (
+                <th style={{ padding: 6, fontWeight: 600, color: "var(--text-primary)", borderRight: "1px solid var(--accent)", minWidth: 80, textAlign: "center" }}>
+                  姓名
+                </th>
+                {dates.map((date) => (
                   <th
-                    key={day}
+                    key={date}
                     style={{
-                      textAlign: "center",
-                      padding: 8,
+                      padding: 6,
                       fontWeight: 600,
                       color: "var(--text-primary)",
-                      minWidth: 60,
+                      borderRight: "1px solid var(--accent)",
+                      minWidth: 35,
+                      textAlign: "center",
                     }}
                   >
-                    {day}
+                    {date}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {employees.map((emp) => (
-                <tr key={emp.name} style={{ borderBottom: "1px solid rgba(99, 102, 241, 0.1)" }}>
-                  <td style={{ padding: 8, color: "var(--text-primary)", fontWeight: 500 }}>
-                    {emp.name}
+                <tr key={emp.employeeId} style={{ borderBottom: "1px solid var(--accent)" }}>
+                  <td style={{ padding: 6, borderRight: "1px solid var(--accent)", color: "var(--text-primary)", fontWeight: 600, textAlign: "center" }}>
+                    {emp.employeeId}
                   </td>
-                  {emp.status.map((status, idx) => (
-                    <td
-                      key={idx}
-                      style={{
-                        textAlign: "center",
-                        padding: 8,
-                        color: status === "駐點" ? "var(--success, #10b981)" : status === "外出" ? "var(--warning, #f59e0b)" : "var(--text-muted)",
-                      }}
-                    >
-                      {status}
-                    </td>
-                  ))}
+                  <td style={{ padding: 6, borderRight: "1px solid var(--accent)", color: "var(--text-primary)", fontWeight: 500, textAlign: "center" }}>
+                    {emp.employeeName}
+                  </td>
+                  {emp.dailyStatus.slice(0, dates.length).map((status, idx) => {
+                    const getBgColor = () => {
+                      if (!status) return "transparent";
+                      if (status.includes("排休")) return "#FFF4CC"; // 黃色
+                      if (status.includes("駐點")) return "#D4EDDA"; // 綠色
+                      if (status.includes("巡檢")) return "#D1ECF1"; // 藍色
+                      if (status.includes("上午") || status.includes("下午")) return "#E6D5F5"; // 紫色
+                      if (status.includes("(外)")) return "#F8D7DA"; // 紅色
+                      if (status.includes("病假")) return "#E2E3E5"; // 灰色
+                      return "transparent";
+                    };
+
+                    return (
+                      <td
+                        key={idx}
+                        style={{
+                          padding: 6,
+                          borderRight: "1px solid var(--accent)",
+                          backgroundColor: getBgColor(),
+                          textAlign: "center",
+                          color: "var(--text-primary)",
+                          fontSize: 10,
+                        }}
+                      >
+                        {status}
+                      </td>
+                    );
+                  })}
                 </tr>
               ))}
             </tbody>
@@ -320,37 +343,33 @@ export default function SchedulePage() {
             }}>
               <thead>
                 <tr style={{ background: "rgba(99, 102, 241, 0.1)", borderBottom: "1px solid var(--accent)" }}>
-                  <th style={{ padding: 10, textAlign: "left", fontWeight: 600, borderRight: "1px solid var(--accent)" }}>日期</th>
-                  <th style={{ padding: 10, textAlign: "left", fontWeight: 600, borderRight: "1px solid var(--accent)" }}>時間</th>
-                  <th style={{ padding: 10, textAlign: "left", fontWeight: 600, borderRight: "1px solid var(--accent)" }}>員編</th>
-                  <th style={{ padding: 10, textAlign: "left", fontWeight: 600, borderRight: "1px solid var(--accent)" }}>姓名</th>
-                  <th style={{ padding: 10, textAlign: "left", fontWeight: 600, borderRight: "1px solid var(--accent)" }}>地點</th>
-                  <th style={{ padding: 10, textAlign: "left", fontWeight: 600, borderRight: "1px solid var(--accent)" }}>事件</th>
-                  <th style={{ padding: 10, textAlign: "left", fontWeight: 600 }}>備註</th>
+                  <th style={{ padding: 10, textAlign: "center", fontWeight: 600, borderRight: "1px solid var(--accent)" }}>日期</th>
+                  <th style={{ padding: 10, textAlign: "center", fontWeight: 600, borderRight: "1px solid var(--accent)" }}>時間</th>
+                  <th style={{ padding: 10, textAlign: "center", fontWeight: 600, borderRight: "1px solid var(--accent)" }}>負責人</th>
+                  <th style={{ padding: 10, textAlign: "center", fontWeight: 600, borderRight: "1px solid var(--accent)" }}>地點</th>
+                  <th style={{ padding: 10, textAlign: "center", fontWeight: 600, borderRight: "1px solid var(--accent)" }}>事件</th>
+                  <th style={{ padding: 10, textAlign: "center", fontWeight: 600 }}>備註</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredSchedules.map((schedule, index) => (
                   <tr key={index} style={{ borderBottom: "1px solid var(--accent)" }}>
-                    <td style={{ padding: 10, borderRight: "1px solid var(--accent)", color: "var(--text-primary)" }}>
+                    <td style={{ padding: 10, borderRight: "1px solid var(--accent)", color: "var(--text-primary)", textAlign: "center" }}>
                       {schedule.date}
                     </td>
-                    <td style={{ padding: 10, borderRight: "1px solid var(--accent)", color: "var(--text-secondary)" }}>
+                    <td style={{ padding: 10, borderRight: "1px solid var(--accent)", color: "var(--text-secondary)", textAlign: "center" }}>
                       {schedule.time}
                     </td>
-                    <td style={{ padding: 10, borderRight: "1px solid var(--accent)", color: "var(--text-primary)", fontWeight: 500 }}>
-                      {schedule.employeeId}
-                    </td>
-                    <td style={{ padding: 10, borderRight: "1px solid var(--accent)", color: "var(--text-secondary)" }}>
+                    <td style={{ padding: 10, borderRight: "1px solid var(--accent)", color: "var(--text-secondary)", textAlign: "center" }}>
                       {schedule.person}
                     </td>
-                    <td style={{ padding: 10, borderRight: "1px solid var(--accent)", color: "var(--text-secondary)" }}>
+                    <td style={{ padding: 10, borderRight: "1px solid var(--accent)", color: "var(--text-secondary)", textAlign: "center" }}>
                       {schedule.location}
                     </td>
-                    <td style={{ padding: 10, borderRight: "1px solid var(--accent)", color: "var(--text-secondary)" }}>
+                    <td style={{ padding: 10, borderRight: "1px solid var(--accent)", color: "var(--text-secondary)", textAlign: "center" }}>
                       {schedule.event}
                     </td>
-                    <td style={{ padding: 10, color: "var(--text-secondary)" }}>
+                    <td style={{ padding: 10, color: "var(--text-secondary)", textAlign: "center" }}>
                       {schedule.note}
                     </td>
                   </tr>
