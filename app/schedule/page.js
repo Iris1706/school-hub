@@ -104,12 +104,13 @@ export default function SchedulePage() {
       {!statusLoading && employees.length > 0 && (
         <div
           style={{
-            background: "linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%)",
-            border: "1px solid var(--accent)",
+            background: "linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(168, 85, 247, 0.08) 100%)",
+            border: "1px solid rgba(99, 102, 241, 0.2)",
             padding: 16,
-            borderRadius: 8,
+            borderRadius: 12,
             marginBottom: 20,
             overflowX: "auto",
+            boxShadow: "0 4px 16px rgba(99, 102, 241, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.5)",
           }}
         >
           <h3
@@ -234,7 +235,7 @@ export default function SchedulePage() {
         </div>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: 20, alignItems: "start" }}>
         {/* 月曆 */}
         <div
           style={{
@@ -243,6 +244,7 @@ export default function SchedulePage() {
             padding: 8,
             borderRadius: 8,
             width: "fit-content",
+            height: "fit-content",
           }}
         >
           <div style={{ marginBottom: 6, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -333,17 +335,39 @@ export default function SchedulePage() {
 
         {/* 本週行程清單 */}
         <div>
-          <h3
-            style={{
-              margin: "0 0 12px",
-              fontSize: 16,
-              fontWeight: 600,
-              paddingBottom: 10,
-              borderBottom: "2px solid var(--accent)",
-            }}
-          >
-            📋 {selectedDate ? `${formatDate(selectedDate)} 的行程` : "本週行程"}
-          </h3>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+            <h3
+              style={{
+                margin: 0,
+                fontSize: 16,
+                fontWeight: 600,
+                paddingBottom: 10,
+                borderBottom: "2px solid var(--accent)",
+                flex: 1,
+              }}
+            >
+              📋 {selectedDate ? `${formatDate(selectedDate)} 的行程` : "本週行程"}
+            </h3>
+            <div style={{ display: "flex", gap: 6, marginLeft: 16 }}>
+              <button
+                className="secondary"
+                onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1))}
+                style={{ padding: "4px 8px", fontSize: 12 }}
+              >
+                ←
+              </button>
+              <div style={{ fontSize: 12, color: "var(--text-muted)", padding: "4px 8px", minWidth: 60, textAlign: "center" }}>
+                {currentDate.getFullYear()} 年 {currentDate.getMonth() + 1} 月
+              </div>
+              <button
+                className="secondary"
+                onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1))}
+                style={{ padding: "4px 8px", fontSize: 12 }}
+              >
+                →
+              </button>
+            </div>
+          </div>
 
           {loading && <p style={{ color: "var(--text-muted)" }}>讀取中...</p>}
           {error && <p style={{ color: "var(--danger)" }}>讀取失敗：{error}</p>}
