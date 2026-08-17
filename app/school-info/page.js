@@ -131,6 +131,17 @@ export default function SchoolInfoPage() {
     }
   }
 
+  // 統計資訊
+  const stats = useMemo(() => {
+    if (loading || !schools.length) return null;
+    const regions = {};
+    schools.forEach((s) => {
+      const region = (s["行政區合併學校名稱"] || "").split("-")[0] || "未分類";
+      regions[region] = (regions[region] || 0) + 1;
+    });
+    return { total: schools.length, regions };
+  }, [schools, loading]);
+
   return (
     <div>
       <h1 className="page-title">學校資訊</h1>
@@ -140,7 +151,15 @@ export default function SchoolInfoPage() {
         placeholder="搜尋學校名稱..."
         value={searchInput}
         onChange={(e) => setSearchInput(e.target.value)}
-        style={{ width: "100%", marginBottom: 18 }}
+        style={{
+          width: "100%",
+          marginBottom: 18,
+          padding: "10px 12px",
+          border: "1px solid rgba(99, 102, 241, 0.2)",
+          borderRadius: 8,
+          fontSize: 14,
+          boxShadow: "0 2px 8px rgba(99, 102, 241, 0.08)",
+        }}
       />
 
       {loading && <p style={{ color: "var(--text-muted)" }}>讀取中...</p>}
@@ -150,10 +169,55 @@ export default function SchoolInfoPage() {
         </p>
       )}
 
+      {!search && stats && (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12, marginBottom: 20 }}>
+          <div
+            style={{
+              background: "linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%)",
+              border: "1px solid rgba(99, 102, 241, 0.25)",
+              borderRadius: 12,
+              padding: 16,
+              boxShadow: "0 8px 24px rgba(99, 102, 241, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.6)",
+            }}
+          >
+            <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 8, fontWeight: 500 }}>總學校數</div>
+            <div style={{ fontSize: 28, fontWeight: 700, color: "var(--accent)" }}>{stats.total}</div>
+          </div>
+          {Object.entries(stats.regions)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 3)
+            .map(([region, count]) => (
+              <div
+                key={region}
+                style={{
+                  background: "linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%)",
+                  border: "1px solid rgba(139, 92, 246, 0.2)",
+                  borderRadius: 12,
+                  padding: 16,
+                  boxShadow: "0 8px 24px rgba(139, 92, 246, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5)",
+                }}
+              >
+                <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 8, fontWeight: 500 }}>{region}</div>
+                <div style={{ fontSize: 24, fontWeight: 700, color: "#8b5cf6" }}>{count}</div>
+              </div>
+            ))}
+        </div>
+      )}
+
       {search && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           {filtered.map((s) => (
-            <div className="card" key={s.__row} style={{ background: "linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)", borderLeft: "3px solid var(--accent)" }}>
+            <div
+              className="card"
+              key={s.__row}
+              style={{
+                background: "linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%)",
+                border: "1px solid rgba(99, 102, 241, 0.3)",
+                borderLeft: "4px solid var(--accent)",
+                borderRadius: 12,
+                boxShadow: "0 12px 32px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)",
+              }}
+            >
               <div style={{ marginBottom: 14 }}>
                 <p style={{ fontWeight: 600, fontSize: 16, margin: "0 0 4px", color: "var(--text-primary)" }}>
                   {s[TITLE_FIELD]}
