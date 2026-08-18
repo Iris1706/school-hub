@@ -1,173 +1,145 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Trash2, Plus, CheckCircle2, Circle } from 'lucide-react';
+
+const STATUS_ORDER = {
+  '急': 1,
+  '不急': 2,
+  '可等待': 3,
+};
 
 export default function TodoPage() {
   const [todos, setTodos] = useState([]);
-  const [newTodo, setNewTodo] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // 從 localStorage 載入待辦事項
+  // 從 API 載入待辦事項
   useEffect(() => {
-    const saved = localStorage.getItem('todos');
-    if (saved) {
-      setTodos(JSON.parse(saved));
-    }
+    const fetchTodos = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch('/api/todos');
+        if (!res.ok) throw new Error('Failed to fetch todos');
+        const { data } = await res.json();
+        setTodos(data || []);
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+        setTodos([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTodos();
   }, []);
 
-  // 保存到 localStorage
-  const saveTodos = (newTodos) => {
-    setTodos(newTodos);
-    localStorage.setItem('todos', JSON.stringify(newTodos));
+  // 分組和排序
+  const pendingTodos = todos
+    .filter((t) => !t.完成日期)
+    .sort((a, b) => {
+      const orderA = STATUS_ORDER[a.狀態] || 999;
+      const orderB = STATUS_ORDER[b.狀態] || 999;
+      return orderA - orderB;
+    });
+
+  const completedTodos = todos
+    .filter((t) => t.完成日期)
+    .sort((a, b) => {
+      const orderA = STATUS_ORDER[a.狀態] || 999;
+      const orderB = STATUS_ORDER[b.狀態] || 999;
+      return orderA - orderB;
+    });
+
+  // 狀態標籤樣式
+  const getStatusStyle = (status) => {
+    const styles = {
+      '急': { backgroundColor: '#ef4444', color: 'white' },
+      '不急': { backgroundColor: '#f59e0b', color: 'white' },
+      '可等待': { backgroundColor: '#6b7280', color: 'white' },
+    };
+    return styles[status] || { backgroundColor: '#d1d5db', color: 'white' };
   };
 
-  // 新增待辦事項
-  const addTodo = () => {
-    if (newTodo.trim()) {
-      const newItem = {
-        id: Date.now(),
-        text: newTodo,
-        completed: false,
-        createdAt: new Date().toLocaleString('zh-TW'),
-      };
-      saveTodos([...todos, newItem]);
-      setNewTodo('');
-    }
-  };
+  // 待辦清單項目
+  const TodoItem = ({ item, isCompleted = false }) => (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '12px 16px',
+        backgroundColor: isCompleted
+          ? 'var(--background-secondary, #f9f9f9)'
+          : 'var(--background, white)',
+        borderRadius: '6px',
+        border: '1px solid var(--border-color, #ccc)',
+        gap: '8px',
+        opacity: isCompleted ? 0.7 : 1,
+      }}
+    >
+      {/* 第一列：事件 + 狀態標籤 */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
+        <div
+          style={{
+            fontSize: '14px',
+            fontWeight: '500',
+            color: 'var(--text-primary, black)',
+            textDecoration: isCompleted ? 'line-through' : 'none',
+            flex: 1,
+            wordBreak: 'break-word',
+          }}
+        >
+          {item.事件}
+        </div>
+        {item.狀態 && (
+          <span
+            style={{
+              fontSize: '12px',
+              fontWeight: '600',
+              padding: '4px 10px',
+              borderRadius: '4px',
+              whiteSpace: 'nowrap',
+              ...getStatusStyle(item.狀態),
+            }}
+          >
+            {item.狀態}
+          </span>
+        )}
+      </div>
 
-  // 切換完成狀態
-  const toggleComplete = (id) => {
-    const updated = todos.map((todo) =>
-      todo.id === id ? { ...todo, completed: !todo.completed } : todo
-    );
-    saveTodos(updated);
-  };
+      {/* 第二列：日期、學校等資訊 */}
+      <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+        {item.日期 && (
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary, #666)' }}>
+            <span style={{ fontWeight: '600' }}>日期：</span>{item.日期}
+          </div>
+        )}
+        {item.學校 && (
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary, #666)' }}>
+            <span style={{ fontWeight: '600' }}>學校：</span>{item.學校}
+          </div>
+        )}
+        {isCompleted && item.完成日期 && (
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary, #666)' }}>
+            <span style={{ fontWeight: '600' }}>完成日期：</span>{item.完成日期}
+          </div>
+        )}
+      </div>
 
-  // 刪除待辦事項
-  const deleteTodo = (id) => {
-    saveTodos(todos.filter((todo) => todo.id !== id));
-  };
-
-  // 計算統計數據
-  const completedCount = todos.filter((t) => t.completed).length;
-  const totalCount = todos.length;
-  const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+      {/* 備註 */}
+      {item.備註 && (
+        <div style={{ fontSize: '12px', color: 'var(--text-secondary, #666)', fontStyle: 'italic' }}>
+          {item.備註}
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div>
       <h1 className="page-title">待辦事項</h1>
 
-      {/* 統計卡片 */}
-      {totalCount > 0 && (
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr 1fr',
-            gap: '16px',
-            marginBottom: '24px',
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: 'var(--background-secondary, #f9f9f9)',
-              padding: '16px',
-              borderRadius: '8px',
-              textAlign: 'center',
-              borderLeft: '3px solid #10b981',
-            }}
-          >
-            <div style={{ fontSize: '24px', fontWeight: '600', color: '#10b981' }}>
-              {completedCount}
-            </div>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-              已完成
-            </div>
-          </div>
-          <div
-            style={{
-              backgroundColor: 'var(--background-secondary, #f9f9f9)',
-              padding: '16px',
-              borderRadius: '8px',
-              textAlign: 'center',
-              borderLeft: '3px solid #3b82f6',
-            }}
-          >
-            <div style={{ fontSize: '24px', fontWeight: '600', color: '#3b82f6' }}>
-              {totalCount - completedCount}
-            </div>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-              待進行
-            </div>
-          </div>
-          <div
-            style={{
-              backgroundColor: 'var(--background-secondary, #f9f9f9)',
-              padding: '16px',
-              borderRadius: '8px',
-              textAlign: 'center',
-              borderLeft: '3px solid #8b5cf6',
-            }}
-          >
-            <div style={{ fontSize: '24px', fontWeight: '600', color: '#8b5cf6' }}>
-              {percentage}%
-            </div>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-              完成度
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 新增待辦事項 */}
-      <div
-        style={{
-          display: 'flex',
-          gap: '8px',
-          marginBottom: '24px',
-        }}
-      >
-        <input
-          type="text"
-          value={newTodo}
-          onChange={(e) => setNewTodo(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && addTodo()}
-          placeholder="輸入新的待辦事項..."
-          style={{
-            flex: 1,
-            padding: '12px 16px',
-            borderRadius: '6px',
-            border: '1px solid var(--border-color, #ccc)',
-            fontSize: '14px',
-            backgroundColor: 'var(--background, white)',
-            color: 'var(--text-primary, black)',
-          }}
-        />
-        <button
-          onClick={addTodo}
-          style={{
-            padding: '12px 16px',
-            backgroundColor: 'var(--accent)',
-            color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: '500',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            transition: 'opacity 0.2s',
-          }}
-          onMouseOver={(e) => (e.target.style.opacity = '0.9')}
-          onMouseOut={(e) => (e.target.style.opacity = '1')}
-        >
-          <Plus size={18} />
-          新增
-        </button>
-      </div>
-
-      {/* 待辦事項清單 */}
-      {todos.length === 0 ? (
+      {loading && (
         <div
           style={{
             textAlign: 'center',
@@ -175,103 +147,81 @@ export default function TodoPage() {
             color: 'var(--text-secondary)',
           }}
         >
-          <p style={{ fontSize: '14px', margin: 0 }}>
-            📋 暫無待辦事項。開始新增您的第一項任務吧！
-          </p>
+          <p style={{ fontSize: '14px', margin: 0 }}>載入中...</p>
         </div>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {todos.map((todo) => (
-            <div
-              key={todo.id}
+      )}
+
+      {error && (
+        <div
+          style={{
+            padding: '12px 16px',
+            backgroundColor: '#fee2e2',
+            color: '#991b1b',
+            borderRadius: '6px',
+            marginBottom: '24px',
+            fontSize: '14px',
+          }}
+        >
+          錯誤：{error}
+        </div>
+      )}
+
+      {!loading && !error && (
+        <>
+          {/* 待處理事項 */}
+          <div style={{ marginBottom: '32px' }}>
+            <h2
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '12px 16px',
-                backgroundColor: todo.completed
-                  ? 'var(--background-secondary, #f9f9f9)'
-                  : 'var(--background, white)',
-                borderRadius: '6px',
-                border: '1px solid var(--border-color, #ccc)',
-                transition: 'all 0.2s',
-                opacity: todo.completed ? 0.7 : 1,
+                fontSize: '16px',
+                fontWeight: '600',
+                marginBottom: '12px',
+                color: 'var(--text-primary, black)',
               }}
             >
-              {/* 完成按鈕 */}
-              <button
-                onClick={() => toggleComplete(todo.id)}
+              待處理事項 ({pendingTodos.length})
+            </h2>
+            {pendingTodos.length === 0 ? (
+              <div
                 style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  color: todo.completed ? '#10b981' : 'var(--border-color, #ccc)',
-                  transition: 'color 0.2s',
+                  textAlign: 'center',
+                  padding: '32px 20px',
+                  color: 'var(--text-secondary)',
+                  backgroundColor: 'var(--background-secondary, #f9f9f9)',
+                  borderRadius: '6px',
                 }}
-                title={todo.completed ? '標記為未完成' : '標記為完成'}
               >
-                {todo.completed ? (
-                  <CheckCircle2 size={20} />
-                ) : (
-                  <Circle size={20} />
-                )}
-              </button>
-
-              {/* 文字內容 */}
-              <div style={{ flex: 1 }}>
-                <div
-                  style={{
-                    fontSize: '14px',
-                    color: 'var(--text-primary, black)',
-                    textDecoration: todo.completed ? 'line-through' : 'none',
-                    wordBreak: 'break-word',
-                  }}
-                >
-                  {todo.text}
-                </div>
-                <div
-                  style={{
-                    fontSize: '12px',
-                    color: 'var(--text-secondary, #666)',
-                    marginTop: '4px',
-                  }}
-                >
-                  {todo.createdAt}
-                </div>
+                <p style={{ fontSize: '14px', margin: 0 }}>✨ 沒有待處理事項</p>
               </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {pendingTodos.map((todo, idx) => (
+                  <TodoItem key={idx} item={todo} isCompleted={false} />
+                ))}
+              </div>
+            )}
+          </div>
 
-              {/* 刪除按鈕 */}
-              <button
-                onClick={() => deleteTodo(todo.id)}
+          {/* 已完成事項 */}
+          {completedTodos.length > 0 && (
+            <div style={{ marginBottom: '32px' }}>
+              <h2
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  padding: '6px 12px',
-                  backgroundColor: '#ef4444',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '12px',
-                  transition: 'background-color 0.2s',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  marginBottom: '12px',
+                  color: 'var(--text-primary, black)',
                 }}
-                onMouseOver={(e) =>
-                  (e.target.style.backgroundColor = '#dc2626')
-                }
-                onMouseOut={(e) =>
-                  (e.target.style.backgroundColor = '#ef4444')
-                }
               >
-                <Trash2 size={14} />
-                刪除
-              </button>
+                已完成事項 ({completedTodos.length})
+              </h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {completedTodos.map((todo, idx) => (
+                  <TodoItem key={idx} item={todo} isCompleted={true} />
+                ))}
+              </div>
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
     </div>
   );

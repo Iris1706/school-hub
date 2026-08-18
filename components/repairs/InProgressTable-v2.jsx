@@ -146,8 +146,7 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
               <div style={{ fontSize: '14px', fontWeight: '500' }}>{row[7] || '-'}</div>
             </div>
 
-            <div style={{ gridColumn: 'span 1' }}>
-              <div style={{ display: 'flex', gap: '8px', flexDirection: 'column' }}>
+            <div style={{ gridColumn: 'span 1', display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
                 {/* Complete Button */}
                 <button
                   onClick={() => onShowCompleteModal(index, row)}
@@ -166,7 +165,6 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
                     fontWeight: '500',
                     transition: 'all 0.2s',
                     whiteSpace: 'nowrap',
-                    width: '100%',
                   }}
                   onMouseEnter={(e) => {
                     e.target.style.background = '#059669';
@@ -199,7 +197,6 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
                     fontWeight: '500',
                     transition: 'all 0.2s',
                     whiteSpace: 'nowrap',
-                    width: '100%',
                   }}
                   onMouseEnter={(e) => {
                     e.target.style.background = '#2563eb';
@@ -232,7 +229,6 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
                     fontWeight: '500',
                     transition: 'all 0.2s',
                     whiteSpace: 'nowrap',
-                    width: '100%',
                   }}
                   onMouseEnter={(e) => {
                     e.target.style.background = '#dc2626';
@@ -246,7 +242,6 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
                   <Trash2 size={14} />
                   刪除
                 </button>
-              </div>
             </div>
           </div>
         ))}
