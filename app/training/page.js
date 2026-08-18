@@ -207,14 +207,16 @@ export default function TrainingPage() {
           {/* 一、官網派車 */}
           <div>
             <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>一、官網派車（優先使用）</h4>
-            <p style={{ margin: '4px 0', fontSize: 13 }}>✅ 只能選隔天收件</p>
-            <p style={{ margin: '4px 0', fontSize: 13 }}>✅ 產生正確黑貓單號</p>
-            <p style={{ margin: '12px 0 0 0' }}>
-              <a href="https://www.takkyubin.com.tw/YMTContract/aspx/Login.aspx" target="_blank" rel="noopener noreferrer" style={{ color: '#10b981', textDecoration: 'none', fontWeight: 500, fontSize: 13 }}>🔗 官網派車</a>
-            </p>
+            <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px', marginBottom: 12, background: '#f9fafb', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' }}>
+              <p style={{ margin: '4px 0', fontSize: 13 }}>✅ 只能選隔天收件</p>
+              <p style={{ margin: '4px 0', fontSize: 13 }}>✅ 產生正確黑貓單號</p>
+              <p style={{ margin: '8px 0 0 0' }}>
+                <a href="https://www.takkyubin.com.tw/YMTContract/aspx/Login.aspx" target="_blank" rel="noopener noreferrer" style={{ color: '#10b981', textDecoration: 'none', fontWeight: 500, fontSize: 13 }}>🔗 官網派車</a>
+              </p>
+            </div>
 
             <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, marginTop: 16, color: 'var(--text-primary)' }}>台南／嘉義 帳密</h4>
-            <div style={{ border: '1px solid var(--border)', borderRadius: '6px', padding: '10px 12px', marginBottom: 12 }}>
+            <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px', marginBottom: 12, background: '#f9fafb', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' }}>
               <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>帳號</p>
               <p style={{ margin: '2px 0 8px 0', fontSize: 13, fontFamily: 'monospace' }}>2848061309</p>
               <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>密碼</p>
@@ -222,7 +224,7 @@ export default function TrainingPage() {
             </div>
 
             <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, marginTop: 16, color: 'var(--text-primary)' }}>高雄 帳密</h4>
-            <div style={{ border: '1px solid var(--border)', borderRadius: '6px', padding: '10px 12px' }}>
+            <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px', background: '#f9fafb', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' }}>
               <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>帳號</p>
               <p style={{ margin: '2px 0 8px 0', fontSize: 13, fontFamily: 'monospace' }}>2848061341</p>
               <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>密碼</p>
@@ -234,7 +236,7 @@ export default function TrainingPage() {
           {/* 二、統一收件資料 */}
           <div>
             <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>二、統一收件資料</h4>
-            <div style={{ border: '1px solid var(--border)', borderRadius: '6px', padding: '10px 12px', marginBottom: 12 }}>
+            <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px', marginBottom: 12, background: '#f9fafb', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' }}>
               <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>地址</p>
               <p style={{ margin: '2px 0 8px 0', fontSize: 13 }}>830 高雄市鳳山區文苑街 75 號</p>
               <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>收件人</p>
@@ -250,7 +252,7 @@ export default function TrainingPage() {
             </div>
 
             <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, marginTop: 16, color: 'var(--text-primary)' }}>嘉義數辦地址</h4>
-            <div style={{ border: '1px solid var(--border)', borderRadius: '6px', padding: '10px 12px' }}>
+            <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px', background: '#f9fafb', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' }}>
               <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>地址</p>
               <p style={{ margin: '2px 0 8px 0', fontSize: 13 }}>嘉義市西區四維路 25 號</p>
               <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>聯絡人</p>
@@ -263,15 +265,17 @@ export default function TrainingPage() {
           {/* 三、文字客服派車 */}
           <div>
             <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>三、文字客服派車（急件）</h4>
-            <p style={{ margin: '4px 0', fontSize: 13 }}>✅ 中午前申請，有機會當天收件</p>
-            <p style={{ margin: '4px 0', fontSize: 13 }}>❌ 客服詢問事項較多</p>
-            <p style={{ margin: '8px 0 12px 0', fontSize: 13 }}>非急件不建議使用</p>
-            <p style={{ margin: '0' }}>
-              <a href="https://neko.t-cat.com.tw/webchat/index.html" target="_blank" rel="noopener noreferrer" style={{ color: '#10b981', textDecoration: 'none', fontWeight: 500, fontSize: 13 }}>🔗 文字客服入口</a>
-            </p>
+            <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px', marginBottom: 12, background: '#f9fafb', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' }}>
+              <p style={{ margin: '4px 0', fontSize: 13 }}>✅ 中午前申請，有機會當天收件</p>
+              <p style={{ margin: '4px 0', fontSize: 13 }}>❌ 客服詢問事項較多</p>
+              <p style={{ margin: '8px 0 8px 0', fontSize: 13 }}>非急件不建議使用</p>
+              <p style={{ margin: '0' }}>
+                <a href="https://neko.t-cat.com.tw/webchat/index.html" target="_blank" rel="noopener noreferrer" style={{ color: '#10b981', textDecoration: 'none', fontWeight: 500, fontSize: 13 }}>🔗 文字客服入口</a>
+              </p>
+            </div>
 
             <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, marginTop: 16, color: 'var(--text-primary)' }}>常見問題</h4>
-            <div style={{ border: '1px solid var(--border)', borderRadius: '6px', padding: '10px 12px' }}>
+            <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px', background: '#f9fafb', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' }}>
               <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>Q：電話後四碼？</p>
               <p style={{ margin: '2px 0 8px 0', fontSize: 13 }}>• 台南 → 8838</p>
               <p style={{ margin: '2px 0 8px 0', fontSize: 13 }}>• 高雄 → 8332</p>
