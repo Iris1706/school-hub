@@ -90,80 +90,95 @@ export default function CompletedTable({ sheetName }) {
   }
 
   return (
-    <div style={{ overflowX: 'auto' }}>
-      <table
-        style={{
-          width: '100%',
-          borderCollapse: 'collapse',
-          background: 'var(--background, white)',
-          minWidth: '1200px',
-        }}
-      >
-        <thead>
-          <tr style={{ borderBottom: '2px solid #e5e7eb', background: 'var(--background-secondary, #f9f9f9)' }}>
-            <th style={{ padding: '16px', textAlign: 'left', fontWeight: '600', fontSize: '14px', whiteSpace: 'nowrap' }}>建單日期</th>
-            <th style={{ padding: '16px', textAlign: 'left', fontWeight: '600', fontSize: '14px', whiteSpace: 'nowrap' }}>維修單號</th>
-            <th style={{ padding: '16px', textAlign: 'left', fontWeight: '600', fontSize: '14px', whiteSpace: 'nowrap' }}>學校名稱</th>
-            <th style={{ padding: '16px', textAlign: 'left', fontWeight: '600', fontSize: '14px', whiteSpace: 'nowrap' }}>問題分類</th>
-            <th style={{ padding: '16px', textAlign: 'left', fontWeight: '600', fontSize: '14px', whiteSpace: 'nowrap' }}>機器舊序號</th>
-            <th style={{ padding: '16px', textAlign: 'left', fontWeight: '600', fontSize: '14px', whiteSpace: 'nowrap' }}>機器新序號</th>
-            <th style={{ padding: '16px', textAlign: 'left', fontWeight: '600', fontSize: '14px', whiteSpace: 'nowrap' }}>狀態</th>
-            <th style={{ padding: '16px', textAlign: 'left', fontWeight: '600', fontSize: '14px', whiteSpace: 'nowrap' }}>完成日期(寄回)</th>
-            <th style={{ padding: '16px', textAlign: 'center', fontWeight: '600', fontSize: '14px', whiteSpace: 'nowrap' }}>操作</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sortedData.map((row, index) => (
-            <tr
-              key={index}
+    <div style={{ display: 'grid', gap: '16px' }}>
+      {sortedData.map((row, index) => (
+        <div
+          key={index}
+          style={{
+            background: 'var(--background, white)',
+            border: '1px solid #e5e7eb',
+            borderRadius: '8px',
+            padding: '16px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+            gap: '16px',
+            alignItems: 'start',
+          }}
+        >
+          <div>
+            <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: '600', marginBottom: '4px' }}>建單日期</div>
+            <div style={{ fontSize: '14px', fontWeight: '500' }}>{row[0] || '-'}</div>
+          </div>
+
+          <div>
+            <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: '600', marginBottom: '4px' }}>維修單號</div>
+            <div style={{ fontSize: '14px', fontWeight: '500', fontFamily: 'monospace' }}>{row[1] || '-'}</div>
+          </div>
+
+          <div>
+            <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: '600', marginBottom: '4px' }}>學校名稱</div>
+            <div style={{ fontSize: '14px', fontWeight: '500' }}>{row[2] || '-'}</div>
+          </div>
+
+          <div>
+            <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: '600', marginBottom: '4px' }}>問題分類</div>
+            <div style={{ fontSize: '14px', fontWeight: '500' }}>{row[3] || '-'}</div>
+          </div>
+
+          <div>
+            <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: '600', marginBottom: '4px' }}>機器舊序號</div>
+            <div style={{ fontSize: '14px', fontWeight: '500', fontFamily: 'monospace' }}>{row[4] || '-'}</div>
+          </div>
+
+          <div>
+            <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: '600', marginBottom: '4px' }}>機器新序號</div>
+            <div style={{ fontSize: '14px', fontWeight: '500', fontFamily: 'monospace' }}>{row[5] || '-'}</div>
+          </div>
+
+          <div>
+            <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: '600', marginBottom: '4px' }}>狀態</div>
+            <div style={{ fontSize: '14px', fontWeight: '500' }}>{row[6] || '-'}</div>
+          </div>
+
+          <div>
+            <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: '600', marginBottom: '4px' }}>完成日期(寄回)</div>
+            <div style={{ fontSize: '14px', fontWeight: '500' }}>{row[7] || '-'}</div>
+          </div>
+
+          <div>
+            <button
+              onClick={() => handleDelete(index)}
               style={{
-                borderBottom: '1px solid #e5e7eb',
-                '&:hover': { background: 'var(--background-secondary, #f9f9f9)' },
+                background: '#ef4444',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                padding: '8px 14px',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '13px',
+                fontWeight: '500',
+                transition: 'all 0.2s',
+                whiteSpace: 'nowrap',
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.background = '#dc2626';
+                e.target.style.transform = 'scale(1.05)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = '#ef4444';
+                e.target.style.transform = 'scale(1)';
               }}
             >
-              <td style={{ padding: '14px 16px', fontSize: '13px' }}>{row[0] || '-'}</td>
-              <td style={{ padding: '14px 16px', fontSize: '13px', fontFamily: 'monospace' }}>{row[1] || '-'}</td>
-              <td style={{ padding: '14px 16px', fontSize: '13px' }}>{row[2] || '-'}</td>
-              <td style={{ padding: '14px 16px', fontSize: '13px' }}>{row[3] || '-'}</td>
-              <td style={{ padding: '14px 16px', fontSize: '13px', fontFamily: 'monospace' }}>{row[4] || '-'}</td>
-              <td style={{ padding: '14px 16px', fontSize: '13px', fontFamily: 'monospace' }}>{row[5] || '-'}</td>
-              <td style={{ padding: '14px 16px', fontSize: '13px' }}>{row[6] || '-'}</td>
-              <td style={{ padding: '14px 16px', fontSize: '13px' }}>{row[7] || '-'}</td>
-              <td style={{ padding: '12px', textAlign: 'center' }}>
-                <button
-                  onClick={() => handleDelete(index)}
-                  style={{
-                    background: '#ef4444',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    padding: '8px 14px',
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    fontSize: '13px',
-                    fontWeight: '500',
-                    transition: 'all 0.2s',
-                    whiteSpace: 'nowrap',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.background = '#dc2626';
-                    e.target.style.transform = 'scale(1.05)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.background = '#ef4444';
-                    e.target.style.transform = 'scale(1)';
-                  }}
-                >
-                  <Trash2 size={16} />
-                  刪除
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              <Trash2 size={16} />
+              刪除
+            </button>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
