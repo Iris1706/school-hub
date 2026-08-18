@@ -22,22 +22,19 @@ export async function GET(request) {
 
     const sheets = getSheetsClient();
 
-    // 讀取已完修資料 (A2:H)
     const completedResponse = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.Repair_SHEET_ID,
-      range: `${sheetName}!A2:H`,
+      range: `${sheetName}!A3:H`,
     });
 
-    // 讀取處理中資料 (J2:P)
     const inProgressResponse = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.Repair_SHEET_ID,
-      range: `${sheetName}!J2:P`,
+      range: `${sheetName}!J3:S`,
     });
 
     const completedData = completedResponse.data.values || [];
     const inProgressData = inProgressResponse.data.values || [];
 
-    // 計算統計資料
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
@@ -52,48 +49,39 @@ export async function GET(request) {
     const schoolStats = {};
     const categoryStats = {};
 
-    // 分析已完修資料
-    // 格式：建單日期、維修單號、學校名稱、問題分類、機器舊序號、機器新序號、狀態、完成日期
     completedData.forEach((row) => {
-      if (!row[0] || !row[7]) return; // 需要有建單日期和完成日期
+      if (!row[0] || !row[7]) return;
 
       try {
         const createdDate = new Date(row[0]);
         const completedDate = new Date(row[7]);
 
-        // 檢查是否在本月
         if (createdDate.getMonth() === currentMonth && createdDate.getFullYear() === currentYear) {
           thisMonthCompleted++;
           monthCompletedCount++;
 
-          // 計算維修天數
           const daysToRepair = Math.ceil((completedDate - createdDate) / (1000 * 60 * 60 * 24));
           totalDaysForMonth += daysToRepair;
         }
 
-        // 檢查是否在本週
         if (createdDate >= weekStart && createdDate <= now) {
           thisWeekCompleted++;
         }
 
-        // 統計學校
         const school = row[2];
         if (school) {
           schoolStats[school] = (schoolStats[school] || 0) + 1;
         }
 
-        // 統計問題分類
         const category = row[3];
         if (category) {
           categoryStats[category] = (categoryStats[category] || 0) + 1;
         }
       } catch (e) {
-        // 日期解析失敗，跳過此列
+        // 日期解析失敗
       }
     });
 
-    // 處理中資料
-    // 格式：建單日期、維修單號、學校名稱、問題分類、機器舊序號、進度、完修日期、綁定ASM帳號、ASM取消指派、PreStage註冊
     inProgressData.forEach((row) => {
       const school = row[2];
       if (school) {
@@ -109,7 +97,6 @@ export async function GET(request) {
     const averageRepairDays =
       monthCompletedCount > 0 ? Math.round(totalDaysForMonth / monthCompletedCount) : 0;
 
-    // 排序並取前 5 名
     const topSchools = Object.entries(schoolStats)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5);

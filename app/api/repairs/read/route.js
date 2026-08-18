@@ -23,32 +23,36 @@ export async function GET(request) {
 
     const sheets = getSheetsClient();
 
-    let range;
     if (type === 'completed') {
-      range = 'A2:H';
+      const response = await sheets.spreadsheets.values.get({
+        spreadsheetId: process.env.Repair_SHEET_ID,
+        range: `${sheetName}!A3:H`,
+      });
+
+      const rows = response.data.values || [];
+      return Response.json({
+        success: true,
+        rows: rows,
+      });
     } else if (type === 'inProgress') {
-      range = 'J2:P';
+      const response = await sheets.spreadsheets.values.get({
+        spreadsheetId: process.env.Repair_SHEET_ID,
+        range: `${sheetName}!J3:S`,
+      });
+
+      const rows = response.data.values || [];
+      return Response.json({
+        success: true,
+        rows: rows,
+      });
     }
 
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: process.env.Repair_SHEET_ID,
-      range: `${sheetName}!${range}`,
-    });
-
-    const values = response.data.values || [];
-
-    const headers = values[0] || [];
-    const rows = values.slice(1);
-
-    return Response.json({
-      success: true,
-      headers,
-      rows,
-      sheetName,
-      type,
-    });
+    return Response.json(
+      { success: false, error: '無效的資料類型' },
+      { status: 400 }
+    );
   } catch (error) {
-    console.error('讀取 Sheet 失敗:', error.message);
+    console.error('讀取資料錯誤:', error.message);
     return Response.json(
       {
         success: false,

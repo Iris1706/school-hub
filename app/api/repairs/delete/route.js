@@ -15,96 +15,80 @@ function getSheetsClient() {
   return google.sheets({ version: 'v4', auth });
 }
 
-async function getSheetId(sheetName) {
-  const sheets = getSheetsClient();
-
-  try {
-    const response = await sheets.spreadsheets.get({
-      spreadsheetId: process.env.Repair_SHEET_ID,
-    });
-
-    const sheet = response.data.sheets.find(
-      (s) => s.properties.title === sheetName
-    );
-
-    if (!sheet) {
-      throw new Error(`找不到分頁: ${sheetName}`);
-    }
-
-    return sheet.properties.sheetId;
-  } catch (error) {
-    console.error('取得 Sheet ID 失敗:', error.message);
-    throw error;
-  }
-}
-
-async function appendLog(logSheetName, logData) {
-  const sheets = getSheetsClient();
-
-  try {
-    await sheets.spreadsheets.values.append({
-      spreadsheetId: process.env.Repair_SHEET_ID,
-      range: `${logSheetName}!A:A`,
-      valueInputOption: 'USER_ENTERED',
-      requestBody: {
-        values: [logData],
-      },
-    });
-  } catch (error) {
-    console.error('記錄日誌失敗:', error.message);
-  }
-}
-
 export async function POST(request) {
   try {
-    const { sheetName, rowIndex } = await request.json();
+    const { sheetName, rowIndex, type } = await request.json();
 
     if (!sheetName || rowIndex === undefined) {
       return Response.json(
-        { success: false, error: '缺少必要參數: sheetName 或 rowIndex' },
+        { success: false, error: '缺少必要參數' },
         { status: 400 }
       );
     }
 
     const sheets = getSheetsClient();
-    const sheetId = await getSheetId(sheetName);
 
-    await sheets.spreadsheets.batchUpdate({
+    const googleSheetRowIndex = rowIndex + 3;
+
+    if (type === 'completed') {
+      await sheets.spreadsheets.values.clear({
+        spreadsheetId: process.env.Repair_SHEET_ID,
+        range: `${sheetName}!A${googleSheetRowIndex}:H${googleSheetRowIndex}`,
+      });
+    } else if (type === 'inProgress') {
+      await sheets.spreadsheets.values.clear({
+        spreadsheetId: process.env.Repair_SHEET_ID,
+        range: `${sheetName}!J${googleSheetRowIndex}:S${googleSheetRowIndex}`,
+      });
+    }
+
+    const logsSheetName = sheetName === 'Pawn' ? '操作日誌1' : '操作日誌2';
+    const timestamp = new Date().toLocaleString('zh-TW', {
+      timeZone: 'Asia/Taipei',
+    });
+
+    const logsDataResponse = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.Repair_SHEET_ID,
-      requestBody: {
-        requests: [
-          {
-            deleteDimension: {
-              range: {
-                sheetId: sheetId,
-                dimension: 'ROWS',
-                startIndex: rowIndex - 1,
-                endIndex: rowIndex,
-              },
-            },
-          },
+      range: `${logsSheetName}!A:A`,
+    });
+
+    let logNextRow = 3;
+    const logsValues = logsDataResponse.data.values || [];
+    for (let i = 2; i < logsValues.length; i++) {
+      if (!logsValues[i] || !logsValues[i][0]) {
+        logNextRow = i + 1;
+        break;
+      }
+    }
+
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: process.env.Repair_SHEET_ID,
+      range: `${logsSheetName}!A${logNextRow}:E${logNextRow}`,
+      valueInputOption: 'RAW',
+      resource: {
+        values: [
+          [
+            timestamp,
+            '刪除',
+            `行 ${googleSheetRowIndex}`,
+            type === 'completed' ? '已完修' : '處理中',
+            '資料已清空',
+          ],
         ],
       },
     });
 
-    const logSheetName = sheetName === 'Pawn' ? '操作日誌1' : '操作日誌2';
-    const logData = [
-      new Date().toLocaleString('zh-TW'),
-      '刪除',
-      sheetName,
-      `列 ${rowIndex}`,
-    ];
-
-    await appendLog(logSheetName, logData);
-
     return Response.json({
       success: true,
-      message: `成功刪除 ${sheetName} 的第 ${rowIndex} 列`,
+      message: '刪除成功',
     });
   } catch (error) {
-    console.error('API 錯誤:', error.message);
+    console.error('刪除失敗:', error.message);
     return Response.json(
-      { success: false, error: error.message },
+      {
+        success: false,
+        error: error.message,
+      },
       { status: 500 }
     );
   }

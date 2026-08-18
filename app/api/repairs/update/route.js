@@ -15,71 +15,77 @@ function getSheetsClient() {
   return google.sheets({ version: 'v4', auth });
 }
 
-async function appendLog(logSheetName, logData) {
-  const sheets = getSheetsClient();
-
-  try {
-    await sheets.spreadsheets.values.append({
-      spreadsheetId: process.env.Repair_SHEET_ID,
-      range: `${logSheetName}!A:A`,
-      valueInputOption: 'USER_ENTERED',
-      requestBody: {
-        values: [logData],
-      },
-    });
-  } catch (error) {
-    console.error('記錄日誌失敗:', error.message);
-  }
-}
-
 export async function POST(request) {
   try {
     const { sheetName, rowIndex, values, type } = await request.json();
 
-    if (!sheetName || rowIndex === undefined || !values || !type) {
+    if (!sheetName || rowIndex === undefined || !values) {
       return Response.json(
-        {
-          success: false,
-          error: '缺少必要參數: sheetName、rowIndex、values 或 type',
-        },
+        { success: false, error: '缺少必要參數' },
         { status: 400 }
       );
     }
 
     const sheets = getSheetsClient();
 
-    const startColumn = type === 'completed' ? 'A' : 'J';
-    const endColumn = type === 'completed' ? 'H' : 'P';
-    const range = `${sheetName}!${startColumn}${rowIndex}:${endColumn}${rowIndex}`;
+    if (type === 'inProgress') {
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: process.env.Repair_SHEET_ID,
+        range: `${sheetName}!J${rowIndex}:S${rowIndex}`,
+        valueInputOption: 'RAW',
+        resource: {
+          values: [values],
+        },
+      });
 
-    await sheets.spreadsheets.values.update({
-      spreadsheetId: process.env.Repair_SHEET_ID,
-      range: range,
-      valueInputOption: 'USER_ENTERED',
-      requestBody: {
-        values: [values],
-      },
-    });
+      const logsSheetName = sheetName === 'Pawn' ? '操作日誌1' : '操作日誌2';
+      const timestamp = new Date().toLocaleString('zh-TW', {
+        timeZone: 'Asia/Taipei',
+      });
 
-    const logSheetName = sheetName === 'Pawn' ? '操作日誌1' : '操作日誌2';
-    const logData = [
-      new Date().toLocaleString('zh-TW'),
-      '更新',
-      sheetName,
-      `列 ${rowIndex}`,
-      values.join(' | '),
-    ];
+      const logsDataResponse = await sheets.spreadsheets.values.get({
+        spreadsheetId: process.env.Repair_SHEET_ID,
+        range: `${logsSheetName}!A:A`,
+      });
 
-    await appendLog(logSheetName, logData);
+      let logNextRow = 3;
+      const logsValues = logsDataResponse.data.values || [];
+      for (let i = 2; i < logsValues.length; i++) {
+        if (!logsValues[i] || !logsValues[i][0]) {
+          logNextRow = i + 1;
+          break;
+        }
+      }
+
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: process.env.Repair_SHEET_ID,
+        range: `${logsSheetName}!A${logNextRow}:E${logNextRow}`,
+        valueInputOption: 'RAW',
+        resource: {
+          values: [
+            [
+              timestamp,
+              '編輯',
+              values[1] || '',
+              values[2] || '',
+              `進度更新至: ${values[5] || ''}`,
+            ],
+          ],
+        },
+      });
+    }
 
     return Response.json({
       success: true,
-      message: `成功更新 ${sheetName} 的第 ${rowIndex} 列`,
+      message: '更新成功',
     });
   } catch (error) {
-    console.error('API 錯誤:', error.message);
+    console.error('更新失敗:', error.message);
     return Response.json(
-      { success: false, error: error.message },
+      {
+        success: false,
+        error: error.message,
+      },
       { status: 500 }
     );
   }
