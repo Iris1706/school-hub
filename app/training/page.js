@@ -49,21 +49,21 @@ export default function TrainingPage() {
 
         {/* 上面部分 - 左右並排三個項目 */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 20, paddingBottom: 20, borderBottom: '1px solid var(--border)' }}>
-          <div>
-            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>一、正常上下班（無外出）</h4>
+          <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px', background: '#f9fafb', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' }}>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)', marginTop: 0 }}>一、正常上下班（無外出）</h4>
             <p style={{ margin: '3px 0', fontSize: 13 }}>08:00 前打「上班」卡（需定位於辦公室）</p>
             <p style={{ margin: '3px 0', fontSize: 13 }}>17:00 後打「下班」卡（需定位於辦公室）</p>
           </div>
 
-          <div>
-            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>請假規範</h4>
+          <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px', background: '#f9fafb', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' }}>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)', marginTop: 0 }}>請假規範</h4>
             <p style={{ margin: '3px 0', fontSize: 13 }}>・病假、事假：可當日申請</p>
             <p style={{ margin: '3px 0', fontSize: 13 }}>・特休：須提前申請，不可當日提出</p>
             <p style={{ margin: '3px 0', fontSize: 13 }}>外出前至少 30 分鐘送出請假單，假別選「外出」</p>
           </div>
 
-          <div>
-            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>忘記打卡提醒</h4>
+          <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px', background: '#f9fafb', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' }}>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)', marginTop: 0 }}>忘記打卡提醒</h4>
             <p style={{ margin: '3px 0', fontSize: 13 }}>・每月享有 2 次忘記打卡補登額度</p>
             <p style={{ margin: '3px 0', fontSize: 13 }}>・超過 2 次將依公司規定扣款</p>
             <p style={{ margin: '3px 0', fontSize: 13 }}>請務必記得打卡，以免影響出勤紀錄及薪資</p>
@@ -72,23 +72,23 @@ export default function TrainingPage() {
 
         {/* 下面部分 - 左到右並排三個項目 */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
-          <div>
-            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>（一）當日整天外出</h4>
+          <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px', background: '#f9fafb', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' }}>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)', marginTop: 0 }}>（一）當日整天外出</h4>
             <p style={{ margin: '3px 0', fontSize: 13 }}>08:00 前不論人在哪裡，先打「上班」卡</p>
             <p style={{ margin: '3px 0', fontSize: 13 }}>外出地點每到一個地點皆需打「外出」卡</p>
             <p style={{ margin: '3px 0', fontSize: 13 }}>17:00 後不論人在哪裡，打「下班」卡</p>
           </div>
 
-          <div>
-            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>（二）上午外出，之後返回辦公室</h4>
+          <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px', background: '#f9fafb', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' }}>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)', marginTop: 0 }}>（二）上午外出，之後返回辦公室</h4>
             <p style={{ margin: '3px 0', fontSize: 13 }}>08:00 前不論人在哪裡，先打「上班」卡</p>
             <p style={{ margin: '3px 0', fontSize: 13 }}>外出地點打「外出」卡</p>
             <p style={{ margin: '3px 0', fontSize: 13 }}>返回辦公室打「返回」卡</p>
             <p style={{ margin: '3px 0', fontSize: 13 }}>17:00 後打「下班」卡</p>
           </div>
 
-          <div>
-            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>（三）下午外出，不再返回辦公室</h4>
+          <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px', background: '#f9fafb', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' }}>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)', marginTop: 0 }}>（三）下午外出，不再返回辦公室</h4>
             <p style={{ margin: '3px 0', fontSize: 13 }}>08:00 前於辦公室打「上班」卡</p>
             <p style={{ margin: '3px 0', fontSize: 13 }}>出發外出打「外出」卡</p>
             <p style={{ margin: '3px 0', fontSize: 13 }}>17:00 後不論人在哪裡，打「下班」卡</p>
@@ -113,11 +113,11 @@ export default function TrainingPage() {
           {/* 左列：一般外出任務 */}
           <div>
             <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>一般外出任務</h4>
-            <div style={{ background: '#FFFFAA', padding: '12px', borderRadius: '6px', marginBottom: 10 }}>
+            <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px', marginBottom: 10, background: '#f9fafb', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' }}>
               <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>快速任務</p>
               <p style={{ margin: '3px 0', fontSize: 12 }}>單一學校：約 16:00 之後</p>
             </div>
-            <div style={{ background: '#FFFFAA', padding: '12px', borderRadius: '6px' }}>
+            <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px', background: '#f9fafb', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' }}>
               <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>耗時任務</p>
               <p style={{ margin: '3px 0', fontSize: 12 }}>請備妥處理內容或台數</p>
             </div>
@@ -126,26 +126,26 @@ export default function TrainingPage() {
           {/* 中列：巡檢外出標準 */}
           <div>
             <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>巡檢外出標準（兩週未連線台數）</h4>
-            <div style={{ background: '#FFE8E8', padding: '8px 10px', borderRadius: '5px', marginBottom: 8 }}>
+            <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px', marginBottom: 8, background: '#f9fafb', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' }}>
               <p style={{ margin: '0', fontSize: 12, fontWeight: 500 }}>250 台以上</p>
-              <p style={{ margin: '2px 0 0 0', fontSize: 11, background: '#FFD4D4', display: 'inline-block', padding: '2px 6px', borderRadius: '3px', fontWeight: 600 }}>2 人 / 半天</p>
+              <p style={{ margin: '4px 0 0 0', fontSize: 11, fontWeight: 600 }}>→ 2 人 / 半天</p>
             </div>
-            <div style={{ background: '#FFE8E8', padding: '8px 10px', borderRadius: '5px', marginBottom: 8 }}>
+            <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px', marginBottom: 8, background: '#f9fafb', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' }}>
               <p style={{ margin: '0', fontSize: 12, fontWeight: 500 }}>180–249 台</p>
-              <p style={{ margin: '2px 0 0 0', fontSize: 11, background: '#FFD4D4', display: 'inline-block', padding: '2px 6px', borderRadius: '3px', fontWeight: 600 }}>1 人 / 整天</p>
+              <p style={{ margin: '4px 0 0 0', fontSize: 11, fontWeight: 600 }}>→ 1 人 / 整天</p>
             </div>
-            <div style={{ background: '#FFE8E8', padding: '8px 10px', borderRadius: '5px', marginBottom: 8 }}>
+            <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px', marginBottom: 8, background: '#f9fafb', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' }}>
               <p style={{ margin: '0', fontSize: 12, fontWeight: 500 }}>61–179 台</p>
-              <p style={{ margin: '2px 0 0 0', fontSize: 11, background: '#FFD4D4', display: 'inline-block', padding: '2px 6px', borderRadius: '3px', fontWeight: 600 }}>1 人 / 半天</p>
+              <p style={{ margin: '4px 0 0 0', fontSize: 11, fontWeight: 600 }}>→ 1 人 / 半天</p>
             </div>
-            <div style={{ background: '#FFFFAA', padding: '8px 10px', borderRadius: '5px', marginBottom: 8, fontSize: 11 }}>
-              <p style={{ margin: '0', fontWeight: 600 }}>20–60 台（彈性）</p>
-              <p style={{ margin: '2px 0', fontSize: 11 }}>市區≥3間 非市區≥3間或2+1</p>
+            <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px', marginBottom: 8, background: '#f9fafb', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' }}>
+              <p style={{ margin: '0', fontWeight: 600, fontSize: 12 }}>20–60 台（彈性）</p>
+              <p style={{ margin: '3px 0 0 0', fontSize: 11 }}>市區≥3間 非市區≥3間或2+1</p>
               <p style={{ margin: '2px 0', fontSize: 11 }}>半天≥2間或1+1</p>
             </div>
-            <div style={{ background: '#E8F4FF', padding: '8px 10px', borderRadius: '5px', fontSize: 11 }}>
-              <p style={{ margin: '0', fontWeight: 600 }}>0–19 台（彈性）</p>
-              <p style={{ margin: '2px 0', fontSize: 11 }}>市區≥4間或3+1 非市區≥3間</p>
+            <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px', background: '#f9fafb', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' }}>
+              <p style={{ margin: '0', fontWeight: 600, fontSize: 12 }}>0–19 台（彈性）</p>
+              <p style={{ margin: '3px 0 0 0', fontSize: 11 }}>市區≥4間或3+1 非市區≥3間</p>
               <p style={{ margin: '2px 0', fontSize: 11 }}>半天≥2間或1+1</p>
             </div>
           </div>
@@ -153,40 +153,43 @@ export default function TrainingPage() {
           {/* 右上列：地區分類 */}
           <div>
             <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>地區分類</h4>
-            <div style={{ background: '#D1F4E8', padding: '12px', borderRadius: '6px', marginBottom: 10 }}>
-              <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 12, color: '#059669' }}>市區</p>
+            <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px', marginBottom: 10, background: '#f9fafb', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' }}>
+              <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 12 }}>市區</p>
               <p style={{ margin: '3px 0', fontSize: 11 }}>鳳山、大寮、三民、新興、前金、烏松、鼓山、蓋埤、左營、仁武、小港、苦雄、大樹</p>
             </div>
-            <div style={{ background: '#D1F4E8', padding: '12px', borderRadius: '6px' }}>
-              <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 12, color: '#B91C1C' }}>非市區</p>
-              <p style={{ margin: '3px 0', fontSize: 11 }}>旗津、路竹、岡山、大社、林園、橋頭、蒸蒂、燕巢、六龜、永安、茂林、桃源</p>
+            <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px', background: '#f9fafb', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' }}>
+              <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 12 }}>非市區</p>
+              <p style={{ margin: '3px 0', fontSize: 11 }}>旗津、路竹、岡山、大社、林園、橋頭、蒸蒂、燕巢、六龜、永安、茂林、桃源、楠梓、梓官、旗山、彌陀、湖內、那瑪夏、甲仙、內門、田寮</p>
             </div>
           </div>
 
           {/* 右下列：打卡系統 App 下載 */}
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', gap: 8 }}>
-            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 0, color: '#7c3aed', marginTop: 0 }}>打卡系統</h4>
-            <a
-              href="https://download.winton.com.tw/AppCenter/App/Download/Index2?appName=MHR&platform=ios&version=25.00.83.250630&webversion=25.20"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: 'inline-block',
-                padding: '8px 12px',
-                background: '#8b5cf6',
-                color: '#fff',
-                textDecoration: 'none',
-                borderRadius: '5px',
-                fontSize: 12,
-                fontWeight: 600,
-                textAlign: 'center',
-                transition: 'background 0.2s'
-              }}
-              onMouseEnter={(e) => e.target.style.background = '#7c3aed'}
-              onMouseLeave={(e) => e.target.style.background = '#8b5cf6'}
-            >
-              iOS 下載
-            </a>
+          <div>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>打卡系統</h4>
+            <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px', background: '#f9fafb', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)', textAlign: 'center' }}>
+              <p style={{ margin: '0 0 8px 0', fontSize: 12, color: 'var(--text-secondary)' }}>MHR 打卡 App</p>
+              <a
+                href="https://download.winton.com.tw/AppCenter/App/Download/Index2?appName=MHR&platform=ios&version=25.00.83.250630&webversion=25.20"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-block',
+                  padding: '8px 12px',
+                  background: '#8b5cf6',
+                  color: '#fff',
+                  textDecoration: 'none',
+                  borderRadius: '5px',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  textAlign: 'center',
+                  transition: 'background 0.2s'
+                }}
+                onMouseEnter={(e) => e.target.style.background = '#7c3aed'}
+                onMouseLeave={(e) => e.target.style.background = '#8b5cf6'}
+              >
+                iOS 版本下載
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -246,12 +249,7 @@ export default function TrainingPage() {
               <p style={{ margin: '2px 0', fontSize: 13 }}>0910165191（公務機）</p>
             </div>
 
-            <div style={{ background: '#FEF3C7', padding: '10px 12px', borderRadius: '6px', marginBottom: 12, marginTop: 12 }}>
-              <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: '#a8631a', marginTop: 0 }}>⚠️ 注意</h4>
-              <p style={{ margin: '0', fontSize: 13, color: '#a8631a', fontWeight: 500 }}>公務機請勿靜音，需專門接黑貓電話</p>
-            </div>
-
-            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, marginTop: 16, color: 'var(--text-primary)' }}>嘉義數辦地址</h4>
+<h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, marginTop: 16, color: 'var(--text-primary)' }}>嘉義數辦地址</h4>
             <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px', background: '#f9fafb', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' }}>
               <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>地址</p>
               <p style={{ margin: '2px 0 8px 0', fontSize: 13 }}>嘉義市西區四維路 25 號</p>
