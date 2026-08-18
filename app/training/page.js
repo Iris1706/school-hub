@@ -107,30 +107,61 @@ export default function TrainingPage() {
       }}>
         <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, color: '#f59e0b', marginTop: 0 }}>🚗 外出規定</h2>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 16 }}>
-          <div>
-            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>一般外出任務</h4>
-            <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>快速任務</p>
-            <p style={{ margin: '2px 0 10px 0', fontSize: 13 }}>單一學校：約 16:00 之後</p>
-            <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>託時任務</p>
-            <p style={{ margin: '2px 0', fontSize: 13 }}>請備妥處理內容或台數</p>
-          </div>
-          <div>
-            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>巡檢標準（兩週未連線台數）</h4>
-            <p style={{ margin: '3px 0', fontSize: 13 }}>250+ 台：2 人/半天</p>
-            <p style={{ margin: '3px 0', fontSize: 13 }}>180-249 台：1 人/整天</p>
-            <p style={{ margin: '3px 0', fontSize: 13 }}>61-179 台：1 人/半天</p>
-            <p style={{ margin: '3px 0', fontSize: 13 }}>20-60 台：彈性</p>
-            <p style={{ margin: '3px 0', fontSize: 13 }}>0-19 台：彈性</p>
-          </div>
+        {/* 一般外出任務 - 淡藍色 */}
+        <div style={{ background: '#dbeafe', padding: '12px', borderRadius: '6px', marginBottom: 16 }}>
+          <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>一般外出任務</h4>
+          <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>快速任務</p>
+          <p style={{ margin: '2px 0 10px 0', fontSize: 13 }}>單一學校：約 16:00 之後</p>
+          <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>耗時任務</p>
+          <p style={{ margin: '2px 0', fontSize: 13 }}>請備妥處理內容或台數</p>
         </div>
 
-        <div>
+        {/* 巡檢外出標準 */}
+        <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>巡檢外出標準（兩週未連線台數）</h4>
+
+        {/* A底色 - 250台以上 */}
+        <div style={{ background: '#dbeafe', padding: '10px 12px', borderRadius: '6px', marginBottom: 10 }}>
+          <p style={{ margin: '0', fontSize: 13 }}>250 台以上　2 人 / 半天</p>
+        </div>
+
+        {/* B底色 - 180-249台 */}
+        <div style={{ background: '#dcfce7', padding: '10px 12px', borderRadius: '6px', marginBottom: 10 }}>
+          <p style={{ margin: '0', fontSize: 13 }}>180–249 台　1 人 / 整天</p>
+        </div>
+
+        {/* C底色 - 61-179台 */}
+        <div style={{ background: '#e9d5ff', padding: '10px 12px', borderRadius: '6px', marginBottom: 10 }}>
+          <p style={{ margin: '0', fontSize: 13 }}>61–179 台　1 人 / 半天</p>
+        </div>
+
+        {/* D底色 - 20-60台 */}
+        <div style={{ background: '#fef3c7', padding: '10px 12px', borderRadius: '6px', marginBottom: 10 }}>
+          <p style={{ margin: '3px 0', fontWeight: 600, fontSize: 13 }}>20–60 台（彈性）</p>
+          <p style={{ margin: '2px 0', fontSize: 13 }}>・市區整天：≥ 3 間　非市區整天：≥ 3 間或 2+1</p>
+          <p style={{ margin: '2px 0', fontSize: 13 }}>・半天：≥ 2 間或 1+1</p>
+        </div>
+
+        {/* D底色 - 0-19台 */}
+        <div style={{ background: '#fef3c7', padding: '10px 12px', borderRadius: '6px', marginBottom: 16 }}>
+          <p style={{ margin: '3px 0', fontWeight: 600, fontSize: 13 }}>0–19 台（彈性）</p>
+          <p style={{ margin: '2px 0', fontSize: 13 }}>・市區整天：≥ 4 間或 3+1　非市區整天：≥ 3 間</p>
+          <p style={{ margin: '2px 0', fontSize: 13 }}>・半天：≥ 2 間或 1+1</p>
+        </div>
+
+        {/* 地區分類 - 淡粉色 */}
+        <div style={{ background: '#fbcfe8', padding: '12px', borderRadius: '6px', marginBottom: 16 }}>
           <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>地區分類</h4>
-          <p style={{ margin: '4px 0', fontWeight: 700, fontSize: 13, background: '#fef3c7', padding: '3px 6px', borderRadius: '4px', display: 'inline-block' }}>市區</p>
+          <p style={{ margin: '4px 0', fontWeight: 700, fontSize: 13 }}>市區</p>
           <p style={{ margin: '3px 0 8px 0', fontSize: 13 }}>鳳山、大寮、三民、新興、前金、烏松、鼓山、蓋埤、左營、仁武、小港、苦雄、大樹</p>
-          <p style={{ margin: '4px 0', fontWeight: 700, fontSize: 13, background: '#fef3c7', padding: '3px 6px', borderRadius: '4px', display: 'inline-block' }}>非市區</p>
+          <p style={{ margin: '4px 0', fontWeight: 700, fontSize: 13 }}>非市區</p>
           <p style={{ margin: '3px 0', fontSize: 13 }}>旗津、路竹、岡山、大社、林園、橋頭、蒸蒂、燕巢、六龜、永安、茂林、桃源</p>
+        </div>
+
+        {/* 注意事項 - 淡粉色 */}
+        <div style={{ background: '#fbcfe8', padding: '12px', borderRadius: '6px' }}>
+          <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>注意事項</h4>
+          <p style={{ margin: '3px 0', fontSize: 13 }}>外出時務必使用外出打卡功能，記錄準確位置</p>
+          <p style={{ margin: '3px 0', fontSize: 13 }}>回辦公室後需及時打「返回」卡，確保出勤紀錄正確</p>
         </div>
       </div>
 
