@@ -9,6 +9,7 @@ import EditModal from '@/components/repairs/EditModal';
 
 export default function HardwarePage() {
   const [sheetDisplayName, setSheetDisplayName] = useState('一期生生平板維修');
+  const [activeTab, setActiveTab] = useState('dashboard'); // dashboard, completed, inProgress
   const [completeModal, setCompleteModal] = useState({
     isOpen: false,
     rowData: null,
@@ -56,13 +57,33 @@ export default function HardwarePage() {
   };
 
   const handleCompleteSuccess = () => {
-    // Refresh data by triggering a refetch
     setSheetDisplayName((prev) => prev);
   };
 
   const handleEditSuccess = () => {
-    // Refresh data by triggering a refetch
     setSheetDisplayName((prev) => prev);
+  };
+
+  const tabStyle = {
+    padding: '10px 20px',
+    borderRadius: '6px',
+    border: 'none',
+    cursor: 'pointer',
+    fontWeight: '600',
+    fontSize: '14px',
+    transition: 'all 0.2s',
+  };
+
+  const activeTabStyle = {
+    ...tabStyle,
+    background: '#3b82f6',
+    color: 'white',
+  };
+
+  const inactiveTabStyle = {
+    ...tabStyle,
+    background: '#e5e7eb',
+    color: '#374151',
   };
 
   return (
@@ -87,50 +108,78 @@ export default function HardwarePage() {
         </select>
       </div>
 
-      {/* Dashboard */}
-      <div style={{ marginBottom: '40px' }}>
-        <RepairDashboard sheetName={sheetName} />
+      {/* Tab Navigation */}
+      <div style={{ marginBottom: '24px', display: 'flex', gap: '8px' }}>
+        <button
+          onClick={() => setActiveTab('dashboard')}
+          style={activeTab === 'dashboard' ? activeTabStyle : inactiveTabStyle}
+        >
+          📊 儀表板
+        </button>
+        <button
+          onClick={() => setActiveTab('completed')}
+          style={activeTab === 'completed' ? activeTabStyle : inactiveTabStyle}
+        >
+          ✅ 已完修
+        </button>
+        <button
+          onClick={() => setActiveTab('inProgress')}
+          style={activeTab === 'inProgress' ? activeTabStyle : inactiveTabStyle}
+        >
+          ⚙️ 處理中
+        </button>
       </div>
 
-      {/* Completed Repairs Section */}
-      <div style={{ marginBottom: '40px' }}>
-        <div style={{ marginBottom: '16px' }}>
-          <h2 style={{ fontSize: '18px', fontWeight: '700', margin: '0 0 8px 0' }}>✅ 已完修</h2>
+      {/* Dashboard Tab */}
+      {activeTab === 'dashboard' && (
+        <div style={{ marginBottom: '40px' }}>
+          <RepairDashboard sheetName={sheetName} />
         </div>
-        <div
-          style={{
-            background: 'var(--background, white)',
-            borderRadius: '12px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-            padding: '24px',
-            border: '1px solid var(--border-color, #e5e7eb)',
-          }}
-        >
-          <CompletedTable sheetName={sheetName} />
-        </div>
-      </div>
+      )}
 
-      {/* In Progress Repairs Section */}
-      <div style={{ marginBottom: '40px' }}>
-        <div style={{ marginBottom: '16px' }}>
-          <h2 style={{ fontSize: '18px', fontWeight: '700', margin: '0 0 8px 0' }}>⚙️ 處理中</h2>
+      {/* Completed Repairs Tab */}
+      {activeTab === 'completed' && (
+        <div style={{ marginBottom: '40px' }}>
+          <div style={{ marginBottom: '16px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: '700', margin: '0 0 8px 0' }}>✅ 已完修</h2>
+          </div>
+          <div
+            style={{
+              background: 'var(--background, white)',
+              borderRadius: '12px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+              padding: '24px',
+              border: '1px solid var(--border-color, #e5e7eb)',
+            }}
+          >
+            <CompletedTable sheetName={sheetName} />
+          </div>
         </div>
-        <div
-          style={{
-            background: 'var(--background, white)',
-            borderRadius: '12px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-            padding: '24px',
-            border: '1px solid var(--border-color, #e5e7eb)',
-          }}
-        >
-          <InProgressTable
-            sheetName={sheetName}
-            onShowCompleteModal={handleShowCompleteModal}
-            onShowEditModal={handleShowEditModal}
-          />
+      )}
+
+      {/* In Progress Repairs Tab */}
+      {activeTab === 'inProgress' && (
+        <div style={{ marginBottom: '40px' }}>
+          <div style={{ marginBottom: '16px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: '700', margin: '0 0 8px 0' }}>⚙️ 處理中</h2>
+          </div>
+          <div
+            style={{
+              background: 'var(--background, white)',
+              borderRadius: '12px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+              padding: '24px',
+              border: '1px solid var(--border-color, #e5e7eb)',
+            }}
+          >
+            <InProgressTable
+              sheetName={sheetName}
+              onShowCompleteModal={handleShowCompleteModal}
+              onShowEditModal={handleShowEditModal}
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Modals */}
       <CompleteModal
