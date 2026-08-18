@@ -131,3 +131,33 @@ input:focus {
   color: var(--text-muted);
   font-size: 14px;
 }
+
+/* 驗證碼卡片網格 - 響應式設計 */
+.verification-codes-grid {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 1400px) {
+  .verification-codes-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1399px) {
+  .verification-codes-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .verification-codes-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .verification-codes-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}

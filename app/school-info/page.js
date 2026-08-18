@@ -13,7 +13,6 @@ const FIELD_GROUPS = [
     fields: [
       { key: "學校代碼", label: "學校代碼" },
       { key: "行政區合併學校名稱", label: "行政區合併學校名稱", full: true },
-      { key: "學校名稱", label: "學校名稱" },
       { key: "地址", label: "地址", full: true },
     ],
   },
@@ -192,6 +191,8 @@ export default function SchoolInfoPage() {
                     <div style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 13, color: "var(--text-secondary)" }}>
                       {visible.map((f) => {
                         const Icon = f.icon ? ICONS[f.icon] : null;
+                        const isBold = f.key === "負責老師" || f.key === "負責老師2";
+                        const isUrl = f.key === "Jamf Pro URL" || f.key === "Jamf Pro URL2";
                         return (
                           <div key={f.key} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
                             {Icon ? (
@@ -199,7 +200,13 @@ export default function SchoolInfoPage() {
                             ) : (
                               <span style={{ color: "var(--text-muted)", minWidth: "60px" }}>{f.label}</span>
                             )}
-                            <span style={{ flex: 1 }}>{s[f.key]}</span>
+                            {isUrl ? (
+                              <a href={s[f.key]} target="_blank" rel="noopener noreferrer" style={{ flex: 1, color: "var(--accent)", textDecoration: "underline", cursor: "pointer" }}>
+                                {s[f.key]}
+                              </a>
+                            ) : (
+                              <span style={{ flex: 1, fontWeight: isBold ? 600 : 400 }}>{s[f.key]}</span>
+                            )}
                           </div>
                         );
                       })}
@@ -211,7 +218,7 @@ export default function SchoolInfoPage() {
 
               <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
               <button onClick={() => setEditing(s)}>編輯</button>
-              <button className="secondary" onClick={() => openHistory(s["學校代碼"])}>
+              <button onClick={() => openHistory(s["學校代碼"])}>
                 修改歷程
               </button>
             </div>
@@ -301,7 +308,7 @@ function HistoryModal({ code, entries, onClose }) {
       }}
     >
       <div className="card" style={{ width: 420, maxHeight: "80vh", overflow: "auto", background: "var(--surface-1)" }}>
-        <p style={{ fontWeight: 500, fontSize: 14, margin: "0 0 12px" }}>修改歷程 — {code}</p>
+        <p style={{ fontWeight: 500, fontSize: 14, margin: "0 0 12px" }}>變更紀錄 — {code}</p>
         {entries.length === 0 && <p style={{ fontSize: 13, color: "var(--text-muted)" }}>目前沒有異動紀錄。</p>}
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {entries.map((e, i) => (
