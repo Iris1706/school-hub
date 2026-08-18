@@ -164,7 +164,7 @@ export default function TrainingPage() {
           </div>
 
           {/* 右下列：打卡系統 App 下載 */}
-          <div style={{ background: '#F3E8FF', padding: '16px', borderRadius: '6px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', gap: 12 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', gap: 8 }}>
             <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 0, color: '#7c3aed', marginTop: 0 }}>打卡系統</h4>
             <a
               href="https://download.winton.com.tw/AppCenter/App/Download/Index2?appName=MHR&platform=ios&version=25.00.83.250630&webversion=25.20"
@@ -172,16 +172,15 @@ export default function TrainingPage() {
               rel="noopener noreferrer"
               style={{
                 display: 'inline-block',
-                padding: '10px 14px',
+                padding: '8px 12px',
                 background: '#8b5cf6',
                 color: '#fff',
                 textDecoration: 'none',
-                borderRadius: '6px',
+                borderRadius: '5px',
                 fontSize: 12,
                 fontWeight: 600,
                 textAlign: 'center',
-                transition: 'background 0.2s',
-                minWidth: '120px'
+                transition: 'background 0.2s'
               }}
               onMouseEnter={(e) => e.target.style.background = '#7c3aed'}
               onMouseLeave={(e) => e.target.style.background = '#8b5cf6'}
