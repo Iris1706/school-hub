@@ -44,47 +44,55 @@ export default function TrainingPage() {
         padding: '16px',
         marginBottom: 20
       }}>
-        <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, color: '#3b82f6', marginTop: 0 }}>📅 打卡及請假規範</h2>
+        <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 6, color: '#3b82f6', marginTop: 0 }}>📅 打卡及請假規範</h2>
+        <p style={{ margin: '0 0 16px 0', fontSize: 12, color: 'var(--text-muted)' }}>出勤打卡流程・外出規範・請假說明</p>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 16 }}>
+        {/* 上面部分 - 竖排三個項目 */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16, marginBottom: 20, paddingBottom: 20, borderBottom: '1px solid var(--border)' }}>
           <div>
             <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>一、正常上下班（無外出）</h4>
-            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>08:00 前 打「上班」卡（需定位於辦公室）</p>
-            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>17:00 後 打「下班」卡（需定位於辦公室）</p>
+            <p style={{ margin: '3px 0', fontSize: 13 }}>08:00 前打「上班」卡（需定位於辦公室）</p>
+            <p style={{ margin: '3px 0', fontSize: 13 }}>17:00 後打「下班」卡（需定位於辦公室）</p>
           </div>
+
           <div>
             <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>請假規範</h4>
-            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>病假、事假：可當日申請</p>
-            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>特休：須提前申請，不可當日提出</p>
-            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>外出前至少 30 分鐘送出請假單</p>
+            <p style={{ margin: '3px 0', fontSize: 13 }}>・病假、事假：可當日申請</p>
+            <p style={{ margin: '3px 0', fontSize: 13 }}>・特休：須提前申請，不可當日提出</p>
+            <p style={{ margin: '3px 0', fontSize: 13 }}>外出前至少 30 分鐘送出請假單，假別選「外出」</p>
           </div>
-        </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20 }}>
           <div>
             <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>忘記打卡提醒</h4>
-            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>每月享有 2 次補簽額度</p>
-            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>超過 2 次將依公司規定扣款</p>
-            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>請務必記打卡，以免影響薪資</p>
-          </div>
-          <div>
-            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>（一）當日簽天外出</h4>
-            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>08:00 前 先打「上班」卡</p>
-            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>各地點 臨時打「外出」卡</p>
-            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>17:00 後 打「下班」卡</p>
-          </div>
-          <div>
-            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>（二）上午外出，之後返回</h4>
-            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>08:00 前 先打「上班」卡</p>
-            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>外出地點 打「外出」卡</p>
-            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>返回辦公室 打「返回」卡</p>
-            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>17:00 後 打「下班」卡</p>
+            <p style={{ margin: '3px 0', fontSize: 13 }}>・每月享有 2 次忘記打卡補登額度</p>
+            <p style={{ margin: '3px 0', fontSize: 13 }}>・超過 2 次將依公司規定扣款</p>
+            <p style={{ margin: '3px 0', fontSize: 13 }}>請務必記得打卡，以免影響出勤紀錄及薪資</p>
           </div>
         </div>
 
-        <div style={{ marginTop: 16 }}>
-          <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>（三）下午外出，不再返回</h4>
-          <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>08:00 前 於辦公室打「上班」卡   •   出發外出 打「外出」卡   •   17:00 後 打「下班」卡</p>
+        {/* 下面部分 - 左到右並排三個項目 */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+          <div>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>（一）當日整天外出</h4>
+            <p style={{ margin: '3px 0', fontSize: 13 }}>08:00 前不論人在哪裡，先打「上班」卡</p>
+            <p style={{ margin: '3px 0', fontSize: 13 }}>外出地點每到一個地點皆需打「外出」卡</p>
+            <p style={{ margin: '3px 0', fontSize: 13 }}>17:00 後不論人在哪裡，打「下班」卡</p>
+          </div>
+
+          <div>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>（二）上午外出，之後返回辦公室</h4>
+            <p style={{ margin: '3px 0', fontSize: 13 }}>08:00 前不論人在哪裡，先打「上班」卡</p>
+            <p style={{ margin: '3px 0', fontSize: 13 }}>外出地點打「外出」卡</p>
+            <p style={{ margin: '3px 0', fontSize: 13 }}>返回辦公室打「返回」卡</p>
+            <p style={{ margin: '3px 0', fontSize: 13 }}>17:00 後打「下班」卡</p>
+          </div>
+
+          <div>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>（三）下午外出，不再返回辦公室</h4>
+            <p style={{ margin: '3px 0', fontSize: 13 }}>08:00 前於辦公室打「上班」卡</p>
+            <p style={{ margin: '3px 0', fontSize: 13 }}>出發外出打「外出」卡</p>
+            <p style={{ margin: '3px 0', fontSize: 13 }}>17:00 後不論人在哪裡，打「下班」卡</p>
+          </div>
         </div>
       </div>
 
