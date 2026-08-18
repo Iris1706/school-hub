@@ -109,12 +109,12 @@ export default function HardwarePage() {
       </div>
 
       {/* Tab Navigation */}
-      <div style={{ marginBottom: '24px', display: 'flex', gap: '8px' }}>
+      <div style={{ marginBottom: '24px', display: 'flex', gap: '12px' }}>
         <button
           onClick={() => setActiveTab('dashboard')}
           style={activeTab === 'dashboard' ? activeTabStyle : inactiveTabStyle}
         >
-          📊 儀表板
+          儀表板
         </button>
         <button
           onClick={() => setActiveTab('completed')}
