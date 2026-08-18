@@ -125,7 +125,7 @@ export default function TrainingPage() {
 
           {/* 中列：巡檢外出標準 */}
           <div>
-            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>巡檢外出標準<br/>（兩週未連線台數）</h4>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>巡檢外出標準（兩週未連線台數）</h4>
             <div style={{ background: '#FFE8E8', padding: '8px 10px', borderRadius: '5px', marginBottom: 8 }}>
               <p style={{ margin: '0', fontSize: 12, fontWeight: 500 }}>250 台以上</p>
               <p style={{ margin: '2px 0 0 0', fontSize: 11, background: '#FFD4D4', display: 'inline-block', padding: '2px 6px', borderRadius: '3px', fontWeight: 600 }}>2 人 / 半天</p>
@@ -164,30 +164,29 @@ export default function TrainingPage() {
           </div>
 
           {/* 右下列：打卡系統 App 下載 */}
-          <div style={{ background: '#F3E8FF', padding: '12px', borderRadius: '6px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
-            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: '#7c3aed', marginTop: 0 }}>📱 打卡系統</h4>
-            <p style={{ margin: '0 0 8px 0', fontSize: 11, color: 'var(--text-secondary)' }}>MHR 打卡 App<br/>iOS 版本</p>
+          <div style={{ background: '#F3E8FF', padding: '16px', borderRadius: '6px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', gap: 12 }}>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 0, color: '#7c3aed', marginTop: 0 }}>打卡系統</h4>
             <a
               href="https://download.winton.com.tw/AppCenter/App/Download/Index2?appName=MHR&platform=ios&version=25.00.83.250630&webversion=25.20"
               target="_blank"
               rel="noopener noreferrer"
               style={{
                 display: 'inline-block',
-                padding: '6px 10px',
+                padding: '10px 14px',
                 background: '#8b5cf6',
                 color: '#fff',
                 textDecoration: 'none',
-                borderRadius: '5px',
-                fontSize: 11,
+                borderRadius: '6px',
+                fontSize: 12,
                 fontWeight: 600,
                 textAlign: 'center',
                 transition: 'background 0.2s',
-                marginTop: 'auto'
+                minWidth: '120px'
               }}
               onMouseEnter={(e) => e.target.style.background = '#7c3aed'}
               onMouseLeave={(e) => e.target.style.background = '#8b5cf6'}
             >
-              iOS 下載連結
+              iOS 下載
             </a>
           </div>
         </div>
