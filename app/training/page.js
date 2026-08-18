@@ -47,8 +47,8 @@ export default function TrainingPage() {
         <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 6, color: '#3b82f6', marginTop: 0 }}>📅 打卡及請假規範</h2>
         <p style={{ margin: '0 0 16px 0', fontSize: 12, color: 'var(--text-muted)' }}>出勤打卡流程・外出規範・請假說明</p>
 
-        {/* 上面部分 - 竖排三個項目 */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16, marginBottom: 20, paddingBottom: 20, borderBottom: '1px solid var(--border)' }}>
+        {/* 上面部分 - 左右並排三個項目 */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 20, paddingBottom: 20, borderBottom: '1px solid var(--border)' }}>
           <div>
             <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>一、正常上下班（無外出）</h4>
             <p style={{ margin: '3px 0', fontSize: 13 }}>08:00 前打「上班」卡（需定位於辦公室）</p>
