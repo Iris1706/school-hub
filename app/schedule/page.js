@@ -125,7 +125,7 @@ export default function SchedulePage() {
       <h1 className="page-title">每日行程</h1>
 
       {/* 本月員工排班表 */}
-      {!statusLoading && employees.length > 0 && (
+      {employees.length > 0 && (
         <div
           style={{
             background: "linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(168, 85, 247, 0.08) 100%)",
@@ -138,17 +138,17 @@ export default function SchedulePage() {
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-            <h3
-              style={{
-                margin: 0,
-                fontSize: 14,
-                fontWeight: 600,
-                color: "var(--text-primary)",
-              }}
-            >
-              本月員工排班表
-            </h3>
-            <div style={{ display: "flex", gap: 6 }}>
+            <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+              <h3
+                style={{
+                  margin: 0,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: "var(--text-primary)",
+                }}
+              >
+                本月員工排班表
+              </h3>
               <button
                 className="secondary"
                 onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1))}
@@ -292,24 +292,8 @@ export default function SchedulePage() {
             height: "fit-content",
           }}
         >
-          <div style={{ marginBottom: 6, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ marginBottom: 6 }}>
             <h3 style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>{monthName}</h3>
-            <div style={{ display: "flex", gap: 6 }}>
-              <button
-                className="secondary"
-                onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1))}
-                style={{ padding: "4px 8px", fontSize: 12 }}
-              >
-                ←
-              </button>
-              <button
-                className="secondary"
-                onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1))}
-                style={{ padding: "4px 8px", fontSize: 12 }}
-              >
-                →
-              </button>
-            </div>
           </div>
 
           {/* 星期頭 */}
