@@ -35,216 +35,178 @@ export default function TrainingPage() {
         SOP 文件、操作手冊與教學資源
       </p>
 
-      {/* 打卡及請假規範區塊 */}
-      <div style={{ marginBottom: 28 }}>
-        <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, color: '#3b82f6' }}>📅 打卡及請假規範</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16 }}>
-          {/* 項目 1 */}
-          <div style={itemCardStyle('#3b82f6')}>
-            <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>一、正常上下班（無外出）</h3>
-            <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)' }}>
-              <p style={{ margin: '6px 0' }}>08:00 前 打「上班」卡（需定位於辦公室）</p>
-              <p style={{ margin: '6px 0' }}>17:00 後 打「下班」卡（需定位於辦公室）</p>
-            </div>
-          </div>
+      {/* 打卡及請假規範 - 大卡片 */}
+      <div style={{
+        background: 'var(--surface-1)',
+        border: '1px solid var(--border)',
+        borderLeft: '4px solid #3b82f6',
+        borderRadius: 'var(--radius)',
+        padding: '16px',
+        marginBottom: 20
+      }}>
+        <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, color: '#3b82f6', marginTop: 0 }}>📅 打卡及請假規範</h2>
 
-          {/* 項目 2 */}
-          <div style={itemCardStyle('#3b82f6')}>
-            <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>請假規範</h3>
-            <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)' }}>
-              <p style={{ margin: '6px 0' }}>病假、事假：可當日申請</p>
-              <p style={{ margin: '6px 0' }}>特休：須提前申請，不可當日提出</p>
-              <p style={{ margin: '6px 0' }}>外出前至少 30 分鐘送出請假單</p>
-            </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 16 }}>
+          <div>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>一、正常上下班（無外出）</h4>
+            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>08:00 前 打「上班」卡（需定位於辦公室）</p>
+            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>17:00 後 打「下班」卡（需定位於辦公室）</p>
           </div>
+          <div>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>請假規範</h4>
+            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>病假、事假：可當日申請</p>
+            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>特休：須提前申請，不可當日提出</p>
+            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>外出前至少 30 分鐘送出請假單</p>
+          </div>
+        </div>
 
-          {/* 項目 3 */}
-          <div style={itemCardStyle('#3b82f6')}>
-            <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>忘記打卡提醒</h3>
-            <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)' }}>
-              <p style={{ margin: '6px 0' }}>每月享有 2 次補簽額度</p>
-              <p style={{ margin: '6px 0' }}>超過 2 次將依公司規定扣款</p>
-              <p style={{ margin: '6px 0' }}>請務必記打卡，以免影響薪資</p>
-            </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20 }}>
+          <div>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>忘記打卡提醒</h4>
+            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>每月享有 2 次補簽額度</p>
+            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>超過 2 次將依公司規定扣款</p>
+            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>請務必記打卡，以免影響薪資</p>
           </div>
+          <div>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>（一）當日簽天外出</h4>
+            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>08:00 前 先打「上班」卡</p>
+            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>各地點 臨時打「外出」卡</p>
+            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>17:00 後 打「下班」卡</p>
+          </div>
+          <div>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>（二）上午外出，之後返回</h4>
+            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>08:00 前 先打「上班」卡</p>
+            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>外出地點 打「外出」卡</p>
+            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>返回辦公室 打「返回」卡</p>
+            <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>17:00 後 打「下班」卡</p>
+          </div>
+        </div>
 
-          {/* 項目 4 */}
-          <div style={itemCardStyle('#3b82f6')}>
-            <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>（一）當日簽天外出</h3>
-            <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)' }}>
-              <p style={{ margin: '6px 0' }}>08:00 前 先打「上班」卡</p>
-              <p style={{ margin: '6px 0' }}>各地點 臨時打「外出」卡</p>
-              <p style={{ margin: '6px 0' }}>17:00 後 打「下班」卡</p>
-            </div>
-          </div>
-
-          {/* 項目 5 */}
-          <div style={itemCardStyle('#3b82f6')}>
-            <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>（二）上午外出，之後返回</h3>
-            <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)' }}>
-              <p style={{ margin: '6px 0' }}>08:00 前 先打「上班」卡</p>
-              <p style={{ margin: '6px 0' }}>外出地點 打「外出」卡</p>
-              <p style={{ margin: '6px 0' }}>返回辦公室 打「返回」卡</p>
-              <p style={{ margin: '6px 0' }}>17:00 後 打「下班」卡</p>
-            </div>
-          </div>
-
-          {/* 項目 6 */}
-          <div style={itemCardStyle('#3b82f6')}>
-            <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>（三）下午外出，不再返回</h3>
-            <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)' }}>
-              <p style={{ margin: '6px 0' }}>08:00 前 於辦公室打「上班」卡</p>
-              <p style={{ margin: '6px 0' }}>出發外出 打「外出」卡</p>
-              <p style={{ margin: '6px 0' }}>17:00 後 打「下班」卡</p>
-            </div>
-          </div>
+        <div style={{ marginTop: 16 }}>
+          <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>（三）下午外出，不再返回</h4>
+          <p style={{ margin: '4px 0', fontSize: 13, lineHeight: 1.5 }}>08:00 前 於辦公室打「上班」卡   •   出發外出 打「外出」卡   •   17:00 後 打「下班」卡</p>
         </div>
       </div>
 
-      {/* 外出規定區塊 */}
-      <div style={{ marginBottom: 28 }}>
-        <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, color: '#f59e0b' }}>🚗 外出規定</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16 }}>
-          {/* 項目 1 */}
-          <div style={itemCardStyle('#f59e0b')}>
-            <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>一般外出任務</h3>
-            <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)' }}>
-              <p style={{ margin: '6px 0', fontWeight: 600 }}>快速任務</p>
-              <p style={{ margin: '2px 0 10px 0' }}>單一學校：約 16:00 之後</p>
-              <p style={{ margin: '6px 0', fontWeight: 600 }}>託時任務</p>
-              <p style={{ margin: '2px 0' }}>請備妥處理內容或台數</p>
-            </div>
-          </div>
+      {/* 外出規定 - 大卡片 */}
+      <div style={{
+        background: 'var(--surface-1)',
+        border: '1px solid var(--border)',
+        borderLeft: '4px solid #f59e0b',
+        borderRadius: 'var(--radius)',
+        padding: '16px',
+        marginBottom: 20
+      }}>
+        <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, color: '#f59e0b', marginTop: 0 }}>🚗 外出規定</h2>
 
-          {/* 項目 2 */}
-          <div style={itemCardStyle('#f59e0b')}>
-            <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>巡檢標準（兩週未連線台數）</h3>
-            <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)' }}>
-              <p style={{ margin: '4px 0' }}>250+ 台：2 人/半天</p>
-              <p style={{ margin: '4px 0' }}>180-249 台：1 人/整天</p>
-              <p style={{ margin: '4px 0' }}>61-179 台：1 人/半天</p>
-              <p style={{ margin: '4px 0' }}>20-60 台：彈性</p>
-              <p style={{ margin: '4px 0' }}>0-19 台：彈性</p>
-            </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 16 }}>
+          <div>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>一般外出任務</h4>
+            <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>快速任務</p>
+            <p style={{ margin: '2px 0 10px 0', fontSize: 13 }}>單一學校：約 16:00 之後</p>
+            <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>託時任務</p>
+            <p style={{ margin: '2px 0', fontSize: 13 }}>請備妥處理內容或台數</p>
           </div>
+          <div>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>巡檢標準（兩週未連線台數）</h4>
+            <p style={{ margin: '3px 0', fontSize: 13 }}>250+ 台：2 人/半天</p>
+            <p style={{ margin: '3px 0', fontSize: 13 }}>180-249 台：1 人/整天</p>
+            <p style={{ margin: '3px 0', fontSize: 13 }}>61-179 台：1 人/半天</p>
+            <p style={{ margin: '3px 0', fontSize: 13 }}>20-60 台：彈性</p>
+            <p style={{ margin: '3px 0', fontSize: 13 }}>0-19 台：彈性</p>
+          </div>
+        </div>
 
-          {/* 項目 3 */}
-          <div style={itemCardStyle('#f59e0b')}>
-            <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>地區分類</h3>
-            <div style={contentStyle}>
-              <p style={{ margin: '4px 0', fontWeight: 700, fontSize: 14, background: '#fef3c7', padding: '3px 6px', borderRadius: '4px', display: 'inline-block' }}>市區</p>
-              <p style={{ margin: '3px 0 8px 0', fontSize: 14 }}>鳳山、大寮、三民、新興、前金、烏松、鼓山、蓋埤、左營、仁武、小港、苦雄、大樹</p>
-              <p style={{ margin: '4px 0', fontWeight: 700, fontSize: 14, background: '#fef3c7', padding: '3px 6px', borderRadius: '4px', display: 'inline-block' }}>非市區</p>
-              <p style={{ margin: '3px 0', fontSize: 14 }}>旗津、路竹、岡山、大社、林園、橋頭、蒸蒂、燕巢、六龜、永安、茂林、桃源</p>
-            </div>
-          </div>
+        <div>
+          <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>地區分類</h4>
+          <p style={{ margin: '4px 0', fontWeight: 700, fontSize: 13, background: '#fef3c7', padding: '3px 6px', borderRadius: '4px', display: 'inline-block' }}>市區</p>
+          <p style={{ margin: '3px 0 8px 0', fontSize: 13 }}>鳳山、大寮、三民、新興、前金、烏松、鼓山、蓋埤、左營、仁武、小港、苦雄、大樹</p>
+          <p style={{ margin: '4px 0', fontWeight: 700, fontSize: 13, background: '#fef3c7', padding: '3px 6px', borderRadius: '4px', display: 'inline-block' }}>非市區</p>
+          <p style={{ margin: '3px 0', fontSize: 13 }}>旗津、路竹、岡山、大社、林園、橋頭、蒸蒂、燕巢、六龜、永安、茂林、桃源</p>
         </div>
       </div>
 
-      {/* 黑貓派車規定區塊 */}
-      <div style={{ marginBottom: 28 }}>
-        <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, color: '#10b981' }}>📦 黑貓派車規定</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16 }}>
-          {/* 項目 1 - 官網派車 */}
-          <div style={itemCardStyle('#10b981')}>
-            <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>一、官網派車（優先使用）</h3>
-            <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)' }}>
-              <p style={{ margin: '6px 0' }}>✅ 只能選隔天收件</p>
-              <p style={{ margin: '6px 0' }}>✅ 產生正確黑貓單號（可正常查詢）</p>
-              <p style={{ margin: '10px 0 0 0' }}>
-                <a href="https://www.takkyubin.com.tw/YMTContract/aspx/Login.aspx" target="_blank" rel="noopener noreferrer" style={{ color: '#10b981', textDecoration: 'none', fontWeight: 500 }}>🔗 黑貓宅急便官網派車</a>
-              </p>
-            </div>
+      {/* 黑貓派車規定 - 大卡片 */}
+      <div style={{
+        background: 'var(--surface-1)',
+        border: '1px solid var(--border)',
+        borderLeft: '4px solid #10b981',
+        borderRadius: 'var(--radius)',
+        padding: '16px',
+        marginBottom: 20
+      }}>
+        <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, color: '#10b981', marginTop: 0 }}>📦 黑貓派車規定</h2>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20, marginBottom: 16 }}>
+          <div>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>一、官網派車（優先使用）</h4>
+            <p style={{ margin: '4px 0', fontSize: 13 }}>✅ 只能選隔天收件</p>
+            <p style={{ margin: '4px 0', fontSize: 13 }}>✅ 產生正確黑貓單號</p>
+            <p style={{ margin: '8px 0 0 0' }}>
+              <a href="https://www.takkyubin.com.tw/YMTContract/aspx/Login.aspx" target="_blank" rel="noopener noreferrer" style={{ color: '#10b981', textDecoration: 'none', fontWeight: 500, fontSize: 13 }}>🔗 官網派車</a>
+            </p>
           </div>
-
-          {/* 項目 2 - 台南／嘉義帳密 */}
-          <div style={itemCardStyle('#10b981')}>
-            <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>台南／嘉義 帳密</h3>
-            <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)' }}>
-              <p style={{ margin: '6px 0', fontWeight: 600 }}>帳號</p>
-              <p style={{ margin: '2px 0 10px 0', fontFamily: 'monospace' }}>2848061309</p>
-              <p style={{ margin: '6px 0', fontWeight: 600 }}>密碼</p>
-              <p style={{ margin: '2px 0', fontFamily: 'monospace' }}>SA28480613</p>
-            </div>
+          <div>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>台南／嘉義 帳密</h4>
+            <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>帳號</p>
+            <p style={{ margin: '2px 0 8px 0', fontSize: 13, fontFamily: 'monospace' }}>2848061309</p>
+            <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>密碼</p>
+            <p style={{ margin: '2px 0', fontSize: 13, fontFamily: 'monospace' }}>SA28480613</p>
           </div>
-
-          {/* 項目 3 - 高雄帳密 */}
-          <div style={itemCardStyle('#10b981')}>
-            <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>高雄 帳密</h3>
-            <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)' }}>
-              <p style={{ margin: '6px 0', fontWeight: 600 }}>帳號</p>
-              <p style={{ margin: '2px 0 10px 0', fontFamily: 'monospace' }}>2848061341</p>
-              <p style={{ margin: '6px 0', fontWeight: 600 }}>密碼</p>
-              <p style={{ margin: '2px 0 10px 0', fontFamily: 'monospace' }}>Sa28480613@@</p>
-              <p style={{ margin: '8px 0 4px 0' }}>👉 操作步驟：線上印單 → 單筆建立</p>
-              <p style={{ margin: '4px 0 0 0', color: '#a8631a' }}>⚠️ 密碼請勿擅自變更，如需變更請洽 Jimmy</p>
-            </div>
+          <div>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>高雄 帳密</h4>
+            <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>帳號</p>
+            <p style={{ margin: '2px 0 8px 0', fontSize: 13, fontFamily: 'monospace' }}>2848061341</p>
+            <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>密碼</p>
+            <p style={{ margin: '2px 0 8px 0', fontSize: 13, fontFamily: 'monospace' }}>Sa28480613@@</p>
+            <p style={{ margin: '0', fontSize: 12, color: '#a8631a' }}>⚠️ 請勿擅自變更</p>
           </div>
+        </div>
 
-          {/* 項目 4-6 - 統一收件資料、注意、文字客服派車（合併為一卡） */}
-          <div style={itemCardStyle('#10b981')} colspan="3">
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
-              {/* 左列 - 統一收件資料 */}
-              <div style={{ paddingRight: 12 }}>
-                <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>二、統一收件資料</h3>
-                <div style={{ lineHeight: 1.8, color: 'var(--text-secondary)' }}>
-                  <p style={{ margin: '8px 0', fontWeight: 600, fontSize: 14 }}>地址</p>
-                  <p style={{ margin: '2px 0 12px 0', fontSize: 14 }}>830 高雄市鳳山區文苑街 75 號</p>
-                  <p style={{ margin: '8px 0', fontWeight: 600, fontSize: 14 }}>收件人</p>
-                  <p style={{ margin: '2px 0 12px 0', fontSize: 14 }}>晶盛科技文山國小駐點單位</p>
-                  <p style={{ margin: '8px 0', fontWeight: 600, fontSize: 14 }}>電話</p>
-                  <p style={{ margin: '2px 0 3px 0', fontSize: 14 }}>07-7260089 #161–167</p>
-                  <p style={{ margin: '3px 0', fontSize: 14 }}>0910165191（公務機）</p>
-                </div>
-              </div>
-
-              {/* 中列 - 注意 */}
-              <div style={{ paddingRight: 12, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
-                <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, color: '#a8631a' }}>⚠️ 注意</h3>
-                <div style={{ lineHeight: 1.8, color: 'var(--text-secondary)' }}>
-                  <p style={{ margin: '0', fontSize: 14, color: '#a8631a', fontWeight: 500 }}>公務機請勿靜音，需專門接黑貓電話</p>
-                </div>
-              </div>
-
-              {/* 右列 - 文字客服派車 */}
-              <div>
-                <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>三、文字客服派車（急件）</h3>
-                <div style={{ lineHeight: 1.8, color: 'var(--text-secondary)' }}>
-                  <p style={{ margin: '8px 0', fontSize: 14 }}>✅ 中午前申請，有機會當天收件</p>
-                  <p style={{ margin: '8px 0', fontSize: 14 }}>❌ 客服詢問事項較多</p>
-                  <p style={{ margin: '12px 0 12px 0', fontSize: 14 }}>非急件不建議使用</p>
-                  <p style={{ margin: '0' }}>
-                    <a href="https://neko.t-cat.com.tw/webchat/index.html" target="_blank" rel="noopener noreferrer" style={{ color: '#10b981', textDecoration: 'none', fontWeight: 500, fontSize: 14 }}>🔗 文字客服入口</a>
-                  </p>
-                </div>
-              </div>
-            </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20, marginBottom: 16 }}>
+          <div>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>二、統一收件資料</h4>
+            <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>地址</p>
+            <p style={{ margin: '2px 0 8px 0', fontSize: 13 }}>830 高雄市鳳山區文苑街 75 號</p>
+            <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>收件人</p>
+            <p style={{ margin: '2px 0 8px 0', fontSize: 13 }}>晶盛科技文山國小駐點單位</p>
+            <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>電話</p>
+            <p style={{ margin: '2px 0 2px 0', fontSize: 13 }}>07-7260089 #161–167</p>
+            <p style={{ margin: '2px 0', fontSize: 13 }}>0910165191（公務機）</p>
           </div>
-
-          {/* 項目 7 - 常見問題 */}
-          <div style={itemCardStyle('#10b981')}>
-            <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>常見問題</h3>
-            <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)' }}>
-              <p style={{ margin: '6px 0', fontWeight: 600 }}>🔹 Q：電話後四碼？</p>
-              <p style={{ margin: '2px 0 10px 0' }}>• 台南 → 8838（總公司電話）</p>
-              <p style={{ margin: '2px 0 10px 0' }}>• 高雄 → 8332（三多電話）</p>
-              <p style={{ margin: '6px 0', fontWeight: 600 }}>🔹 Q：誰付費怎麼選？</p>
-              <p style={{ margin: '2px 0 2px 0' }}>A1 收回我們這 → 選「收件者付費」</p>
-              <p style={{ margin: '2px 0' }}>A2 派車去B → 選「第三方收費」</p>
-            </div>
+          <div>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: '#a8631a' }}>⚠️ 注意</h4>
+            <p style={{ margin: '4px 0', fontSize: 13, color: '#a8631a', fontWeight: 500 }}>公務機請勿靜音，需專門接黑貓電話</p>
           </div>
+          <div>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>三、文字客服派車（急件）</h4>
+            <p style={{ margin: '4px 0', fontSize: 13 }}>✅ 中午前申請，有機會當天收件</p>
+            <p style={{ margin: '4px 0', fontSize: 13 }}>❌ 客服詢問事項較多</p>
+            <p style={{ margin: '8px 0 8px 0', fontSize: 13 }}>非急件不建議使用</p>
+            <p style={{ margin: '0' }}>
+              <a href="https://neko.t-cat.com.tw/webchat/index.html" target="_blank" rel="noopener noreferrer" style={{ color: '#10b981', textDecoration: 'none', fontWeight: 500, fontSize: 13 }}>🔗 文字客服入口</a>
+            </p>
+          </div>
+        </div>
 
-          {/* 項目 8 - 嘉義數辦地址 */}
-          <div style={itemCardStyle('#10b981')}>
-            <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>嘉義數辦地址</h3>
-            <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)' }}>
-              <p style={{ margin: '6px 0', fontWeight: 600 }}>地址</p>
-              <p style={{ margin: '2px 0 10px 0' }}>嘉義市西區四維路 25 號（嘉義市智慧教育中心）</p>
-              <p style={{ margin: '6px 0', fontWeight: 600 }}>聯絡人</p>
-              <p style={{ margin: '2px 0 10px 0' }}>蕭博元 Wayne</p>
-              <p style={{ margin: '6px 0', fontWeight: 600 }}>電話</p>
-              <p style={{ margin: '2px 0', fontFamily: 'monospace' }}>0955170523</p>
-            </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+          <div>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>常見問題</h4>
+            <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>Q：電話後四碼？</p>
+            <p style={{ margin: '2px 0 8px 0', fontSize: 13 }}>• 台南 → 8838（總公司電話）</p>
+            <p style={{ margin: '2px 0 8px 0', fontSize: 13 }}>• 高雄 → 8332（三多電話）</p>
+            <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>Q：誰付費怎麼選？</p>
+            <p style={{ margin: '2px 0 2px 0', fontSize: 13 }}>A1 收回我們這 → 選「收件者付費」</p>
+            <p style={{ margin: '2px 0', fontSize: 13 }}>A2 派車去B → 選「第三方收費」</p>
+          </div>
+          <div>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>嘉義數辦地址</h4>
+            <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>地址</p>
+            <p style={{ margin: '2px 0 8px 0', fontSize: 13 }}>嘉義市西區四維路 25 號（嘉義市智慧教育中心）</p>
+            <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>聯絡人</p>
+            <p style={{ margin: '2px 0 8px 0', fontSize: 13 }}>蕭博元 Wayne</p>
+            <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>電話</p>
+            <p style={{ margin: '2px 0', fontSize: 13, fontFamily: 'monospace' }}>0955170523</p>
           </div>
         </div>
       </div>
