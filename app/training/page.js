@@ -155,11 +155,11 @@ export default function TrainingPage() {
             <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>地區分類</h4>
             <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px', marginBottom: 10, background: '#f9fafb', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' }}>
               <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 12 }}>市區</p>
-              <p style={{ margin: '3px 0', fontSize: 11 }}>鳳山、大寮、三民、新興、前金、烏松、鼓山、蓋埤、左營、仁武、小港、苦雄、大樹</p>
+              <p style={{ margin: '3px 0', fontSize: 11 }}>鳳山、大寮、三民、新興、前金、鳥松、鼓山、鹽埕、左營、仁武、前鎮、小港、苓雅、大樹</p>
             </div>
             <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px', background: '#f9fafb', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' }}>
               <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 12 }}>非市區</p>
-              <p style={{ margin: '3px 0', fontSize: 11 }}>旗津、路竹、岡山、大社、林園、橋頭、蒸蒂、燕巢、六龜、永安、茂林、桃源、楠梓、梓官、旗山、彌陀、湖內、那瑪夏、甲仙、內門、田寮</p>
+              <p style={{ margin: '3px 0', fontSize: 11 }}>旗津、路竹、岡山、大社、林園、橋頭、楠梓、燕巢、阿蓮、六龜、美濃、茄萣、杉林、梓官、旗山、彌陀、湖內、那瑪夏、甲仙、內門、田寮、永安、茂林、桃源</p>
             </div>
           </div>
 
