@@ -146,102 +146,99 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
               <div style={{ fontSize: '14px', fontWeight: '500' }}>{row[7] || '-'}</div>
             </div>
 
-            <div style={{ gridColumn: 'span 1', display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-                {/* Complete Button */}
-                <button
-                  onClick={() => onShowCompleteModal(index, row)}
-                  style={{
-                    background: '#10b981',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    padding: '8px 14px',
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px',
-                    fontSize: '13px',
-                    fontWeight: '500',
-                    transition: 'all 0.2s',
-                    whiteSpace: 'nowrap',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.background = '#059669';
-                    e.target.style.transform = 'scale(1.02)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.background = '#10b981';
-                    e.target.style.transform = 'scale(1)';
-                  }}
-                >
-                  <CheckCircle size={14} />
-                  完成
-                </button>
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+              {/* Complete Button */}
+              <button
+                onClick={() => onShowCompleteModal(index, row)}
+                style={{
+                  background: '#10b981',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '8px 14px',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  transition: 'all 0.2s',
+                  whiteSpace: 'nowrap',
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = '#059669';
+                  e.target.style.transform = 'scale(1.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = '#10b981';
+                  e.target.style.transform = 'scale(1)';
+                }}
+              >
+                <CheckCircle size={14} />
+                完成
+              </button>
 
-                {/* Edit Button */}
-                <button
-                  onClick={() => onShowEditModal(index, row)}
-                  style={{
-                    background: '#3b82f6',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    padding: '8px 14px',
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px',
-                    fontSize: '13px',
-                    fontWeight: '500',
-                    transition: 'all 0.2s',
-                    whiteSpace: 'nowrap',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.background = '#2563eb';
-                    e.target.style.transform = 'scale(1.02)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.background = '#3b82f6';
-                    e.target.style.transform = 'scale(1)';
-                  }}
-                >
-                  <Edit2 size={14} />
-                  編輯
-                </button>
+              {/* Edit Button */}
+              <button
+                onClick={() => onShowEditModal(index, row)}
+                style={{
+                  background: '#3b82f6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '8px 14px',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  transition: 'all 0.2s',
+                  whiteSpace: 'nowrap',
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = '#2563eb';
+                  e.target.style.transform = 'scale(1.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = '#3b82f6';
+                  e.target.style.transform = 'scale(1)';
+                }}
+              >
+                <Edit2 size={14} />
+                編輯
+              </button>
 
-                {/* Delete Button */}
-                <button
-                  onClick={() => handleDelete(index)}
-                  style={{
-                    background: '#ef4444',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    padding: '8px 14px',
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px',
-                    fontSize: '13px',
-                    fontWeight: '500',
-                    transition: 'all 0.2s',
-                    whiteSpace: 'nowrap',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.background = '#dc2626';
-                    e.target.style.transform = 'scale(1.02)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.background = '#ef4444';
-                    e.target.style.transform = 'scale(1)';
-                  }}
-                >
-                  <Trash2 size={14} />
-                  刪除
-                </button>
+              {/* Delete Button */}
+              <button
+                onClick={() => handleDelete(index)}
+                style={{
+                  background: '#ef4444',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '8px 14px',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  transition: 'all 0.2s',
+                  whiteSpace: 'nowrap',
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = '#dc2626';
+                  e.target.style.transform = 'scale(1.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = '#ef4444';
+                  e.target.style.transform = 'scale(1)';
+                }}
+              >
+                <Trash2 size={14} />
+                刪除
+              </button>
             </div>
           </div>
         ))}
