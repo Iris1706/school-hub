@@ -5,6 +5,7 @@ import PeriodSelector from '@/components/repairs/PeriodSelector';
 import CompletedTable from '@/components/repairs/CompletedTable';
 import InProgressTable from '@/components/repairs/InProgressTable';
 import EditModal from '@/components/repairs/EditModal';
+import RepairDashboard from '@/components/repairs/RepairDashboard';
 
 export default function HardwarePage() {
   const [selectedPeriod, setSelectedPeriod] = useState('Pawn');
@@ -117,19 +118,8 @@ export default function HardwarePage() {
 
       {/* 儀表板 */}
       {activeTab === 'dashboard' && (
-        <div
-          style={{
-            background:
-              'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%)',
-            borderLeft: '3px solid var(--accent)',
-            padding: '20px',
-            borderRadius: '8px',
-            textAlign: 'center',
-          }}
-        >
-          <p style={{ fontSize: 14, color: 'var(--text-secondary)', margin: 0 }}>
-            📊 儀表板 - 內容待定
-          </p>
+        <div>
+          <RepairDashboard sheetName={selectedPeriod} />
         </div>
       )}
 
