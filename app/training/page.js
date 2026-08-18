@@ -145,48 +145,100 @@ export default function TrainingPage() {
       <div style={{ marginBottom: 28 }}>
         <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, color: '#10b981' }}>📦 黑貓派車規定</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
-          {/* 項目 1 */}
+          {/* 項目 1 - 官網派車 */}
           <div style={itemCardStyle('#10b981')}>
-            <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, color: 'var(--text-primary)' }}>一、營網派車（優先使用）</h3>
+            <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, color: 'var(--text-primary)' }}>一、官網派車（優先使用）</h3>
             <div style={contentStyle}>
-              <p style={{ margin: '6px 0', fontSize: 12 }}>✓ 只能選離天收件</p>
-              <p style={{ margin: '6px 0', fontSize: 12 }}>✓ 產生正確無誤單號</p>
-              <p style={{ margin: '6px 0', fontSize: 12 }}>（可正常查詢）</p>
+              <p style={{ margin: '6px 0', fontSize: 12 }}>✅ 只能選隔天收件</p>
+              <p style={{ margin: '6px 0', fontSize: 12 }}>✅ 產生正確黑貓單號（可正常查詢）</p>
+              <p style={{ margin: '10px 0 0 0', fontSize: 12 }}>
+                <a href="https://www.takkyubin.com.tw/YMTContract/aspx/Login.aspx" target="_blank" rel="noopener noreferrer" style={{ color: '#10b981', textDecoration: 'none', fontWeight: 500 }}>🔗 黑貓宅急便官網派車</a>
+              </p>
             </div>
           </div>
 
-          {/* 項目 2 */}
+          {/* 項目 2 - 台南／嘉義帳密 */}
+          <div style={itemCardStyle('#10b981')}>
+            <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, color: 'var(--text-primary)' }}>台南／嘉義 帳密</h3>
+            <div style={contentStyle}>
+              <p style={{ margin: '4px 0', fontWeight: 500, fontSize: 12 }}>帳號</p>
+              <p style={{ margin: '2px 0 8px 0', fontSize: 11, fontFamily: 'monospace' }}>2848061309</p>
+              <p style={{ margin: '4px 0', fontWeight: 500, fontSize: 12 }}>密碼</p>
+              <p style={{ margin: '2px 0', fontSize: 11, fontFamily: 'monospace' }}>SA28480613</p>
+            </div>
+          </div>
+
+          {/* 項目 3 - 高雄帳密 */}
+          <div style={itemCardStyle('#10b981')}>
+            <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, color: 'var(--text-primary)' }}>高雄 帳密</h3>
+            <div style={contentStyle}>
+              <p style={{ margin: '4px 0', fontWeight: 500, fontSize: 12 }}>帳號</p>
+              <p style={{ margin: '2px 0 8px 0', fontSize: 11, fontFamily: 'monospace' }}>2848061341</p>
+              <p style={{ margin: '4px 0', fontWeight: 500, fontSize: 12 }}>密碼</p>
+              <p style={{ margin: '2px 0 8px 0', fontSize: 11, fontFamily: 'monospace' }}>Sa28480613@@</p>
+              <p style={{ margin: '8px 0 4px 0', fontSize: 12 }}>👉 操作步驟：線上印單 → 單筆建立</p>
+              <p style={{ margin: '4px 0 0 0', fontSize: 11, color: '#a8631a' }}>⚠️ 密碼請勿擅自變更，如需變更請洽 Jimmy</p>
+            </div>
+          </div>
+
+          {/* 項目 4 - 統一收件資料 */}
           <div style={itemCardStyle('#10b981')}>
             <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, color: 'var(--text-primary)' }}>二、統一收件資料</h3>
             <div style={contentStyle}>
               <p style={{ margin: '4px 0', fontWeight: 500, fontSize: 12 }}>地址</p>
-              <p style={{ margin: '2px 0 6px 0', fontSize: 11 }}>830 高雄市鳳山區文苑 75 號</p>
+              <p style={{ margin: '2px 0 8px 0', fontSize: 11 }}>830 高雄市鳳山區文苑街 75 號</p>
               <p style={{ margin: '4px 0', fontWeight: 500, fontSize: 12 }}>收件人</p>
-              <p style={{ margin: '2px 0 6px 0', fontSize: 11 }}>盖盖科技文山國小點點</p>
+              <p style={{ margin: '2px 0 8px 0', fontSize: 11 }}>晶盛科技文山國小駐點單位</p>
               <p style={{ margin: '4px 0', fontWeight: 500, fontSize: 12 }}>電話</p>
-              <p style={{ margin: '2px 0', fontSize: 11 }}>07-7260089 #161-167</p>
+              <p style={{ margin: '2px 0 2px 0', fontSize: 11 }}>07-7260089 #161–167</p>
+              <p style={{ margin: '2px 0', fontSize: 11 }}>0910165191（公務機）</p>
             </div>
           </div>
 
-          {/* 項目 3 */}
+          {/* 項目 5 - 注意 */}
+          <div style={itemCardStyle('#10b981')}>
+            <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, color: '#a8631a' }}>⚠️ 注意</h3>
+            <div style={contentStyle}>
+              <p style={{ margin: '0', fontSize: 12, color: '#a8631a' }}>公務機請勿靜音，需專門接黑貓電話</p>
+            </div>
+          </div>
+
+          {/* 項目 6 - 文字客服派車 */}
+          <div style={itemCardStyle('#10b981')}>
+            <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, color: 'var(--text-primary)' }}>三、文字客服派車（急件）</h3>
+            <div style={contentStyle}>
+              <p style={{ margin: '4px 0', fontSize: 12 }}>✅ 中午前申請，有機會當天收件</p>
+              <p style={{ margin: '4px 0', fontSize: 12 }}>❌ 客服詢問事項較多</p>
+              <p style={{ margin: '8px 0 0 0', fontSize: 12 }}>非急件不建議使用</p>
+              <p style={{ margin: '10px 0 0 0', fontSize: 12 }}>
+                <a href="https://neko.t-cat.com.tw/webchat/index.html" target="_blank" rel="noopener noreferrer" style={{ color: '#10b981', textDecoration: 'none', fontWeight: 500 }}>🔗 文字客服入口</a>
+              </p>
+            </div>
+          </div>
+
+          {/* 項目 7 - 常見問題 */}
           <div style={itemCardStyle('#10b981')}>
             <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, color: 'var(--text-primary)' }}>常見問題</h3>
             <div style={contentStyle}>
-              <p style={{ margin: '4px 0', fontWeight: 500, fontSize: 12 }}>電話後四碼</p>
-              <p style={{ margin: '2px 0 6px 0', fontSize: 11 }}>台南→8838 / 高雄→8332</p>
-              <p style={{ margin: '4px 0', fontWeight: 500, fontSize: 12 }}>費用選擇</p>
-              <p style={{ margin: '2px 0', fontSize: 11 }}>收回我們→「收件者付費」</p>
-              <p style={{ margin: '2px 0', fontSize: 11 }}>派車去B→「第三方收費」</p>
+              <p style={{ margin: '4px 0', fontWeight: 500, fontSize: 12 }}>🔹 Q：電話後四碼？</p>
+              <p style={{ margin: '2px 0 8px 0', fontSize: 11 }}>• 台南 → 8838（總公司電話）</p>
+              <p style={{ margin: '2px 0 8px 0', fontSize: 11 }}>• 高雄 → 8332（三多電話）</p>
+              <p style={{ margin: '4px 0', fontWeight: 500, fontSize: 12 }}>🔹 Q：誰付費怎麼選？</p>
+              <p style={{ margin: '2px 0 2px 0', fontSize: 11 }}>A1 收回我們這 → 選「收件者付費」</p>
+              <p style={{ margin: '2px 0', fontSize: 11 }}>A2 派車去B → 選「第三方收費」</p>
             </div>
           </div>
 
-          {/* 項目 4 */}
+          {/* 項目 8 - 嘉義數辦地址 */}
           <div style={itemCardStyle('#10b981')}>
-            <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, color: 'var(--text-primary)' }}>四、文字客服派車（急件）</h3>
+            <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, color: 'var(--text-primary)' }}>嘉義數辦地址</h3>
             <div style={contentStyle}>
-              <p style={{ margin: '6px 0', fontSize: 12 }}>✓ 中午前申請，有機會當天收件</p>
-              <p style={{ margin: '6px 0', fontSize: 12 }}>✗ 客服詢問事項較多</p>
-              <p style={{ margin: '6px 0', fontSize: 12 }}>非急件不建議使用</p>
+              <p style={{ margin: '4px 0', fontWeight: 500, fontSize: 12 }}>地址</p>
+              <p style={{ margin: '2px 0 8px 0', fontSize: 11 }}>嘉義市西區四維路 25 號（嘉義市智慧教育中心）</p>
+              <p style={{ margin: '4px 0', fontWeight: 500, fontSize: 12 }}>聯絡人</p>
+              <p style={{ margin: '2px 0 8px 0', fontSize: 11 }}>蕭博元 Wayne</p>
+              <p style={{ margin: '4px 0', fontWeight: 500, fontSize: 12 }}>電話</p>
+              <p style={{ margin: '2px 0', fontSize: 11 }}>0955170523</p>
             </div>
           </div>
         </div>
