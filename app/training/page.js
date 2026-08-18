@@ -19,11 +19,11 @@ export default function TrainingPage() {
     border: '1px solid var(--border)',
     borderLeft: `4px solid ${borderColor}`,
     borderRadius: 'var(--radius)',
-    padding: '16px',
+    padding: '12px',
   });
 
   const contentStyle = {
-    fontSize: 13,
+    fontSize: 14,
     lineHeight: 1.6,
     color: 'var(--text-secondary)',
   };
@@ -38,7 +38,7 @@ export default function TrainingPage() {
       {/* 打卡及請假規範區塊 */}
       <div style={{ marginBottom: 28 }}>
         <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, color: '#3b82f6' }}>📅 打卡及請假規範</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16 }}>
           {/* 項目 1 */}
           <div style={itemCardStyle('#3b82f6')}>
             <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, color: 'var(--text-primary)' }}>一、正常上下班（無外出）</h3>
@@ -104,7 +104,7 @@ export default function TrainingPage() {
       {/* 外出規定區塊 */}
       <div style={{ marginBottom: 28 }}>
         <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, color: '#f59e0b' }}>🚗 外出規定</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16 }}>
           {/* 項目 1 */}
           <div style={itemCardStyle('#f59e0b')}>
             <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, color: 'var(--text-primary)' }}>一般外出任務</h3>
@@ -144,7 +144,7 @@ export default function TrainingPage() {
       {/* 黑貓派車規定區塊 */}
       <div style={{ marginBottom: 28 }}>
         <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, color: '#10b981' }}>📦 黑貓派車規定</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16 }}>
           {/* 項目 1 - 官網派車 */}
           <div style={itemCardStyle('#10b981')}>
             <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, color: 'var(--text-primary)' }}>一、官網派車（優先使用）</h3>
@@ -181,38 +181,43 @@ export default function TrainingPage() {
             </div>
           </div>
 
-          {/* 項目 4 - 統一收件資料 */}
+          {/* 項目 4-6 - 統一收件資料、注意、文字客服派車（合併為一卡） */}
           <div style={itemCardStyle('#10b981')}>
-            <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, color: 'var(--text-primary)' }}>二、統一收件資料</h3>
-            <div style={contentStyle}>
-              <p style={{ margin: '4px 0', fontWeight: 500, fontSize: 12 }}>地址</p>
-              <p style={{ margin: '2px 0 8px 0', fontSize: 11 }}>830 高雄市鳳山區文苑街 75 號</p>
-              <p style={{ margin: '4px 0', fontWeight: 500, fontSize: 12 }}>收件人</p>
-              <p style={{ margin: '2px 0 8px 0', fontSize: 11 }}>晶盛科技文山國小駐點單位</p>
-              <p style={{ margin: '4px 0', fontWeight: 500, fontSize: 12 }}>電話</p>
-              <p style={{ margin: '2px 0 2px 0', fontSize: 11 }}>07-7260089 #161–167</p>
-              <p style={{ margin: '2px 0', fontSize: 11 }}>0910165191（公務機）</p>
-            </div>
-          </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+              {/* 左列 - 統一收件資料 */}
+              <div>
+                <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>二、統一收件資料</h3>
+                <div style={{ fontSize: 13, lineHeight: 1.6, color: 'var(--text-secondary)' }}>
+                  <p style={{ margin: '4px 0', fontWeight: 500, fontSize: 12 }}>地址</p>
+                  <p style={{ margin: '2px 0 8px 0', fontSize: 12 }}>830 高雄市鳳山區文苑街 75 號</p>
+                  <p style={{ margin: '4px 0', fontWeight: 500, fontSize: 12 }}>收件人</p>
+                  <p style={{ margin: '2px 0 8px 0', fontSize: 12 }}>晶盛科技文山國小駐點單位</p>
+                  <p style={{ margin: '4px 0', fontWeight: 500, fontSize: 12 }}>電話</p>
+                  <p style={{ margin: '2px 0 2px 0', fontSize: 12 }}>07-7260089 #161–167</p>
+                  <p style={{ margin: '2px 0', fontSize: 12 }}>0910165191（公務機）</p>
+                </div>
+              </div>
 
-          {/* 項目 5 - 注意 */}
-          <div style={itemCardStyle('#10b981')}>
-            <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, color: '#a8631a' }}>⚠️ 注意</h3>
-            <div style={contentStyle}>
-              <p style={{ margin: '0', fontSize: 12, color: '#a8631a' }}>公務機請勿靜音，需專門接黑貓電話</p>
-            </div>
-          </div>
+              {/* 中列 - 注意 */}
+              <div>
+                <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: '#a8631a' }}>⚠️ 注意</h3>
+                <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)' }}>
+                  <p style={{ margin: '0', fontSize: 12, color: '#a8631a' }}>公務機請勿靜音，需專門接黑貓電話</p>
+                </div>
+              </div>
 
-          {/* 項目 6 - 文字客服派車 */}
-          <div style={itemCardStyle('#10b981')}>
-            <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, color: 'var(--text-primary)' }}>三、文字客服派車（急件）</h3>
-            <div style={contentStyle}>
-              <p style={{ margin: '4px 0', fontSize: 12 }}>✅ 中午前申請，有機會當天收件</p>
-              <p style={{ margin: '4px 0', fontSize: 12 }}>❌ 客服詢問事項較多</p>
-              <p style={{ margin: '8px 0 0 0', fontSize: 12 }}>非急件不建議使用</p>
-              <p style={{ margin: '10px 0 0 0', fontSize: 12 }}>
-                <a href="https://neko.t-cat.com.tw/webchat/index.html" target="_blank" rel="noopener noreferrer" style={{ color: '#10b981', textDecoration: 'none', fontWeight: 500 }}>🔗 文字客服入口</a>
-              </p>
+              {/* 右列 - 文字客服派車 */}
+              <div>
+                <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>三、文字客服派車（急件）</h3>
+                <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)' }}>
+                  <p style={{ margin: '4px 0', fontSize: 12 }}>✅ 中午前申請，有機會當天收件</p>
+                  <p style={{ margin: '4px 0', fontSize: 12 }}>❌ 客服詢問事項較多</p>
+                  <p style={{ margin: '8px 0 0 0', fontSize: 12 }}>非急件不建議使用</p>
+                  <p style={{ margin: '10px 0 0 0', fontSize: 12 }}>
+                    <a href="https://neko.t-cat.com.tw/webchat/index.html" target="_blank" rel="noopener noreferrer" style={{ color: '#10b981', textDecoration: 'none', fontWeight: 500 }}>🔗 文字客服入口</a>
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -248,7 +253,7 @@ export default function TrainingPage() {
       <div style={{ marginBottom: 24 }}>
         <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, color: 'var(--text-primary)' }}>🔑 帳戶管理</h2>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16 }}>
           {/* 密碼 - 可折疊 */}
           <div
             style={{
@@ -256,7 +261,7 @@ export default function TrainingPage() {
               border: '1px solid var(--border)',
               borderLeft: '4px solid #8b5cf6',
               borderRadius: 'var(--radius)',
-              padding: '16px',
+              padding: '12px',
             }}
           >
             <button
@@ -299,7 +304,7 @@ export default function TrainingPage() {
               border: '1px solid var(--border)',
               borderLeft: '4px solid #ec4899',
               borderRadius: 'var(--radius)',
-              padding: '16px',
+              padding: '12px',
             }}
           >
             <button
