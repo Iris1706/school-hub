@@ -213,43 +213,51 @@ export default function TrainingPage() {
               <a href="https://www.takkyubin.com.tw/YMTContract/aspx/Login.aspx" target="_blank" rel="noopener noreferrer" style={{ color: '#10b981', textDecoration: 'none', fontWeight: 500, fontSize: 13 }}>🔗 官網派車</a>
             </p>
 
-            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, marginTop: 16, color: 'var(--text-primary)' }}>台南／嘉義 帳密</h4>
-            <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>帳號</p>
-            <p style={{ margin: '2px 0 8px 0', fontSize: 13, fontFamily: 'monospace' }}>2848061309</p>
-            <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>密碼</p>
-            <p style={{ margin: '2px 0', fontSize: 13, fontFamily: 'monospace' }}>SA28480613</p>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, marginTop: 16, color: 'var(--text-primary)' }}>台南／嘉義 帳密</h4>
+            <div style={{ border: '1px solid var(--border)', borderRadius: '6px', padding: '10px 12px', marginBottom: 12 }}>
+              <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>帳號</p>
+              <p style={{ margin: '2px 0 8px 0', fontSize: 13, fontFamily: 'monospace' }}>2848061309</p>
+              <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>密碼</p>
+              <p style={{ margin: '2px 0', fontSize: 13, fontFamily: 'monospace' }}>SA28480613</p>
+            </div>
 
-            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, marginTop: 16, color: 'var(--text-primary)' }}>高雄 帳密</h4>
-            <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>帳號</p>
-            <p style={{ margin: '2px 0 8px 0', fontSize: 13, fontFamily: 'monospace' }}>2848061341</p>
-            <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>密碼</p>
-            <p style={{ margin: '2px 0 8px 0', fontSize: 13, fontFamily: 'monospace' }}>Sa28480613@@</p>
-            <p style={{ margin: '0', fontSize: 12, color: '#a8631a' }}>⚠️ 請勿擅自變更</p>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, marginTop: 16, color: 'var(--text-primary)' }}>高雄 帳密</h4>
+            <div style={{ border: '1px solid var(--border)', borderRadius: '6px', padding: '10px 12px' }}>
+              <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>帳號</p>
+              <p style={{ margin: '2px 0 8px 0', fontSize: 13, fontFamily: 'monospace' }}>2848061341</p>
+              <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>密碼</p>
+              <p style={{ margin: '2px 0 8px 0', fontSize: 13, fontFamily: 'monospace' }}>Sa28480613@@</p>
+              <p style={{ margin: '4px 0 0 0', fontSize: 12, color: '#a8631a' }}>⚠️ 請勿擅自變更</p>
+            </div>
           </div>
 
           {/* 二、統一收件資料 */}
           <div>
             <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>二、統一收件資料</h4>
-            <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>地址</p>
-            <p style={{ margin: '2px 0 8px 0', fontSize: 13 }}>830 高雄市鳳山區文苑街 75 號</p>
-            <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>收件人</p>
-            <p style={{ margin: '2px 0 8px 0', fontSize: 13 }}>晶盛科技文山國小駐點單位</p>
-            <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>電話</p>
-            <p style={{ margin: '2px 0 2px 0', fontSize: 13 }}>07-7260089 #161–167</p>
-            <p style={{ margin: '2px 0', fontSize: 13 }}>0910165191（公務機）</p>
-
-            <div style={{ background: '#FEF3C7', padding: '10px 12px', borderRadius: '6px', marginTop: 16 }}>
-              <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: '#a8631a', marginTop: 0 }}>⚠️ 注意</h4>
-              <p style={{ margin: '4px 0', fontSize: 13, color: '#a8631a', fontWeight: 500 }}>公務機請勿靜音，需專門接黑貓電話</p>
+            <div style={{ border: '1px solid var(--border)', borderRadius: '6px', padding: '10px 12px', marginBottom: 12 }}>
+              <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>地址</p>
+              <p style={{ margin: '2px 0 8px 0', fontSize: 13 }}>830 高雄市鳳山區文苑街 75 號</p>
+              <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>收件人</p>
+              <p style={{ margin: '2px 0 8px 0', fontSize: 13 }}>晶盛科技文山國小駐點單位</p>
+              <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>電話</p>
+              <p style={{ margin: '2px 0 2px 0', fontSize: 13 }}>07-7260089 #161–167</p>
+              <p style={{ margin: '2px 0', fontSize: 13 }}>0910165191（公務機）</p>
             </div>
 
-            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, marginTop: 16, color: 'var(--text-primary)' }}>嘉義數辦地址</h4>
-            <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>地址</p>
-            <p style={{ margin: '2px 0 8px 0', fontSize: 13 }}>嘉義市西區四維路 25 號</p>
-            <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>聯絡人</p>
-            <p style={{ margin: '2px 0 8px 0', fontSize: 13 }}>蕭博元 Wayne</p>
-            <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>電話</p>
-            <p style={{ margin: '2px 0', fontSize: 13, fontFamily: 'monospace' }}>0955170523</p>
+            <div style={{ background: '#FEF3C7', padding: '10px 12px', borderRadius: '6px', marginBottom: 12, marginTop: 12 }}>
+              <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: '#a8631a', marginTop: 0 }}>⚠️ 注意</h4>
+              <p style={{ margin: '0', fontSize: 13, color: '#a8631a', fontWeight: 500 }}>公務機請勿靜音，需專門接黑貓電話</p>
+            </div>
+
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, marginTop: 16, color: 'var(--text-primary)' }}>嘉義數辦地址</h4>
+            <div style={{ border: '1px solid var(--border)', borderRadius: '6px', padding: '10px 12px' }}>
+              <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>地址</p>
+              <p style={{ margin: '2px 0 8px 0', fontSize: 13 }}>嘉義市西區四維路 25 號</p>
+              <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>聯絡人</p>
+              <p style={{ margin: '2px 0 8px 0', fontSize: 13 }}>蕭博元 Wayne</p>
+              <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>電話</p>
+              <p style={{ margin: '2px 0', fontSize: 13, fontFamily: 'monospace' }}>0955170523</p>
+            </div>
           </div>
 
           {/* 三、文字客服派車 */}
@@ -262,13 +270,15 @@ export default function TrainingPage() {
               <a href="https://neko.t-cat.com.tw/webchat/index.html" target="_blank" rel="noopener noreferrer" style={{ color: '#10b981', textDecoration: 'none', fontWeight: 500, fontSize: 13 }}>🔗 文字客服入口</a>
             </p>
 
-            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, marginTop: 16, color: 'var(--text-primary)' }}>常見問題</h4>
-            <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>Q：電話後四碼？</p>
-            <p style={{ margin: '2px 0 8px 0', fontSize: 13 }}>• 台南 → 8838</p>
-            <p style={{ margin: '2px 0 8px 0', fontSize: 13 }}>• 高雄 → 8332</p>
-            <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>Q：誰付費怎麼選？</p>
-            <p style={{ margin: '2px 0 2px 0', fontSize: 13 }}>A1 收回我們 → 「收件者付費」</p>
-            <p style={{ margin: '2px 0', fontSize: 13 }}>A2 派車去B → 「第三方收費」</p>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, marginTop: 16, color: 'var(--text-primary)' }}>常見問題</h4>
+            <div style={{ border: '1px solid var(--border)', borderRadius: '6px', padding: '10px 12px' }}>
+              <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>Q：電話後四碼？</p>
+              <p style={{ margin: '2px 0 8px 0', fontSize: 13 }}>• 台南 → 8838</p>
+              <p style={{ margin: '2px 0 8px 0', fontSize: 13 }}>• 高雄 → 8332</p>
+              <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>Q：誰付費怎麼選？</p>
+              <p style={{ margin: '2px 0 2px 0', fontSize: 13 }}>A1 收回我們 → 「收件者付費」</p>
+              <p style={{ margin: '2px 0', fontSize: 13 }}>A2 派車去B → 「第三方收費」</p>
+            </div>
           </div>
         </div>
       </div>
