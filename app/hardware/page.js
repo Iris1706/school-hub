@@ -8,7 +8,7 @@ import CompleteModal from '@/components/repairs/CompleteModal';
 import EditModal from '@/components/repairs/EditModal';
 
 export default function HardwarePage() {
-  const [sheetName, setSheetName] = useState('Pawn');
+  const [sheetDisplayName, setSheetDisplayName] = useState('一期生生平板維修');
   const [completeModal, setCompleteModal] = useState({
     isOpen: false,
     rowData: null,
@@ -19,6 +19,9 @@ export default function HardwarePage() {
     rowData: null,
     rowIndex: null,
   });
+
+  // Map display name to actual sheet name
+  const sheetName = sheetDisplayName === '一期生生平板維修' ? 'Pawn' : '二期生生平板維修';
 
   const handleShowCompleteModal = (rowIndex, rowData) => {
     setCompleteModal({
@@ -54,12 +57,12 @@ export default function HardwarePage() {
 
   const handleCompleteSuccess = () => {
     // Refresh data by triggering a refetch
-    setSheetName((prev) => prev);
+    setSheetDisplayName((prev) => prev);
   };
 
   const handleEditSuccess = () => {
     // Refresh data by triggering a refetch
-    setSheetName((prev) => prev);
+    setSheetDisplayName((prev) => prev);
   };
 
   return (
@@ -68,8 +71,8 @@ export default function HardwarePage() {
       <div style={{ marginBottom: '32px', display: 'flex', gap: '12px', alignItems: 'center' }}>
         <label style={{ fontWeight: '600', fontSize: '14px' }}>選擇維修分頁:</label>
         <select
-          value={sheetName}
-          onChange={(e) => setSheetName(e.target.value)}
+          value={sheetDisplayName}
+          onChange={(e) => setSheetDisplayName(e.target.value)}
           style={{
             padding: '8px 12px',
             borderRadius: '6px',
@@ -79,7 +82,7 @@ export default function HardwarePage() {
             fontWeight: '500',
           }}
         >
-          <option value="Pawn">Pawn</option>
+          <option value="一期生生平板維修">一期生生平板維修</option>
           <option value="二期生生平板維修">二期生生平板維修</option>
         </select>
       </div>
