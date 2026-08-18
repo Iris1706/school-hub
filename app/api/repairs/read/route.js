@@ -29,10 +29,10 @@ export async function GET(request) {
         range: `${sheetName}!A3:H`,
       });
 
-      const rows = response.data.values || [];
+      const data = response.data.values || [];
       return Response.json({
         success: true,
-        rows: rows,
+        data: data,
       });
     } else if (type === 'inProgress') {
       const response = await sheets.spreadsheets.values.get({
@@ -40,10 +40,10 @@ export async function GET(request) {
         range: `${sheetName}!J3:S`,
       });
 
-      const rows = response.data.values || [];
+      const data = response.data.values || [];
       return Response.json({
         success: true,
-        rows: rows,
+        data: data,
       });
     }
 
