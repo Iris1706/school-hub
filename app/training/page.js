@@ -96,121 +96,100 @@ export default function TrainingPage() {
         </div>
       </div>
 
-      {/* 外出規定 + 打卡App下載 - 並排顯示 */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 20, marginBottom: 20 }}>
-        {/* 外出規定 - 大卡片 */}
-        <div style={{
-          background: 'var(--surface-1)',
-          border: '1px solid var(--border)',
-          borderLeft: '4px solid #f59e0b',
-          borderRadius: 'var(--radius)',
-          padding: '16px',
-        }}>
-          <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, color: '#f59e0b', marginTop: 0 }}>🚗 外出規定</h2>
+      {/* 外出規定 - 大卡片 */}
+      <div style={{
+        background: 'var(--surface-1)',
+        border: '1px solid var(--border)',
+        borderLeft: '4px solid #f59e0b',
+        borderRadius: 'var(--radius)',
+        padding: '16px',
+        marginBottom: 20
+      }}>
+        <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, color: '#f59e0b', marginTop: 0 }}>🚗 外出規定</h2>
 
-          {/* 統一並排網格 */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
-            {/* 一般外出任務 */}
-            <div>
-              <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>一般外出任務</h4>
-              <div style={{ background: '#FFFFAA', padding: '10px 12px', borderRadius: '6px', marginBottom: 8 }}>
-                <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>快速任務</p>
-                <p style={{ margin: '2px 0', fontSize: 13 }}>單一學校：約 16:00 之後</p>
-              </div>
-              <div style={{ background: '#FFFFAA', padding: '10px 12px', borderRadius: '6px' }}>
-                <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>耗時任務</p>
-                <p style={{ margin: '2px 0', fontSize: 13 }}>請備妥處理內容或台數</p>
-              </div>
+        {/* 4列並排布局 */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr 1fr 1fr', gap: 16 }}>
+
+          {/* 左列：一般外出任務 */}
+          <div>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>一般外出任務</h4>
+            <div style={{ background: '#FFFFAA', padding: '12px', borderRadius: '6px', marginBottom: 10 }}>
+              <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>快速任務</p>
+              <p style={{ margin: '3px 0', fontSize: 12 }}>單一學校：約 16:00 之後</p>
             </div>
-
-            {/* 巡檢外出標準 */}
-            <div>
-              <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>巡檢外出標準<br/>（兩週未連線台數）</h4>
-              <div style={{ background: '#FFFFAA', padding: '8px 10px', borderRadius: '6px', marginBottom: 6, fontSize: 12 }}>
-                <p style={{ margin: '0', fontWeight: 500 }}>250 台以上　2 人 / 半天</p>
-              </div>
-              <div style={{ background: '#FFFFAA', padding: '8px 10px', borderRadius: '6px', marginBottom: 6, fontSize: 12 }}>
-                <p style={{ margin: '0', fontWeight: 500 }}>180–249 台　1 人 / 整天</p>
-              </div>
-              <div style={{ background: '#FFFFAA', padding: '8px 10px', borderRadius: '6px', marginBottom: 6, fontSize: 12 }}>
-                <p style={{ margin: '0', fontWeight: 500 }}>61–179 台　1 人 / 半天</p>
-              </div>
-              <div style={{ background: '#FFFFAA', padding: '8px 10px', borderRadius: '6px', marginBottom: 6, fontSize: 12 }}>
-                <p style={{ margin: '2px 0', fontWeight: 600 }}>20–60 台（彈性）</p>
-                <p style={{ margin: '2px 0' }}>市區≥3間 非市區≥3間或2+1</p>
-                <p style={{ margin: '2px 0' }}>半天≥2間或1+1</p>
-              </div>
-              <div style={{ background: '#FFFFAA', padding: '8px 10px', borderRadius: '6px', fontSize: 12 }}>
-                <p style={{ margin: '2px 0', fontWeight: 600 }}>0–19 台（彈性）</p>
-                <p style={{ margin: '2px 0' }}>市區≥4間或3+1 非市區≥3間</p>
-                <p style={{ margin: '2px 0' }}>半天≥2間或1+1</p>
-              </div>
-            </div>
-
-            {/* 地區分類 */}
-            <div>
-              <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>地區分類</h4>
-              <div style={{ background: '#FFFFAA', padding: '10px 12px', borderRadius: '6px', marginBottom: 8 }}>
-                <p style={{ margin: '4px 0', fontWeight: 700, fontSize: 13 }}>市區</p>
-                <p style={{ margin: '3px 0', fontSize: 12 }}>鳳山、大寮、三民、新興、前金、烏松、鼓山、蓋埤、左營、仁武、小港、苦雄、大樹</p>
-              </div>
-              <div style={{ background: '#FFFFAA', padding: '10px 12px', borderRadius: '6px' }}>
-                <p style={{ margin: '4px 0', fontWeight: 700, fontSize: 13 }}>非市區</p>
-                <p style={{ margin: '3px 0', fontSize: 12 }}>旗津、路竹、岡山、大社、林園、橋頭、蒸蒂、燕巢、六龜、永安、茂林、桃源</p>
-              </div>
-            </div>
-
-            {/* 注意事項 */}
-            <div>
-              <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>注意事項</h4>
-              <div style={{ background: '#FFFFAA', padding: '10px 12px', borderRadius: '6px', marginBottom: 8 }}>
-                <p style={{ margin: '3px 0', fontSize: 13 }}>外出時務必使用外出打卡功能，記錄準確位置</p>
-              </div>
-              <div style={{ background: '#FFFFAA', padding: '10px 12px', borderRadius: '6px' }}>
-                <p style={{ margin: '3px 0', fontSize: 13 }}>回辦公室後需及時打「返回」卡，確保出勤紀錄正確</p>
-              </div>
+            <div style={{ background: '#FFFFAA', padding: '12px', borderRadius: '6px' }}>
+              <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 13 }}>耗時任務</p>
+              <p style={{ margin: '3px 0', fontSize: 12 }}>請備妥處理內容或台數</p>
             </div>
           </div>
-        </div>
 
-        {/* 打卡系統 App 下載 - 小卡片 */}
-        <div style={{
-          background: 'var(--surface-1)',
-          border: '1px solid var(--border)',
-          borderLeft: '4px solid #8b5cf6',
-          borderRadius: 'var(--radius)',
-          padding: '16px',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'flex-start',
-          gap: 12
-        }}>
-          <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 0, color: '#8b5cf6', marginTop: 0 }}>📱 打卡系統 App 下載</h3>
+          {/* 中列：巡檢外出標準 */}
+          <div>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>巡檢外出標準<br/>（兩週未連線台數）</h4>
+            <div style={{ background: '#FFE8E8', padding: '8px 10px', borderRadius: '5px', marginBottom: 8 }}>
+              <p style={{ margin: '0', fontSize: 12, fontWeight: 500 }}>250 台以上</p>
+              <p style={{ margin: '2px 0 0 0', fontSize: 11, background: '#FFD4D4', display: 'inline-block', padding: '2px 6px', borderRadius: '3px', fontWeight: 600 }}>2 人 / 半天</p>
+            </div>
+            <div style={{ background: '#FFE8E8', padding: '8px 10px', borderRadius: '5px', marginBottom: 8 }}>
+              <p style={{ margin: '0', fontSize: 12, fontWeight: 500 }}>180–249 台</p>
+              <p style={{ margin: '2px 0 0 0', fontSize: 11, background: '#FFD4D4', display: 'inline-block', padding: '2px 6px', borderRadius: '3px', fontWeight: 600 }}>1 人 / 整天</p>
+            </div>
+            <div style={{ background: '#FFE8E8', padding: '8px 10px', borderRadius: '5px', marginBottom: 8 }}>
+              <p style={{ margin: '0', fontSize: 12, fontWeight: 500 }}>61–179 台</p>
+              <p style={{ margin: '2px 0 0 0', fontSize: 11, background: '#FFD4D4', display: 'inline-block', padding: '2px 6px', borderRadius: '3px', fontWeight: 600 }}>1 人 / 半天</p>
+            </div>
+            <div style={{ background: '#FFFFAA', padding: '8px 10px', borderRadius: '5px', marginBottom: 8, fontSize: 11 }}>
+              <p style={{ margin: '0', fontWeight: 600 }}>20–60 台（彈性）</p>
+              <p style={{ margin: '2px 0', fontSize: 11 }}>市區≥3間 非市區≥3間或2+1</p>
+              <p style={{ margin: '2px 0', fontSize: 11 }}>半天≥2間或1+1</p>
+            </div>
+            <div style={{ background: '#E8F4FF', padding: '8px 10px', borderRadius: '5px', fontSize: 11 }}>
+              <p style={{ margin: '0', fontWeight: 600 }}>0–19 台（彈性）</p>
+              <p style={{ margin: '2px 0', fontSize: 11 }}>市區≥4間或3+1 非市區≥3間</p>
+              <p style={{ margin: '2px 0', fontSize: 11 }}>半天≥2間或1+1</p>
+            </div>
+          </div>
 
-          <p style={{ margin: '0', fontSize: 12, color: 'var(--text-secondary)' }}>MHR 打卡 App，iOS 版本</p>
+          {/* 右上列：地區分類 */}
+          <div>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: 'var(--text-primary)' }}>地區分類</h4>
+            <div style={{ background: '#D1F4E8', padding: '12px', borderRadius: '6px', marginBottom: 10 }}>
+              <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 12, color: '#059669' }}>市區</p>
+              <p style={{ margin: '3px 0', fontSize: 11 }}>鳳山、大寮、三民、新興、前金、烏松、鼓山、蓋埤、左營、仁武、小港、苦雄、大樹</p>
+            </div>
+            <div style={{ background: '#D1F4E8', padding: '12px', borderRadius: '6px' }}>
+              <p style={{ margin: '4px 0', fontWeight: 600, fontSize: 12, color: '#B91C1C' }}>非市區</p>
+              <p style={{ margin: '3px 0', fontSize: 11 }}>旗津、路竹、岡山、大社、林園、橋頭、蒸蒂、燕巢、六龜、永安、茂林、桃源</p>
+            </div>
+          </div>
 
-          {/* 下載按鈕 */}
-          <a
-            href="https://download.winton.com.tw/AppCenter/App/Download/Index2?appName=MHR&platform=ios&version=25.00.83.250630&webversion=25.20"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: 'inline-block',
-              padding: '8px 12px',
-              background: '#8b5cf6',
-              color: '#fff',
-              textDecoration: 'none',
-              borderRadius: '6px',
-              fontSize: 12,
-              fontWeight: 600,
-              textAlign: 'center',
-              transition: 'background 0.2s'
-            }}
-            onMouseEnter={(e) => e.target.style.background = '#7c3aed'}
-            onMouseLeave={(e) => e.target.style.background = '#8b5cf6'}
-          >
-            立即下載
-          </a>
+          {/* 右下列：打卡系統 App 下載 */}
+          <div style={{ background: '#F3E8FF', padding: '12px', borderRadius: '6px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
+            <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: '#7c3aed', marginTop: 0 }}>📱 打卡系統</h4>
+            <p style={{ margin: '0 0 8px 0', fontSize: 11, color: 'var(--text-secondary)' }}>MHR 打卡 App<br/>iOS 版本</p>
+            <a
+              href="https://download.winton.com.tw/AppCenter/App/Download/Index2?appName=MHR&platform=ios&version=25.00.83.250630&webversion=25.20"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-block',
+                padding: '6px 10px',
+                background: '#8b5cf6',
+                color: '#fff',
+                textDecoration: 'none',
+                borderRadius: '5px',
+                fontSize: 11,
+                fontWeight: 600,
+                textAlign: 'center',
+                transition: 'background 0.2s',
+                marginTop: 'auto'
+              }}
+              onMouseEnter={(e) => e.target.style.background = '#7c3aed'}
+              onMouseLeave={(e) => e.target.style.background = '#8b5cf6'}
+            >
+              iOS 下載連結
+            </a>
+          </div>
         </div>
       </div>
 
