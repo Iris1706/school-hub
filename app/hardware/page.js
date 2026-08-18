@@ -8,7 +8,7 @@ import EditModal from '@/components/repairs/EditModal';
 
 export default function HardwarePage() {
   const [selectedPeriod, setSelectedPeriod] = useState('Pawn');
-  const [activeTab, setActiveTab] = useState('dashboard'); // dashboard, completed, inProgress, logs, todos
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [editData, setEditData] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
@@ -36,8 +36,6 @@ export default function HardwarePage() {
 
       alert('保存成功');
       setIsEditModalOpen(false);
-
-      // 刷新數據
       window.location.reload();
     } catch (error) {
       alert(`保存失敗: ${error.message}`);
@@ -115,12 +113,6 @@ export default function HardwarePage() {
         >
           📋 操作日誌
         </button>
-        <button
-          onClick={() => setActiveTab('todos')}
-          style={tabButtonStyle(activeTab === 'todos')}
-        >
-          📝 待辦事項
-        </button>
       </div>
 
       {/* 儀表板 */}
@@ -178,23 +170,6 @@ export default function HardwarePage() {
           <p style={{ fontSize: 12, color: 'var(--text-secondary)', margin: '8px 0 0 0' }}>
             日誌分頁名稱：
             {selectedPeriod === 'Pawn' ? '操作日誌1' : '操作日誌2'}
-          </p>
-        </div>
-      )}
-
-      {/* 待辦事項 */}
-      {activeTab === 'todos' && (
-        <div
-          style={{
-            background:
-              'linear-gradient(135deg, rgba(249, 115, 22, 0.05) 0%, rgba(249, 115, 22, 0.05) 100%)',
-            borderLeft: '3px solid #f97316',
-            padding: '20px',
-            borderRadius: '8px',
-          }}
-        >
-          <p style={{ fontSize: 14, color: 'var(--text-secondary)', margin: 0 }}>
-            📝 待辦事項 - 功能開發中
           </p>
         </div>
       )}

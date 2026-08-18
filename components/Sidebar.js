@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { href: "/weekly-report", label: "週報產生器" },
   { href: "/training", label: "教育訓練" },
   { href: "/hardware", label: "硬體維修" },
+  { href: "/todo", label: "待辦事項" },
 ];
 
 export default function Sidebar() {
