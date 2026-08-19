@@ -102,7 +102,8 @@ export default function HardwarePage() {
       </div>
 
       {/* Tab Buttons */}
-      <div style={{ marginBottom: '32px', display: 'flex', gap: '12px' }}>
+      <div style={{ marginBottom: '32px', display: 'flex', gap: '12px', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '12px' }}>
         <button
           onClick={() => setActiveTab('dashboard')}
           style={{
@@ -151,6 +152,7 @@ export default function HardwarePage() {
         >
           ⚙️ 處理中
         </button>
+        </div>
         <button
           onClick={handleShowAddModal}
           style={{

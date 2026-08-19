@@ -28,22 +28,7 @@ export default function EditModal({ isOpen, rowData, rowIndex, sheetName, onClos
   };
 
   const validate = () => {
-    if (!formData.repairNumber.trim()) {
-      setError('請輸入維修單號');
-      return false;
-    }
-    if (!formData.school.trim()) {
-      setError('請輸入學校');
-      return false;
-    }
-    if (!formData.category.trim()) {
-      setError('請輸入問題分類');
-      return false;
-    }
-    if (!formData.progress.trim()) {
-      setError('請選擇進度');
-      return false;
-    }
+    // 編輯時不強制填寫欄位
     return true;
   };
 
@@ -52,18 +37,18 @@ export default function EditModal({ isOpen, rowData, rowIndex, sheetName, onClos
 
     try {
       setLoading(true);
+      // 只更新有值的欄位，其他保持原值
       const values = [
-        formData.createdDate,
-        formData.repairNumber,
-        formData.school,
-        formData.category,
-        formData.originalSerial,
+        formData.createdDate || rowData?.[0] || '',
+        formData.repairNumber || rowData?.[1] || '',
+        formData.school || rowData?.[2] || '',
+        formData.category || rowData?.[3] || '',
+        formData.originalSerial || rowData?.[4] || '',
         rowData?.[5] || '', // 維修序號（保持不變）
-        formData.progress,
-        formData.asmAccount,
-        formData.asmCancel,
-        formData.preStage,
-        rowData?.[10] || '',
+        formData.progress || rowData?.[6] || '',
+        formData.asmAccount || rowData?.[7] || '',
+        formData.asmCancel || rowData?.[8] || '',
+        formData.preStage || rowData?.[9] || '',
       ];
 
       const response = await fetch('/api/repairs/update', {
@@ -71,7 +56,7 @@ export default function EditModal({ isOpen, rowData, rowIndex, sheetName, onClos
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sheetName,
-          rowIndex,
+          rowIndex: rowIndex + 3, // 轉換為實際行號（API返回的是0-based，實際行號從3開始）
           values,
           type: 'inProgress',
         }),

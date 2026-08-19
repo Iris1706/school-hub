@@ -47,7 +47,7 @@ export default function CompleteModal({ isOpen, rowData, rowIndex, sheetName, on
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sheetName,
-          rowIndex,
+          rowIndex: rowIndex + 3, // 轉換為實際行號（API返回的是0-based，實際行號從3開始）
           completeData: {
             newSerialNumber: formData.newSerialNumber,
             status: formData.status,
