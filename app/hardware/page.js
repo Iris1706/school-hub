@@ -64,10 +64,10 @@ export default function HardwarePage() {
   };
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div style={{ width: '100%', padding: '24px' }}>
       {/* Sheet Selector */}
       <div style={{ marginBottom: '32px', display: 'flex', gap: '12px', alignItems: 'center' }}>
-        <label style={{ fontWeight: '600', fontSize: '14px' }}>選擇維修分頁:</label>
+        <label style={{ fontWeight: '600', fontSize: '14px' }}>選擇標案:</label>
         <select
           value={sheetName}
           onChange={(e) => setSheetName(e.target.value)}
@@ -80,7 +80,7 @@ export default function HardwarePage() {
             fontWeight: '500',
           }}
         >
-          <option value="Pawn">Pawn</option>
+          <option value="Pawn">一期生生平板維修</option>
           <option value="二期生生平板維修">二期生生平板維修</option>
         </select>
       </div>
