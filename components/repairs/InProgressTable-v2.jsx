@@ -107,7 +107,9 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
             <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '13%' }}>問題分類</th>
             <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '11%' }}>機器舊序號</th>
             <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '11%' }}>進度</th>
-            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '11%' }}>ASM帳號</th>
+            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '10%' }}>ASM帳號</th>
+            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '9%' }}>ASM取消指派</th>
+            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '9%' }}>PreStage註冊</th>
             <th style={{ padding: '12px 6px', textAlign: 'center', fontWeight: '600', fontSize: '12px', width: '20%' }}>操作</th>
           </tr>
         </thead>
@@ -125,39 +127,11 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
               <td style={{ padding: '12px 6px', fontSize: '11px', width: '13%' }}>{row[3] || '-'}</td>
               <td style={{ padding: '12px 6px', fontSize: '11px', fontFamily: 'monospace', width: '11%' }}>{row[4] || '-'}</td>
               <td style={{ padding: '12px 6px', fontSize: '11px', width: '11%' }}>{row[5] || '-'}</td>
-              <td style={{ padding: '12px 6px', fontSize: '11px', width: '11%' }}>{row[7] || '-'}</td>
+              <td style={{ padding: '12px 6px', fontSize: '11px', width: '10%' }}>{row[7] || '-'}</td>
+              <td style={{ padding: '12px 6px', fontSize: '11px', width: '9%' }}>{row[8] || '-'}</td>
+              <td style={{ padding: '12px 6px', fontSize: '11px', width: '9%' }}>{row[9] || '-'}</td>
               <td style={{ padding: '12px 6px', textAlign: 'center', width: '20%' }}>
                 <div style={{ display: 'flex', gap: '3px', justifyContent: 'center', flexWrap: 'nowrap' }}>
-                  <button
-                    onClick={() => onShowCompleteModal(index, row)}
-                    style={{
-                      background: '#10b981',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '4px',
-                      padding: '5px 7px',
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '2px',
-                      fontSize: '10px',
-                      fontWeight: '500',
-                      transition: 'all 0.2s',
-                      whiteSpace: 'nowrap',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.background = '#059669';
-                      e.target.style.transform = 'scale(1.05)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.background = '#10b981';
-                      e.target.style.transform = 'scale(1)';
-                    }}
-                  >
-                    <CheckCircle size={10} />
-                    完成
-                  </button>
-
                   <button
                     onClick={() => onShowEditModal(index, row)}
                     style={{
@@ -186,6 +160,36 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
                   >
                     <Edit2 size={10} />
                     編輯
+                  </button>
+
+                  <button
+                    onClick={() => onShowCompleteModal(index, row)}
+                    style={{
+                      background: '#10b981',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      padding: '5px 7px',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '2px',
+                      fontSize: '10px',
+                      fontWeight: '500',
+                      transition: 'all 0.2s',
+                      whiteSpace: 'nowrap',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.background = '#059669';
+                      e.target.style.transform = 'scale(1.05)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.background = '#10b981';
+                      e.target.style.transform = 'scale(1)';
+                    }}
+                  >
+                    <CheckCircle size={10} />
+                    完成
                   </button>
 
                   <button

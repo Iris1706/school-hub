@@ -7,7 +7,7 @@ export default function CompleteModal({ isOpen, rowData, rowIndex, sheetName, on
   const [formData, setFormData] = useState({
     completionDate: '',
     newSerialNumber: '',
-    status: '乙完修',
+    status: '已完修',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -62,7 +62,7 @@ export default function CompleteModal({ isOpen, rowData, rowIndex, sheetName, on
         throw new Error(errorData.error || '完修失敗');
       }
 
-      setFormData({ completionDate: '', newSerialNumber: '', status: '乙完修' });
+      setFormData({ completionDate: '', newSerialNumber: '', status: '已完修' });
       onSuccess();
       onClose();
     } catch (err) {
@@ -295,7 +295,7 @@ export default function CompleteModal({ isOpen, rowData, rowIndex, sheetName, on
                 e.target.style.boxShadow = 'none';
               }}
             >
-              <option value="乙完修">乙完修</option>
+              <option value="已完修">已完修</option>
               <option value="原機返還">原機返還</option>
             </select>
           </div>

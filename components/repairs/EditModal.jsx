@@ -5,11 +5,15 @@ import { X, Edit2 } from 'lucide-react';
 
 export default function EditModal({ isOpen, rowData, rowIndex, sheetName, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
+    createdDate: rowData?.[0] || '',
+    repairNumber: rowData?.[1] || '',
     school: rowData?.[2] || '',
     category: rowData?.[3] || '',
     originalSerial: rowData?.[4] || '',
-    repairSerial: rowData?.[5] || '',
     progress: rowData?.[6] || '',
+    asmAccount: rowData?.[7] || '',
+    asmCancel: rowData?.[8] || '',
+    preStage: rowData?.[9] || '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -24,6 +28,10 @@ export default function EditModal({ isOpen, rowData, rowIndex, sheetName, onClos
   };
 
   const validate = () => {
+    if (!formData.repairNumber.trim()) {
+      setError('請輸入維修單號');
+      return false;
+    }
     if (!formData.school.trim()) {
       setError('請輸入學校');
       return false;
@@ -33,7 +41,7 @@ export default function EditModal({ isOpen, rowData, rowIndex, sheetName, onClos
       return false;
     }
     if (!formData.progress.trim()) {
-      setError('請輸入進度');
+      setError('請選擇進度');
       return false;
     }
     return true;
@@ -45,16 +53,16 @@ export default function EditModal({ isOpen, rowData, rowIndex, sheetName, onClos
     try {
       setLoading(true);
       const values = [
-        rowData?.[0] || '',
-        rowData?.[1] || '',
+        formData.createdDate,
+        formData.repairNumber,
         formData.school,
         formData.category,
         formData.originalSerial,
-        formData.repairSerial,
+        rowData?.[5] || '', // 維修序號（保持不變）
         formData.progress,
-        rowData?.[7] || '',
-        rowData?.[8] || '',
-        rowData?.[9] || '',
+        formData.asmAccount,
+        formData.asmCancel,
+        formData.preStage,
         rowData?.[10] || '',
       ];
 
@@ -160,6 +168,81 @@ export default function EditModal({ isOpen, rowData, rowIndex, sheetName, onClos
             維修資訊
           </div>
 
+          {/* Created Date and Repair Number - Side by side */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '16px',
+              marginBottom: '16px',
+            }}
+          >
+            {/* Created Date */}
+            <div>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '8px' }}>
+                建立日期
+              </label>
+              <input
+                type="date"
+                name="createdDate"
+                value={formData.createdDate}
+                onChange={handleInputChange}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  borderRadius: '6px',
+                  border: '1px solid #d1d5db',
+                  fontSize: '13px',
+                  fontFamily: 'inherit',
+                  boxSizing: 'border-box',
+                  transition: 'all 0.2s',
+                  outline: 'none',
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#3b82f6';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#d1d5db';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
+            </div>
+
+            {/* Repair Number */}
+            <div>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '8px' }}>
+                維修單號
+              </label>
+              <input
+                type="text"
+                name="repairNumber"
+                placeholder="輸入維修單號"
+                value={formData.repairNumber}
+                onChange={handleInputChange}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  borderRadius: '6px',
+                  border: '1px solid #d1d5db',
+                  fontSize: '13px',
+                  fontFamily: 'inherit',
+                  boxSizing: 'border-box',
+                  transition: 'all 0.2s',
+                  outline: 'none',
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#3b82f6';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#d1d5db';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
+            </div>
+          </div>
+
           {/* School and Category - Side by side */}
           <div
             style={{
@@ -236,7 +319,77 @@ export default function EditModal({ isOpen, rowData, rowIndex, sheetName, onClos
             </div>
           </div>
 
-          {/* Serial Numbers - Side by side */}
+          {/* Original Serial - Full Width */}
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '8px' }}>
+              原序號
+            </label>
+            <input
+              type="text"
+              name="originalSerial"
+              placeholder="原序號"
+              value={formData.originalSerial}
+              onChange={handleInputChange}
+              disabled
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                borderRadius: '6px',
+                border: '1px solid #e5e7eb',
+                fontSize: '13px',
+                fontFamily: 'monospace',
+                boxSizing: 'border-box',
+                background: 'var(--background-secondary, #f9f9f9)',
+                color: '#9ca3af',
+                cursor: 'not-allowed',
+              }}
+            />
+          </div>
+
+          {/* Progress - Button Selection */}
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '8px' }}>
+              進度
+            </label>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              {['已開單', '維修待處理', '維修中', '報價中', '已完成'].map((status) => (
+                <button
+                  key={status}
+                  onClick={() => {
+                    setFormData((prev) => ({ ...prev, progress: status }));
+                    setError('');
+                  }}
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: '6px',
+                    border: formData.progress === status ? '2px solid #3b82f6' : '1px solid #d1d5db',
+                    background: formData.progress === status ? '#FFFBEB' : 'white',
+                    color: formData.progress === status ? '#1f2937' : '#6b7280',
+                    cursor: 'pointer',
+                    fontSize: '13px',
+                    fontWeight: formData.progress === status ? '600' : '500',
+                    transition: 'all 0.2s',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (formData.progress !== status) {
+                      e.target.style.borderColor = '#3b82f6';
+                      e.target.style.background = '#f0f9ff';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (formData.progress !== status) {
+                      e.target.style.borderColor = '#d1d5db';
+                      e.target.style.background = 'white';
+                    }
+                  }}
+                >
+                  {status}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* ASM Account and Cancel - Side by side */}
           <div
             style={{
               display: 'grid',
@@ -245,71 +398,83 @@ export default function EditModal({ isOpen, rowData, rowIndex, sheetName, onClos
               marginBottom: '16px',
             }}
           >
-            {/* Original Serial */}
+            {/* ASM Account */}
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '8px' }}>
-                原序號
+                ASM帳號
               </label>
               <input
                 type="text"
-                name="originalSerial"
-                placeholder="原序號"
-                value={formData.originalSerial}
+                name="asmAccount"
+                placeholder="輸入ASM帳號"
+                value={formData.asmAccount}
                 onChange={handleInputChange}
-                disabled
                 style={{
                   width: '100%',
                   padding: '10px 12px',
                   borderRadius: '6px',
-                  border: '1px solid #e5e7eb',
+                  border: '1px solid #d1d5db',
                   fontSize: '13px',
-                  fontFamily: 'monospace',
+                  fontFamily: 'inherit',
                   boxSizing: 'border-box',
-                  background: 'var(--background-secondary, #f9f9f9)',
-                  color: '#9ca3af',
-                  cursor: 'not-allowed',
+                  transition: 'all 0.2s',
+                  outline: 'none',
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#3b82f6';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#d1d5db';
+                  e.target.style.boxShadow = 'none';
                 }}
               />
             </div>
 
-            {/* Repair Serial */}
+            {/* ASM Cancel */}
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '8px' }}>
-                維修序號
+                ASM取消指派
               </label>
               <input
                 type="text"
-                name="repairSerial"
-                placeholder="維修序號"
-                value={formData.repairSerial}
+                name="asmCancel"
+                placeholder="輸入ASM取消指派"
+                value={formData.asmCancel}
                 onChange={handleInputChange}
-                disabled
                 style={{
                   width: '100%',
                   padding: '10px 12px',
                   borderRadius: '6px',
-                  border: '1px solid #e5e7eb',
+                  border: '1px solid #d1d5db',
                   fontSize: '13px',
-                  fontFamily: 'monospace',
+                  fontFamily: 'inherit',
                   boxSizing: 'border-box',
-                  background: 'var(--background-secondary, #f9f9f9)',
-                  color: '#9ca3af',
-                  cursor: 'not-allowed',
+                  transition: 'all 0.2s',
+                  outline: 'none',
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#3b82f6';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#d1d5db';
+                  e.target.style.boxShadow = 'none';
                 }}
               />
             </div>
           </div>
 
-          {/* Progress - Full Width */}
+          {/* PreStage - Full Width */}
           <div style={{ marginBottom: '16px' }}>
             <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '8px' }}>
-              進度
+              PreStage註冊
             </label>
             <input
               type="text"
-              name="progress"
-              placeholder="輸入維修進度（如：檢測中、更新中、測試中）"
-              value={formData.progress}
+              name="preStage"
+              placeholder="輸入PreStage註冊"
+              value={formData.preStage}
               onChange={handleInputChange}
               style={{
                 width: '100%',
