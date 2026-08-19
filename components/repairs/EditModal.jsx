@@ -327,21 +327,27 @@ export default function EditModal({ isOpen, rowData, rowIndex, sheetName, onClos
             <input
               type="text"
               name="originalSerial"
-              placeholder="原序號"
+              placeholder="輸入原序號"
               value={formData.originalSerial}
               onChange={handleInputChange}
-              disabled
               style={{
                 width: '100%',
                 padding: '10px 12px',
                 borderRadius: '6px',
-                border: '1px solid #e5e7eb',
+                border: '1px solid #d1d5db',
                 fontSize: '13px',
                 fontFamily: 'monospace',
                 boxSizing: 'border-box',
-                background: 'var(--background-secondary, #f9f9f9)',
-                color: '#9ca3af',
-                cursor: 'not-allowed',
+                transition: 'all 0.2s',
+                outline: 'none',
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#3b82f6';
+                e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#d1d5db';
+                e.target.style.boxShadow = 'none';
               }}
             />
           </div>

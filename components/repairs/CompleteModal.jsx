@@ -297,6 +297,7 @@ export default function CompleteModal({ isOpen, rowData, rowIndex, sheetName, on
             >
               <option value="已完修">已完修</option>
               <option value="原機返還">原機返還</option>
+              <option value="報價不修（原機返還）">報價不修（原機返還）</option>
             </select>
           </div>
         </div>
