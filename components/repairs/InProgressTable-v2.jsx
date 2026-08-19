@@ -40,6 +40,15 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
     }
   };
 
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '-';
+    // 如果已經是 yyyy/mm/dd 格式，直接返回
+    if (dateStr.includes('/')) return dateStr;
+    // 如果是 yyyy-mm-dd 格式，轉換為 yyyy/mm/dd
+    if (dateStr.includes('-')) return dateStr.replace(/-/g, '/');
+    return dateStr;
+  };
+
   const handleDelete = async (rowIndex) => {
     if (!confirm('確定要刪除此筆資料嗎？')) return;
 
