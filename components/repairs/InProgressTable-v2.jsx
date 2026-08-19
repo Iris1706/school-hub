@@ -120,8 +120,8 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
                 borderBottom: '1px solid #e5e7eb',
               }}
             >
-              <td style={{ padding: '12px 6px', fontSize: '11px', width: '8%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row[0] || '-'}</td>
-              <td style={{ padding: '12px 6px', fontSize: '11px', fontFamily: 'monospace', width: '8%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row[1] || '-'}</td>
+              <td style={{ padding: '12px 6px', fontSize: '11px', width: '8%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{formatDate(row[0])}</td>
+              <td style={{ padding: '12px 6px', fontSize: '11px', fontFamily: 'monospace', width: '8%', whiteSpace: 'nowrap' }}>{row[1] || '-'}</td>
               <td style={{ padding: '12px 6px', fontSize: '11px', width: '14%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row[2] || '-'}</td>
               <td style={{ padding: '12px 6px', fontSize: '11px', width: '11%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row[3] || '-'}</td>
               <td style={{ padding: '12px 6px', fontSize: '11px', fontFamily: 'monospace', width: '9%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row[4] || '-'}</td>
