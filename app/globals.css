@@ -106,7 +106,8 @@ input:focus {
 .main {
   flex: 1;
   padding: 28px 32px;
-  max-width: 1000px;
+  width: 100%;
+  overflow-x: auto;
 }
 
 .page-title {
@@ -160,4 +161,20 @@ input:focus {
   .verification-codes-grid {
     grid-template-columns: repeat(1, 1fr);
   }
+}
+
+/* 表格容器 - 支援橫向滾動 */
+.table-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius);
+}
+
+.table-container table {
+  white-space: nowrap;
+}
+
+.table-container table th,
+.table-container table td {
+  white-space: normal;
 }
