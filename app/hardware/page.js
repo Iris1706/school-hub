@@ -155,7 +155,7 @@ export default function HardwarePage() {
           ⚙️ 處理中
         </button>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: '8px' }}>
           <button
             onClick={() => setRefreshKey((prev) => prev + 1)}
             style={{
