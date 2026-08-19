@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Trash2, Edit2, CheckCircle } from 'lucide-react';
 
-export default function InProgressTable({ sheetName, onShowCompleteModal, onShowEditModal }) {
+export default function InProgressTable({ sheetName, onShowCompleteModal, onShowEditModal, onDataLoaded }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,8 +25,13 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
       }
 
       const result = await response.json();
-      setData(result.data || []);
+      const loadedData = result.data || [];
+      setData(loadedData);
       setError(null);
+      // 通知父元件資料已載入
+      if (onDataLoaded) {
+        onDataLoaded(loadedData.length);
+      }
     } catch (err) {
       setError(err.message);
       console.error('讀取處理中資料錯誤:', err);
@@ -84,33 +89,27 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
 
   return (
     <div>
-      {/* Title with Count on the same line */}
-      <div style={{ marginBottom: '16px' }}>
-        <h3 style={{ fontSize: '18px', fontWeight: '600', margin: '0' }}>
-          ⚙️ 處理中 共 {data.length} 筆
-        </h3>
-      </div>
-
       {/* Table */}
       <table
         style={{
           width: '100%',
           borderCollapse: 'collapse',
           background: 'transparent',
+          tableLayout: 'fixed',
         }}
       >
         <thead>
           <tr style={{ borderBottom: '2px solid #e5e7eb' }}>
-            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '9%' }}>建單日期</th>
-            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '9%' }}>維修單號</th>
-            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '16%' }}>學校名稱</th>
-            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '13%' }}>問題分類</th>
-            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '11%' }}>機器舊序號</th>
-            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '11%' }}>進度</th>
-            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '10%' }}>ASM帳號</th>
-            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '9%' }}>ASM取消指派</th>
-            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '9%' }}>PreStage註冊</th>
-            <th style={{ padding: '12px 6px', textAlign: 'center', fontWeight: '600', fontSize: '12px', width: '20%' }}>操作</th>
+            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '8%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>建單日期</th>
+            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '8%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>維修單號</th>
+            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '14%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>學校名稱</th>
+            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '11%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>問題分類</th>
+            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '9%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>機器舊序號</th>
+            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '9%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>進度</th>
+            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '8%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>ASM帳號</th>
+            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '8%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>ASM取消指派</th>
+            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '8%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>PreStage註冊</th>
+            <th style={{ padding: '12px 6px', textAlign: 'center', fontWeight: '600', fontSize: '12px', width: '17%', whiteSpace: 'nowrap' }}>操作</th>
           </tr>
         </thead>
         <tbody>
@@ -121,16 +120,16 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
                 borderBottom: '1px solid #e5e7eb',
               }}
             >
-              <td style={{ padding: '12px 6px', fontSize: '11px', width: '9%' }}>{row[0] || '-'}</td>
-              <td style={{ padding: '12px 6px', fontSize: '11px', fontFamily: 'monospace', width: '9%' }}>{row[1] || '-'}</td>
-              <td style={{ padding: '12px 6px', fontSize: '11px', width: '16%' }}>{row[2] || '-'}</td>
-              <td style={{ padding: '12px 6px', fontSize: '11px', width: '13%' }}>{row[3] || '-'}</td>
-              <td style={{ padding: '12px 6px', fontSize: '11px', fontFamily: 'monospace', width: '11%' }}>{row[4] || '-'}</td>
-              <td style={{ padding: '12px 6px', fontSize: '11px', width: '11%' }}>{row[5] || '-'}</td>
-              <td style={{ padding: '12px 6px', fontSize: '11px', width: '10%' }}>{row[7] || '-'}</td>
-              <td style={{ padding: '12px 6px', fontSize: '11px', width: '9%' }}>{row[8] || '-'}</td>
-              <td style={{ padding: '12px 6px', fontSize: '11px', width: '9%' }}>{row[9] || '-'}</td>
-              <td style={{ padding: '12px 6px', textAlign: 'center', width: '20%' }}>
+              <td style={{ padding: '12px 6px', fontSize: '11px', width: '8%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row[0] || '-'}</td>
+              <td style={{ padding: '12px 6px', fontSize: '11px', fontFamily: 'monospace', width: '8%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row[1] || '-'}</td>
+              <td style={{ padding: '12px 6px', fontSize: '11px', width: '14%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row[2] || '-'}</td>
+              <td style={{ padding: '12px 6px', fontSize: '11px', width: '11%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row[3] || '-'}</td>
+              <td style={{ padding: '12px 6px', fontSize: '11px', fontFamily: 'monospace', width: '9%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row[4] || '-'}</td>
+              <td style={{ padding: '12px 6px', fontSize: '11px', width: '9%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row[5] || '-'}</td>
+              <td style={{ padding: '12px 6px', fontSize: '11px', width: '8%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row[7] || '-'}</td>
+              <td style={{ padding: '12px 6px', fontSize: '11px', width: '8%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row[8] || '-'}</td>
+              <td style={{ padding: '12px 6px', fontSize: '11px', width: '8%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row[9] || '-'}</td>
+              <td style={{ padding: '12px 6px', textAlign: 'center', width: '17%' }}>
                 <div style={{ display: 'flex', gap: '3px', justifyContent: 'center', flexWrap: 'nowrap' }}>
                   <button
                     onClick={() => onShowEditModal(index, row)}
