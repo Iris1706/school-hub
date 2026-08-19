@@ -83,28 +83,28 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
   }
 
   return (
-    <div>
-      {/* Title Section */}
-      <div style={{ marginBottom: '12px' }}>
-        <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '4px' }}>
-          ⚙️ 處理中
-        </h3>
-        <div style={{ fontSize: '13px', fontWeight: '400', color: '#6b7280' }}>
-          共 {data.length} 筆
+    <div style={{ width: 'calc(100% + 40px)', marginLeft: '-20px', marginRight: '-20px', background: 'var(--background, white)', padding: '0' }}>
+      <div style={{ padding: '16px 20px' }}>
+        {/* Title Section */}
+        <div style={{ marginBottom: '12px' }}>
+          <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '4px' }}>
+            ⚙️ 處理中
+          </h3>
+          <div style={{ fontSize: '13px', fontWeight: '400', color: '#6b7280' }}>
+            共 {data.length} 筆
+          </div>
         </div>
-      </div>
 
-      {/* Table */}
-      <div style={{ width: '100%' }}>
+        {/* Table */}
         <table
           style={{
             width: '100%',
             borderCollapse: 'collapse',
-            background: 'var(--background, white)',
+            background: 'transparent',
           }}
         >
           <thead>
-            <tr style={{ borderBottom: '2px solid #e5e7eb', background: 'var(--background-secondary, #f9f9f9)' }}>
+            <tr style={{ borderBottom: '2px solid #e5e7eb', background: 'transparent' }}>
               <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '9%' }}>建單日期</th>
               <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '9%' }}>維修單號</th>
               <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '16%' }}>學校名稱</th>
