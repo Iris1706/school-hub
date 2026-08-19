@@ -90,26 +90,26 @@ export default function CompletedTable({ sheetName }) {
   }
 
   return (
-    <div style={{ overflowX: 'auto', width: '100%' }}>
+    <div style={{ width: '100%' }}>
       <table
         style={{
           width: '100%',
           borderCollapse: 'collapse',
           background: 'var(--background, white)',
-          minWidth: '1000px',
+          tableLayout: 'auto',
         }}
       >
         <thead>
           <tr style={{ borderBottom: '2px solid #e5e7eb', background: 'var(--background-secondary, #f9f9f9)' }}>
-            <th style={{ padding: '16px', textAlign: 'left', fontWeight: '600', fontSize: '14px', whiteSpace: 'nowrap' }}>建單日期</th>
-            <th style={{ padding: '16px', textAlign: 'left', fontWeight: '600', fontSize: '14px', whiteSpace: 'nowrap' }}>維修單號</th>
-            <th style={{ padding: '16px', textAlign: 'left', fontWeight: '600', fontSize: '14px', whiteSpace: 'nowrap' }}>學校名稱</th>
-            <th style={{ padding: '16px', textAlign: 'left', fontWeight: '600', fontSize: '14px', whiteSpace: 'nowrap' }}>問題分類</th>
-            <th style={{ padding: '16px', textAlign: 'left', fontWeight: '600', fontSize: '14px', whiteSpace: 'nowrap' }}>機器舊序號</th>
-            <th style={{ padding: '16px', textAlign: 'left', fontWeight: '600', fontSize: '14px', whiteSpace: 'nowrap' }}>機器新序號</th>
-            <th style={{ padding: '16px', textAlign: 'left', fontWeight: '600', fontSize: '14px', whiteSpace: 'nowrap' }}>狀態</th>
-            <th style={{ padding: '16px', textAlign: 'left', fontWeight: '600', fontSize: '14px', whiteSpace: 'nowrap' }}>完成日期(寄回)</th>
-            <th style={{ padding: '16px', textAlign: 'center', fontWeight: '600', fontSize: '14px', whiteSpace: 'nowrap' }}>操作</th>
+            <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', fontSize: '13px' }}>建單日期</th>
+            <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', fontSize: '13px' }}>維修單號</th>
+            <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', fontSize: '13px' }}>學校名稱</th>
+            <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', fontSize: '13px' }}>問題分類</th>
+            <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', fontSize: '13px' }}>機器舊序號</th>
+            <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', fontSize: '13px' }}>機器新序號</th>
+            <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', fontSize: '13px' }}>狀態</th>
+            <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', fontSize: '13px' }}>完成日期</th>
+            <th style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600', fontSize: '13px' }}>操作</th>
           </tr>
         </thead>
         <tbody>
@@ -120,28 +120,28 @@ export default function CompletedTable({ sheetName }) {
                 borderBottom: '1px solid #e5e7eb',
               }}
             >
-              <td style={{ padding: '14px 16px', fontSize: '13px' }}>{row[0] || '-'}</td>
-              <td style={{ padding: '14px 16px', fontSize: '13px', fontFamily: 'monospace' }}>{row[1] || '-'}</td>
-              <td style={{ padding: '14px 16px', fontSize: '13px' }}>{row[2] || '-'}</td>
-              <td style={{ padding: '14px 16px', fontSize: '13px' }}>{row[3] || '-'}</td>
-              <td style={{ padding: '14px 16px', fontSize: '13px', fontFamily: 'monospace' }}>{row[4] || '-'}</td>
-              <td style={{ padding: '14px 16px', fontSize: '13px', fontFamily: 'monospace' }}>{row[5] || '-'}</td>
-              <td style={{ padding: '14px 16px', fontSize: '13px' }}>{row[6] || '-'}</td>
-              <td style={{ padding: '14px 16px', fontSize: '13px' }}>{row[7] || '-'}</td>
-              <td style={{ padding: '14px 16px', textAlign: 'center' }}>
+              <td style={{ padding: '12px 8px', fontSize: '12px' }}>{row[0] || '-'}</td>
+              <td style={{ padding: '12px 8px', fontSize: '12px', fontFamily: 'monospace' }}>{row[1] || '-'}</td>
+              <td style={{ padding: '12px 8px', fontSize: '12px' }}>{row[2] || '-'}</td>
+              <td style={{ padding: '12px 8px', fontSize: '12px' }}>{row[3] || '-'}</td>
+              <td style={{ padding: '12px 8px', fontSize: '12px', fontFamily: 'monospace' }}>{row[4] || '-'}</td>
+              <td style={{ padding: '12px 8px', fontSize: '12px', fontFamily: 'monospace' }}>{row[5] || '-'}</td>
+              <td style={{ padding: '12px 8px', fontSize: '12px' }}>{row[6] || '-'}</td>
+              <td style={{ padding: '12px 8px', fontSize: '12px' }}>{row[7] || '-'}</td>
+              <td style={{ padding: '12px 8px', textAlign: 'center' }}>
                 <button
                   onClick={() => handleDelete(index)}
                   style={{
                     background: '#ef4444',
                     color: 'white',
                     border: 'none',
-                    borderRadius: '6px',
-                    padding: '8px 14px',
+                    borderRadius: '4px',
+                    padding: '6px 10px',
                     cursor: 'pointer',
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '6px',
-                    fontSize: '13px',
+                    gap: '4px',
+                    fontSize: '11px',
                     fontWeight: '500',
                     transition: 'all 0.2s',
                     whiteSpace: 'nowrap',
@@ -155,7 +155,7 @@ export default function CompletedTable({ sheetName }) {
                     e.target.style.transform = 'scale(1)';
                   }}
                 >
-                  <Trash2 size={16} />
+                  <Trash2 size={14} />
                   刪除
                 </button>
               </td>
