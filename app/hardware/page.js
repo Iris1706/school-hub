@@ -91,7 +91,7 @@ export default function HardwarePage() {
 
       {/* Completed Repairs Section */}
       <div style={{ marginBottom: '40px' }}>
-        <div style={{ marginBottom: '16px', paddingLeft: '24px' }}>
+        <div style={{ marginBottom: '16px' }}>
           <h2 style={{ fontSize: '18px', fontWeight: '700', margin: '0 0 8px 0' }}>✅ 已完修</h2>
         </div>
         <div
@@ -99,7 +99,6 @@ export default function HardwarePage() {
             background: 'var(--background, white)',
             borderRadius: '12px',
             boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-            margin: '0 -24px',
             padding: '24px',
             border: '1px solid var(--border-color, #e5e7eb)',
           }}
@@ -110,7 +109,7 @@ export default function HardwarePage() {
 
       {/* In Progress Repairs Section */}
       <div style={{ marginBottom: '40px' }}>
-        <div style={{ marginBottom: '16px', paddingLeft: '24px' }}>
+        <div style={{ marginBottom: '16px' }}>
           <h2 style={{ fontSize: '18px', fontWeight: '700', margin: '0 0 8px 0' }}>⚙️ 處理中</h2>
         </div>
         <div
@@ -118,7 +117,6 @@ export default function HardwarePage() {
             background: 'var(--background, white)',
             borderRadius: '12px',
             boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-            margin: '0 -24px',
             padding: '24px',
             border: '1px solid var(--border-color, #e5e7eb)',
           }}

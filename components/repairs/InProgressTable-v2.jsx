@@ -83,154 +83,146 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
   }
 
   return (
-    <div style={{ width: 'calc(100% + 40px)', marginLeft: '-20px', marginRight: '-20px', background: 'var(--background, white)', padding: '0' }}>
-      <div style={{ padding: '16px 20px' }}>
-        {/* Title Section */}
-        <div style={{ marginBottom: '12px' }}>
-          <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '4px' }}>
-            ⚙️ 處理中
-          </h3>
-          <div style={{ fontSize: '13px', fontWeight: '400', color: '#6b7280' }}>
-            共 {data.length} 筆
-          </div>
-        </div>
-
-        {/* Table */}
-        <table
-          style={{
-            width: '100%',
-            borderCollapse: 'collapse',
-            background: 'transparent',
-          }}
-        >
-          <thead>
-            <tr style={{ borderBottom: '2px solid #e5e7eb', background: 'transparent' }}>
-              <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '9%' }}>建單日期</th>
-              <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '9%' }}>維修單號</th>
-              <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '16%' }}>學校名稱</th>
-              <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '13%' }}>問題分類</th>
-              <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '11%' }}>機器舊序號</th>
-              <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '11%' }}>進度</th>
-              <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '11%' }}>ASM帳號</th>
-              <th style={{ padding: '12px 6px', textAlign: 'center', fontWeight: '600', fontSize: '12px', width: '20%' }}>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((row, index) => (
-              <tr
-                key={index}
-                style={{
-                  borderBottom: '1px solid #e5e7eb',
-                }}
-              >
-                <td style={{ padding: '12px 6px', fontSize: '11px', width: '9%' }}>{row[0] || '-'}</td>
-                <td style={{ padding: '12px 6px', fontSize: '11px', fontFamily: 'monospace', width: '9%' }}>{row[1] || '-'}</td>
-                <td style={{ padding: '12px 6px', fontSize: '11px', width: '16%' }}>{row[2] || '-'}</td>
-                <td style={{ padding: '12px 6px', fontSize: '11px', width: '13%' }}>{row[3] || '-'}</td>
-                <td style={{ padding: '12px 6px', fontSize: '11px', fontFamily: 'monospace', width: '11%' }}>{row[4] || '-'}</td>
-                <td style={{ padding: '12px 6px', fontSize: '11px', width: '11%' }}>{row[5] || '-'}</td>
-                <td style={{ padding: '12px 6px', fontSize: '11px', width: '11%' }}>{row[7] || '-'}</td>
-                <td style={{ padding: '12px 6px', textAlign: 'center', width: '20%' }}>
-                  <div style={{ display: 'flex', gap: '3px', justifyContent: 'center', flexWrap: 'nowrap' }}>
-                    {/* Complete Button */}
-                    <button
-                      onClick={() => onShowCompleteModal(index, row)}
-                      style={{
-                        background: '#10b981',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        padding: '5px 7px',
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '2px',
-                        fontSize: '10px',
-                        fontWeight: '500',
-                        transition: 'all 0.2s',
-                        whiteSpace: 'nowrap',
-                      }}
-                      onMouseEnter={(e) => {
-                        e.target.style.background = '#059669';
-                        e.target.style.transform = 'scale(1.05)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.background = '#10b981';
-                        e.target.style.transform = 'scale(1)';
-                      }}
-                    >
-                      <CheckCircle size={10} />
-                      完成
-                    </button>
-
-                    {/* Edit Button */}
-                    <button
-                      onClick={() => onShowEditModal(index, row)}
-                      style={{
-                        background: '#3b82f6',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        padding: '5px 7px',
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '2px',
-                        fontSize: '10px',
-                        fontWeight: '500',
-                        transition: 'all 0.2s',
-                        whiteSpace: 'nowrap',
-                      }}
-                      onMouseEnter={(e) => {
-                        e.target.style.background = '#2563eb';
-                        e.target.style.transform = 'scale(1.05)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.background = '#3b82f6';
-                        e.target.style.transform = 'scale(1)';
-                      }}
-                    >
-                      <Edit2 size={10} />
-                      編輯
-                    </button>
-
-                    {/* Delete Button */}
-                    <button
-                      onClick={() => handleDelete(index)}
-                      style={{
-                        background: '#ef4444',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        padding: '5px 7px',
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '2px',
-                        fontSize: '10px',
-                        fontWeight: '500',
-                        transition: 'all 0.2s',
-                        whiteSpace: 'nowrap',
-                      }}
-                      onMouseEnter={(e) => {
-                        e.target.style.background = '#dc2626';
-                        e.target.style.transform = 'scale(1.05)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.background = '#ef4444';
-                        e.target.style.transform = 'scale(1)';
-                      }}
-                    >
-                      <Trash2 size={10} />
-                      刪除
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <div>
+      {/* Title with Count on the same line */}
+      <div style={{ marginBottom: '16px' }}>
+        <h3 style={{ fontSize: '18px', fontWeight: '600', margin: '0' }}>
+          ⚙️ 處理中 <span style={{ fontSize: '14px', fontWeight: '400', color: '#6b7280' }}>共 {data.length} 筆</span>
+        </h3>
       </div>
+
+      {/* Table */}
+      <table
+        style={{
+          width: '100%',
+          borderCollapse: 'collapse',
+          background: 'transparent',
+        }}
+      >
+        <thead>
+          <tr style={{ borderBottom: '2px solid #e5e7eb' }}>
+            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '9%' }}>建單日期</th>
+            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '9%' }}>維修單號</th>
+            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '16%' }}>學校名稱</th>
+            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '13%' }}>問題分類</th>
+            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '11%' }}>機器舊序號</th>
+            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '11%' }}>進度</th>
+            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '11%' }}>ASM帳號</th>
+            <th style={{ padding: '12px 6px', textAlign: 'center', fontWeight: '600', fontSize: '12px', width: '20%' }}>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((row, index) => (
+            <tr
+              key={index}
+              style={{
+                borderBottom: '1px solid #e5e7eb',
+              }}
+            >
+              <td style={{ padding: '12px 6px', fontSize: '11px', width: '9%' }}>{row[0] || '-'}</td>
+              <td style={{ padding: '12px 6px', fontSize: '11px', fontFamily: 'monospace', width: '9%' }}>{row[1] || '-'}</td>
+              <td style={{ padding: '12px 6px', fontSize: '11px', width: '16%' }}>{row[2] || '-'}</td>
+              <td style={{ padding: '12px 6px', fontSize: '11px', width: '13%' }}>{row[3] || '-'}</td>
+              <td style={{ padding: '12px 6px', fontSize: '11px', fontFamily: 'monospace', width: '11%' }}>{row[4] || '-'}</td>
+              <td style={{ padding: '12px 6px', fontSize: '11px', width: '11%' }}>{row[5] || '-'}</td>
+              <td style={{ padding: '12px 6px', fontSize: '11px', width: '11%' }}>{row[7] || '-'}</td>
+              <td style={{ padding: '12px 6px', textAlign: 'center', width: '20%' }}>
+                <div style={{ display: 'flex', gap: '3px', justifyContent: 'center', flexWrap: 'nowrap' }}>
+                  <button
+                    onClick={() => onShowCompleteModal(index, row)}
+                    style={{
+                      background: '#10b981',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      padding: '5px 7px',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '2px',
+                      fontSize: '10px',
+                      fontWeight: '500',
+                      transition: 'all 0.2s',
+                      whiteSpace: 'nowrap',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.background = '#059669';
+                      e.target.style.transform = 'scale(1.05)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.background = '#10b981';
+                      e.target.style.transform = 'scale(1)';
+                    }}
+                  >
+                    <CheckCircle size={10} />
+                    完成
+                  </button>
+
+                  <button
+                    onClick={() => onShowEditModal(index, row)}
+                    style={{
+                      background: '#3b82f6',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      padding: '5px 7px',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '2px',
+                      fontSize: '10px',
+                      fontWeight: '500',
+                      transition: 'all 0.2s',
+                      whiteSpace: 'nowrap',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.background = '#2563eb';
+                      e.target.style.transform = 'scale(1.05)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.background = '#3b82f6';
+                      e.target.style.transform = 'scale(1)';
+                    }}
+                  >
+                    <Edit2 size={10} />
+                    編輯
+                  </button>
+
+                  <button
+                    onClick={() => handleDelete(index)}
+                    style={{
+                      background: '#ef4444',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      padding: '5px 7px',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '2px',
+                      fontSize: '10px',
+                      fontWeight: '500',
+                      transition: 'all 0.2s',
+                      whiteSpace: 'nowrap',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.background = '#dc2626';
+                      e.target.style.transform = 'scale(1.05)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.background = '#ef4444';
+                      e.target.style.transform = 'scale(1)';
+                    }}
+                  >
+                    <Trash2 size={10} />
+                    刪除
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
