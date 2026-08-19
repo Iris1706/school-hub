@@ -90,26 +90,25 @@ export default function CompletedTable({ sheetName }) {
   }
 
   return (
-    <div style={{ width: '100%', overflowX: 'auto' }}>
+    <div style={{ width: '100%' }}>
       <table
         style={{
           width: '100%',
           borderCollapse: 'collapse',
           background: 'var(--background, white)',
-          minWidth: '1400px',
         }}
       >
         <thead>
           <tr style={{ borderBottom: '2px solid #e5e7eb', background: 'var(--background-secondary, #f9f9f9)' }}>
-            <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', fontSize: '13px', minWidth: '90px' }}>建單日期</th>
-            <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', fontSize: '13px', minWidth: '90px' }}>維修單號</th>
-            <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', fontSize: '13px', minWidth: '140px' }}>學校名稱</th>
-            <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', fontSize: '13px', minWidth: '120px' }}>問題分類</th>
-            <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', fontSize: '13px', minWidth: '100px' }}>機器舊序號</th>
-            <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', fontSize: '13px', minWidth: '100px' }}>機器新序號</th>
-            <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', fontSize: '13px', minWidth: '100px' }}>狀態</th>
-            <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', fontSize: '13px', minWidth: '110px' }}>完成日期</th>
-            <th style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600', fontSize: '13px', minWidth: '70px' }}>操作</th>
+            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '8%' }}>建單日期</th>
+            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '8%' }}>維修單號</th>
+            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '14%' }}>學校名稱</th>
+            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '12%' }}>問題分類</th>
+            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '10%' }}>機器舊序號</th>
+            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '10%' }}>機器新序號</th>
+            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '10%' }}>狀態</th>
+            <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '10%' }}>完成日期</th>
+            <th style={{ padding: '12px 6px', textAlign: 'center', fontWeight: '600', fontSize: '12px', width: '8%' }}>操作</th>
           </tr>
         </thead>
         <tbody>
@@ -120,15 +119,15 @@ export default function CompletedTable({ sheetName }) {
                 borderBottom: '1px solid #e5e7eb',
               }}
             >
-              <td style={{ padding: '12px 8px', fontSize: '12px', minWidth: '90px' }}>{row[0] || '-'}</td>
-              <td style={{ padding: '12px 8px', fontSize: '12px', fontFamily: 'monospace', minWidth: '90px' }}>{row[1] || '-'}</td>
-              <td style={{ padding: '12px 8px', fontSize: '12px', minWidth: '140px' }}>{row[2] || '-'}</td>
-              <td style={{ padding: '12px 8px', fontSize: '12px', minWidth: '120px' }}>{row[3] || '-'}</td>
-              <td style={{ padding: '12px 8px', fontSize: '12px', fontFamily: 'monospace', minWidth: '100px' }}>{row[4] || '-'}</td>
-              <td style={{ padding: '12px 8px', fontSize: '12px', fontFamily: 'monospace', minWidth: '100px' }}>{row[5] || '-'}</td>
-              <td style={{ padding: '12px 8px', fontSize: '12px', minWidth: '100px' }}>{row[6] || '-'}</td>
-              <td style={{ padding: '12px 8px', fontSize: '12px', minWidth: '110px' }}>{row[7] || '-'}</td>
-              <td style={{ padding: '12px 8px', textAlign: 'center', minWidth: '70px' }}>
+              <td style={{ padding: '12px 6px', fontSize: '11px', width: '8%' }}>{row[0] || '-'}</td>
+              <td style={{ padding: '12px 6px', fontSize: '11px', fontFamily: 'monospace', width: '8%' }}>{row[1] || '-'}</td>
+              <td style={{ padding: '12px 6px', fontSize: '11px', width: '14%' }}>{row[2] || '-'}</td>
+              <td style={{ padding: '12px 6px', fontSize: '11px', width: '12%' }}>{row[3] || '-'}</td>
+              <td style={{ padding: '12px 6px', fontSize: '11px', fontFamily: 'monospace', width: '10%' }}>{row[4] || '-'}</td>
+              <td style={{ padding: '12px 6px', fontSize: '11px', fontFamily: 'monospace', width: '10%' }}>{row[5] || '-'}</td>
+              <td style={{ padding: '12px 6px', fontSize: '11px', width: '10%' }}>{row[6] || '-'}</td>
+              <td style={{ padding: '12px 6px', fontSize: '11px', width: '10%' }}>{row[7] || '-'}</td>
+              <td style={{ padding: '12px 6px', textAlign: 'center', width: '8%' }}>
                 <button
                   onClick={() => handleDelete(index)}
                   style={{
@@ -136,12 +135,12 @@ export default function CompletedTable({ sheetName }) {
                     color: 'white',
                     border: 'none',
                     borderRadius: '4px',
-                    padding: '6px 10px',
+                    padding: '5px 8px',
                     cursor: 'pointer',
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '4px',
-                    fontSize: '11px',
+                    gap: '3px',
+                    fontSize: '10px',
                     fontWeight: '500',
                     transition: 'all 0.2s',
                     whiteSpace: 'nowrap',
@@ -155,7 +154,7 @@ export default function CompletedTable({ sheetName }) {
                     e.target.style.transform = 'scale(1)';
                   }}
                 >
-                  <Trash2 size={14} />
+                  <Trash2 size={12} />
                   刪除
                 </button>
               </td>

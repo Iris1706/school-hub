@@ -84,33 +84,35 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
 
   return (
     <div>
-      {/* Title and Count - Top Left */}
-      <div style={{ marginBottom: '16px' }}>
-        <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '2px' }}>
-          ⚙️ 處理中 <span style={{ fontSize: '14px', fontWeight: '400', color: '#6b7280' }}>共 {data.length} 筆</span>
+      {/* Title Section */}
+      <div style={{ marginBottom: '12px' }}>
+        <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '4px' }}>
+          ⚙️ 處理中
         </h3>
+        <div style={{ fontSize: '13px', fontWeight: '400', color: '#6b7280' }}>
+          共 {data.length} 筆
+        </div>
       </div>
 
       {/* Table */}
-      <div style={{ width: '100%', overflowX: 'auto' }}>
+      <div style={{ width: '100%' }}>
         <table
           style={{
             width: '100%',
             borderCollapse: 'collapse',
             background: 'var(--background, white)',
-            minWidth: '1300px',
           }}
         >
           <thead>
             <tr style={{ borderBottom: '2px solid #e5e7eb', background: 'var(--background-secondary, #f9f9f9)' }}>
-              <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', fontSize: '13px', minWidth: '90px' }}>建單日期</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', fontSize: '13px', minWidth: '90px' }}>維修單號</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', fontSize: '13px', minWidth: '140px' }}>學校名稱</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', fontSize: '13px', minWidth: '120px' }}>問題分類</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', fontSize: '13px', minWidth: '100px' }}>機器舊序號</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', fontSize: '13px', minWidth: '100px' }}>進度</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', fontSize: '13px', minWidth: '100px' }}>ASM帳號</th>
-              <th style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600', fontSize: '13px', minWidth: '120px' }}>操作</th>
+              <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '9%' }}>建單日期</th>
+              <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '9%' }}>維修單號</th>
+              <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '16%' }}>學校名稱</th>
+              <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '13%' }}>問題分類</th>
+              <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '11%' }}>機器舊序號</th>
+              <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '11%' }}>進度</th>
+              <th style={{ padding: '12px 6px', textAlign: 'left', fontWeight: '600', fontSize: '12px', width: '11%' }}>ASM帳號</th>
+              <th style={{ padding: '12px 6px', textAlign: 'center', fontWeight: '600', fontSize: '12px', width: '20%' }}>操作</th>
             </tr>
           </thead>
           <tbody>
@@ -121,15 +123,15 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
                   borderBottom: '1px solid #e5e7eb',
                 }}
               >
-                <td style={{ padding: '12px 8px', fontSize: '12px', minWidth: '90px' }}>{row[0] || '-'}</td>
-                <td style={{ padding: '12px 8px', fontSize: '12px', fontFamily: 'monospace', minWidth: '90px' }}>{row[1] || '-'}</td>
-                <td style={{ padding: '12px 8px', fontSize: '12px', minWidth: '140px' }}>{row[2] || '-'}</td>
-                <td style={{ padding: '12px 8px', fontSize: '12px', minWidth: '120px' }}>{row[3] || '-'}</td>
-                <td style={{ padding: '12px 8px', fontSize: '12px', fontFamily: 'monospace', minWidth: '100px' }}>{row[4] || '-'}</td>
-                <td style={{ padding: '12px 8px', fontSize: '12px', minWidth: '100px' }}>{row[5] || '-'}</td>
-                <td style={{ padding: '12px 8px', fontSize: '12px', minWidth: '100px' }}>{row[7] || '-'}</td>
-                <td style={{ padding: '12px 8px', textAlign: 'center', minWidth: '120px' }}>
-                  <div style={{ display: 'flex', gap: '4px', justifyContent: 'center', flexWrap: 'nowrap' }}>
+                <td style={{ padding: '12px 6px', fontSize: '11px', width: '9%' }}>{row[0] || '-'}</td>
+                <td style={{ padding: '12px 6px', fontSize: '11px', fontFamily: 'monospace', width: '9%' }}>{row[1] || '-'}</td>
+                <td style={{ padding: '12px 6px', fontSize: '11px', width: '16%' }}>{row[2] || '-'}</td>
+                <td style={{ padding: '12px 6px', fontSize: '11px', width: '13%' }}>{row[3] || '-'}</td>
+                <td style={{ padding: '12px 6px', fontSize: '11px', fontFamily: 'monospace', width: '11%' }}>{row[4] || '-'}</td>
+                <td style={{ padding: '12px 6px', fontSize: '11px', width: '11%' }}>{row[5] || '-'}</td>
+                <td style={{ padding: '12px 6px', fontSize: '11px', width: '11%' }}>{row[7] || '-'}</td>
+                <td style={{ padding: '12px 6px', textAlign: 'center', width: '20%' }}>
+                  <div style={{ display: 'flex', gap: '3px', justifyContent: 'center', flexWrap: 'nowrap' }}>
                     {/* Complete Button */}
                     <button
                       onClick={() => onShowCompleteModal(index, row)}
@@ -138,12 +140,12 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
                         color: 'white',
                         border: 'none',
                         borderRadius: '4px',
-                        padding: '6px 8px',
+                        padding: '5px 7px',
                         cursor: 'pointer',
                         display: 'inline-flex',
                         alignItems: 'center',
-                        gap: '3px',
-                        fontSize: '11px',
+                        gap: '2px',
+                        fontSize: '10px',
                         fontWeight: '500',
                         transition: 'all 0.2s',
                         whiteSpace: 'nowrap',
@@ -157,7 +159,7 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
                         e.target.style.transform = 'scale(1)';
                       }}
                     >
-                      <CheckCircle size={11} />
+                      <CheckCircle size={10} />
                       完成
                     </button>
 
@@ -169,12 +171,12 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
                         color: 'white',
                         border: 'none',
                         borderRadius: '4px',
-                        padding: '6px 8px',
+                        padding: '5px 7px',
                         cursor: 'pointer',
                         display: 'inline-flex',
                         alignItems: 'center',
-                        gap: '3px',
-                        fontSize: '11px',
+                        gap: '2px',
+                        fontSize: '10px',
                         fontWeight: '500',
                         transition: 'all 0.2s',
                         whiteSpace: 'nowrap',
@@ -188,7 +190,7 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
                         e.target.style.transform = 'scale(1)';
                       }}
                     >
-                      <Edit2 size={11} />
+                      <Edit2 size={10} />
                       編輯
                     </button>
 
@@ -200,12 +202,12 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
                         color: 'white',
                         border: 'none',
                         borderRadius: '4px',
-                        padding: '6px 8px',
+                        padding: '5px 7px',
                         cursor: 'pointer',
                         display: 'inline-flex',
                         alignItems: 'center',
-                        gap: '3px',
-                        fontSize: '11px',
+                        gap: '2px',
+                        fontSize: '10px',
                         fontWeight: '500',
                         transition: 'all 0.2s',
                         whiteSpace: 'nowrap',
@@ -219,7 +221,7 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
                         e.target.style.transform = 'scale(1)';
                       }}
                     >
-                      <Trash2 size={11} />
+                      <Trash2 size={10} />
                       刪除
                     </button>
                   </div>
