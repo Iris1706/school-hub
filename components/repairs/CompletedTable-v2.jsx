@@ -118,14 +118,14 @@ export default function CompletedTable({ sheetName }) {
               borderBottom: '1px solid #e5e7eb',
             }}
           >
-            <td style={{ padding: '12px 8px', fontSize: '10px', width: '9%', lineHeight: '1.4' }}>{row[0] || '-'}</td>
-            <td style={{ padding: '12px 8px', fontSize: '10px', fontFamily: 'monospace', width: '9%', lineHeight: '1.4' }}>{row[1] || '-'}</td>
-            <td style={{ padding: '12px 8px', fontSize: '10px', width: '14%', lineHeight: '1.4' }}>{row[2] || '-'}</td>
-            <td style={{ padding: '12px 8px', fontSize: '10px', width: '12%', lineHeight: '1.4' }}>{row[3] || '-'}</td>
-            <td style={{ padding: '12px 8px', fontSize: '10px', fontFamily: 'monospace', width: '10%', lineHeight: '1.4' }}>{row[4] || '-'}</td>
-            <td style={{ padding: '12px 8px', fontSize: '10px', fontFamily: 'monospace', width: '10%', lineHeight: '1.4' }}>{row[5] || '-'}</td>
-            <td style={{ padding: '12px 8px', fontSize: '10px', width: '10%', lineHeight: '1.4' }}>{row[6] || '-'}</td>
-            <td style={{ padding: '12px 8px', fontSize: '10px', width: '11%', lineHeight: '1.4' }}>{row[7] || '-'}</td>
+            <td style={{ padding: '12px 8px', fontSize: '11px', width: '9%', lineHeight: '1.4' }}>{row[0] || '-'}</td>
+            <td style={{ padding: '12px 8px', fontSize: '11px', fontFamily: 'monospace', width: '9%', lineHeight: '1.4' }}>{row[1] || '-'}</td>
+            <td style={{ padding: '12px 8px', fontSize: '11px', width: '14%', lineHeight: '1.4' }}>{row[2] || '-'}</td>
+            <td style={{ padding: '12px 8px', fontSize: '11px', width: '12%', lineHeight: '1.4' }}>{row[3] || '-'}</td>
+            <td style={{ padding: '12px 8px', fontSize: '11px', fontFamily: 'monospace', width: '10%', lineHeight: '1.4' }}>{row[4] || '-'}</td>
+            <td style={{ padding: '12px 8px', fontSize: '11px', fontFamily: 'monospace', width: '10%', lineHeight: '1.4' }}>{row[5] || '-'}</td>
+            <td style={{ padding: '12px 8px', fontSize: '11px', width: '10%', lineHeight: '1.4' }}>{row[6] || '-'}</td>
+            <td style={{ padding: '12px 8px', fontSize: '11px', width: '11%', lineHeight: '1.4' }}>{row[7] || '-'}</td>
             <td style={{ padding: '12px 8px', textAlign: 'center', width: '15%' }}>
               <button
                 onClick={() => handleDelete(index)}

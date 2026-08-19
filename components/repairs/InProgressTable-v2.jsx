@@ -125,12 +125,12 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
                 borderBottom: '1px solid #e5e7eb',
               }}
             >
-              <td style={{ padding: '12px 8px', fontSize: '10px', width: '9%', lineHeight: '1.4' }}>{formatDate(row[0])}</td>
-              <td style={{ padding: '12px 8px', fontSize: '10px', fontFamily: 'monospace', width: '9%', lineHeight: '1.4' }}>{row[1] || '-'}</td>
-              <td style={{ padding: '12px 8px', fontSize: '10px', width: '16%', lineHeight: '1.4' }}>{row[2] || '-'}</td>
-              <td style={{ padding: '12px 8px', fontSize: '10px', width: '14%', lineHeight: '1.4' }}>{row[3] || '-'}</td>
-              <td style={{ padding: '12px 8px', fontSize: '10px', fontFamily: 'monospace', width: '11%', lineHeight: '1.4' }}>{row[4] || '-'}</td>
-              <td style={{ padding: '12px 8px', fontSize: '10px', width: '11%', lineHeight: '1.4' }}>{row[5] || '-'}</td>
+              <td style={{ padding: '12px 8px', fontSize: '11px', width: '9%', lineHeight: '1.4' }}>{formatDate(row[0])}</td>
+              <td style={{ padding: '12px 8px', fontSize: '11px', fontFamily: 'monospace', width: '9%', lineHeight: '1.4' }}>{row[1] || '-'}</td>
+              <td style={{ padding: '12px 8px', fontSize: '11px', width: '16%', lineHeight: '1.4' }}>{row[2] || '-'}</td>
+              <td style={{ padding: '12px 8px', fontSize: '11px', width: '14%', lineHeight: '1.4' }}>{row[3] || '-'}</td>
+              <td style={{ padding: '12px 8px', fontSize: '11px', fontFamily: 'monospace', width: '11%', lineHeight: '1.4' }}>{row[4] || '-'}</td>
+              <td style={{ padding: '12px 8px', fontSize: '11px', width: '11%', lineHeight: '1.4' }}>{row[5] || '-'}</td>
               <td style={{ padding: '12px 8px', textAlign: 'center', width: '30%' }}>
                 <div style={{ display: 'flex', gap: '3px', justifyContent: 'center', flexWrap: 'nowrap' }}>
                   <button
