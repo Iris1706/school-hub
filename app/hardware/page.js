@@ -82,9 +82,9 @@ export default function HardwarePage() {
   };
 
   return (
-    <div style={{ width: '100%', padding: '24px' }}>
+    <div style={{ width: '100%', padding: '16px', maxWidth: '1400px', margin: '0 auto' }}>
       {/* Sheet Selector */}
-      <div style={{ marginBottom: '32px', display: 'flex', gap: '12px', alignItems: 'center' }}>
+      <div style={{ marginBottom: '24px', display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
         <label style={{ fontWeight: '600', fontSize: '14px' }}>選擇標案:</label>
         <select
           value={sheetName}
@@ -96,6 +96,8 @@ export default function HardwarePage() {
             fontSize: '14px',
             cursor: 'pointer',
             fontWeight: '500',
+            flex: 1,
+            minWidth: '180px',
           }}
         >
           <option value="Pawn">一期生生平板維修</option>
@@ -104,20 +106,23 @@ export default function HardwarePage() {
       </div>
 
       {/* Tab Buttons */}
-      <div style={{ marginBottom: '32px', display: 'flex', gap: '12px', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', gap: '12px' }}>
+      <div style={{ marginBottom: '24px', display: 'flex', gap: '8px', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
         <button
           onClick={() => setActiveTab('dashboard')}
           style={{
-            padding: '10px 20px',
+            padding: '8px 16px',
             borderRadius: '6px',
             border: 'none',
-            fontSize: '14px',
+            fontSize: '13px',
             fontWeight: '600',
             cursor: 'pointer',
             background: activeTab === 'dashboard' ? '#3b82f6' : '#e5e7eb',
             color: activeTab === 'dashboard' ? 'white' : '#374151',
             transition: 'all 0.2s',
+            whiteSpace: 'nowrap',
+            flex: 1,
+            minWidth: '80px',
           }}
         >
           儀表板
@@ -125,15 +130,18 @@ export default function HardwarePage() {
         <button
           onClick={() => setActiveTab('completed')}
           style={{
-            padding: '10px 20px',
+            padding: '8px 16px',
             borderRadius: '6px',
             border: 'none',
-            fontSize: '14px',
+            fontSize: '13px',
             fontWeight: '600',
             cursor: 'pointer',
             background: activeTab === 'completed' ? '#3b82f6' : '#e5e7eb',
             color: activeTab === 'completed' ? 'white' : '#374151',
             transition: 'all 0.2s',
+            whiteSpace: 'nowrap',
+            flex: 1,
+            minWidth: '80px',
           }}
         >
           ✅ 已完修
@@ -141,21 +149,24 @@ export default function HardwarePage() {
         <button
           onClick={() => setActiveTab('inProgress')}
           style={{
-            padding: '10px 20px',
+            padding: '8px 16px',
             borderRadius: '6px',
             border: 'none',
-            fontSize: '14px',
+            fontSize: '13px',
             fontWeight: '600',
             cursor: 'pointer',
             background: activeTab === 'inProgress' ? '#3b82f6' : '#e5e7eb',
             color: activeTab === 'inProgress' ? 'white' : '#374151',
             transition: 'all 0.2s',
+            whiteSpace: 'nowrap',
+            flex: 1,
+            minWidth: '80px',
           }}
         >
           ⚙️ 處理中
         </button>
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', minWidth: '140px' }}>
           <button
             onClick={() => setRefreshKey((prev) => prev + 1)}
             style={{
