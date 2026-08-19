@@ -24,6 +24,8 @@ export default function HardwarePage() {
   const [addModal, setAddModal] = useState({
     isOpen: false,
   });
+  const [inProgressCount, setInProgressCount] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const handleShowCompleteModal = (rowIndex, rowData) => {
     setCompleteModal({
@@ -155,6 +157,28 @@ export default function HardwarePage() {
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <button
+            onClick={() => setRefreshKey((prev) => prev + 1)}
+            style={{
+              padding: '10px 20px',
+              borderRadius: '6px',
+              border: '1px solid #d1d5db',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              background: 'white',
+              color: '#374151',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.background = '#f3f4f6';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = 'white';
+            }}
+          >
+            🔄 重新整理
+          </button>
+          <button
             onClick={handleShowAddModal}
             style={{
               padding: '10px 20px',
@@ -176,35 +200,13 @@ export default function HardwarePage() {
           >
             ➕ 新增維修
           </button>
-          <button
-            onClick={() => setSheetName((prev) => prev)}
-            style={{
-              padding: '10px 20px',
-              borderRadius: '6px',
-              border: '1px solid #d1d5db',
-              fontSize: '14px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              background: 'white',
-              color: '#374151',
-              transition: 'all 0.2s',
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.background = '#f3f4f6';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.background = 'white';
-            }}
-          >
-            🔄 重新整理
-          </button>
         </div>
       </div>
 
       {/* Dashboard Tab */}
       {activeTab === 'dashboard' && (
         <div style={{ marginBottom: '40px' }}>
-          <RepairDashboard sheetName={sheetName} />
+          <RepairDashboard sheetName={sheetName} key={refreshKey} />
         </div>
       )}
 
@@ -223,7 +225,7 @@ export default function HardwarePage() {
               border: '1px solid var(--border-color, #e5e7eb)',
             }}
           >
-            <CompletedTable sheetName={sheetName} />
+            <CompletedTable sheetName={sheetName} key={refreshKey} />
           </div>
         </div>
       )}
@@ -232,7 +234,7 @@ export default function HardwarePage() {
       {activeTab === 'inProgress' && (
         <div style={{ marginBottom: '40px' }}>
           <div style={{ marginBottom: '16px' }}>
-            <h2 style={{ fontSize: '18px', fontWeight: '700', margin: '0 0 8px 0' }}>⚙️ 處理中</h2>
+            <h2 style={{ fontSize: '18px', fontWeight: '700', margin: '0 0 16px 0' }}>⚙️ 處理中 共 {inProgressCount} 筆</h2>
           </div>
           <div
             style={{
@@ -247,6 +249,8 @@ export default function HardwarePage() {
               sheetName={sheetName}
               onShowCompleteModal={handleShowCompleteModal}
               onShowEditModal={handleShowEditModal}
+              onDataLoaded={(count) => setInProgressCount(count)}
+              key={refreshKey}
             />
           </div>
         </div>
