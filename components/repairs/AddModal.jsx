@@ -51,17 +51,23 @@ export default function AddModal({ isOpen, sheetName, onClose, onSuccess }) {
 
     try {
       setLoading(true);
+
+      // 轉換日期格式 yyyy-mm-dd -> yyyy/mm/dd
+      const formattedDate = formData.date
+        ? formData.date.replace(/-/g, '/')
+        : '';
+
       const values = [
-        formData.date,
+        formattedDate,
         formData.repairNumber,
         formData.school,
         formData.category,
         formData.serialNumber,
-        '', // 維修序號（空白）
         '已開單', // 進度預設值
         formData.asmAccount,
         formData.asmCancel,
         formData.preStage,
+        '', // 其他欄位（空白）
       ];
 
       const response = await fetch('/api/repairs/add', {

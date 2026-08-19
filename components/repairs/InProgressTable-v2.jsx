@@ -87,7 +87,7 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
       {/* Title with Count on the same line */}
       <div style={{ marginBottom: '16px' }}>
         <h3 style={{ fontSize: '18px', fontWeight: '600', margin: '0' }}>
-          ⚙️ 處理中 <span style={{ fontSize: '14px', fontWeight: '400', color: '#6b7280' }}>共 {data.length} 筆</span>
+          ⚙️ 處理中 共 {data.length} 筆
         </h3>
       </div>
 

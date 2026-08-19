@@ -10,10 +10,10 @@ export default function EditModal({ isOpen, rowData, rowIndex, sheetName, onClos
     school: rowData?.[2] || '',
     category: rowData?.[3] || '',
     originalSerial: rowData?.[4] || '',
-    progress: rowData?.[6] || '',
-    asmAccount: rowData?.[7] || '',
-    asmCancel: rowData?.[8] || '',
-    preStage: rowData?.[9] || '',
+    progress: rowData?.[5] || '',
+    asmAccount: rowData?.[6] || '',
+    asmCancel: rowData?.[7] || '',
+    preStage: rowData?.[8] || '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -37,18 +37,23 @@ export default function EditModal({ isOpen, rowData, rowIndex, sheetName, onClos
 
     try {
       setLoading(true);
+      // 轉換日期格式 yyyy-mm-dd -> yyyy/mm/dd
+      const formattedDate = formData.createdDate
+        ? formData.createdDate.replace(/-/g, '/')
+        : (rowData?.[0] || '');
+
       // 只更新有值的欄位，其他保持原值
       const values = [
-        formData.createdDate || rowData?.[0] || '',
+        formattedDate,
         formData.repairNumber || rowData?.[1] || '',
         formData.school || rowData?.[2] || '',
         formData.category || rowData?.[3] || '',
         formData.originalSerial || rowData?.[4] || '',
-        rowData?.[5] || '', // 維修序號（保持不變）
-        formData.progress || rowData?.[6] || '',
-        formData.asmAccount || rowData?.[7] || '',
-        formData.asmCancel || rowData?.[8] || '',
-        formData.preStage || rowData?.[9] || '',
+        formData.progress || rowData?.[5] || '',
+        formData.asmAccount || rowData?.[6] || '',
+        formData.asmCancel || rowData?.[7] || '',
+        formData.preStage || rowData?.[8] || '',
+        rowData?.[9] || '', // 其他欄位（保持不變）
       ];
 
       const response = await fetch('/api/repairs/update', {
@@ -427,10 +432,8 @@ export default function EditModal({ isOpen, rowData, rowIndex, sheetName, onClos
               <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '8px' }}>
                 ASM取消指派
               </label>
-              <input
-                type="text"
+              <select
                 name="asmCancel"
-                placeholder="輸入ASM取消指派"
                 value={formData.asmCancel}
                 onChange={handleInputChange}
                 style={{
@@ -443,6 +446,7 @@ export default function EditModal({ isOpen, rowData, rowIndex, sheetName, onClos
                   boxSizing: 'border-box',
                   transition: 'all 0.2s',
                   outline: 'none',
+                  cursor: 'pointer',
                 }}
                 onFocus={(e) => {
                   e.target.style.borderColor = '#3b82f6';
@@ -452,7 +456,11 @@ export default function EditModal({ isOpen, rowData, rowIndex, sheetName, onClos
                   e.target.style.borderColor = '#d1d5db';
                   e.target.style.boxShadow = 'none';
                 }}
-              />
+              >
+                <option value="">請選擇</option>
+                <option value="是">是</option>
+                <option value="否">否</option>
+              </select>
             </div>
           </div>
 

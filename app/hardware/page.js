@@ -153,28 +153,52 @@ export default function HardwarePage() {
           ⚙️ 處理中
         </button>
         </div>
-        <button
-          onClick={handleShowAddModal}
-          style={{
-            padding: '10px 20px',
-            borderRadius: '6px',
-            border: 'none',
-            fontSize: '14px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            background: '#10b981',
-            color: 'white',
-            transition: 'all 0.2s',
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.background = '#059669';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.background = '#10b981';
-          }}
-        >
-          ➕ 新增維修
-        </button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <button
+            onClick={handleShowAddModal}
+            style={{
+              padding: '10px 20px',
+              borderRadius: '6px',
+              border: 'none',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              background: '#10b981',
+              color: 'white',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.background = '#059669';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = '#10b981';
+            }}
+          >
+            ➕ 新增維修
+          </button>
+          <button
+            onClick={() => setSheetName((prev) => prev)}
+            style={{
+              padding: '10px 20px',
+              borderRadius: '6px',
+              border: '1px solid #d1d5db',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              background: 'white',
+              color: '#374151',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.background = '#f3f4f6';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = 'white';
+            }}
+          >
+            🔄 重新整理
+          </button>
+        </div>
       </div>
 
       {/* Dashboard Tab */}
