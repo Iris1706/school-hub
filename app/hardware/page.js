@@ -6,6 +6,7 @@ import CompletedTable from '@/components/repairs/CompletedTable-v2';
 import InProgressTable from '@/components/repairs/InProgressTable-v2';
 import CompleteModal from '@/components/repairs/CompleteModal';
 import EditModal from '@/components/repairs/EditModal';
+import AddModal from '@/components/repairs/AddModal';
 
 export default function HardwarePage() {
   const [sheetName, setSheetName] = useState('Pawn');
@@ -19,6 +20,9 @@ export default function HardwarePage() {
     isOpen: false,
     rowData: null,
     rowIndex: null,
+  });
+  const [addModal, setAddModal] = useState({
+    isOpen: false,
   });
 
   const handleShowCompleteModal = (rowIndex, rowData) => {
@@ -50,6 +54,18 @@ export default function HardwarePage() {
       isOpen: false,
       rowData: null,
       rowIndex: null,
+    });
+  };
+
+  const handleShowAddModal = () => {
+    setAddModal({
+      isOpen: true,
+    });
+  };
+
+  const handleCloseAddModal = () => {
+    setAddModal({
+      isOpen: false,
     });
   };
 
@@ -135,6 +151,28 @@ export default function HardwarePage() {
         >
           ⚙️ 處理中
         </button>
+        <button
+          onClick={handleShowAddModal}
+          style={{
+            padding: '10px 20px',
+            borderRadius: '6px',
+            border: 'none',
+            fontSize: '14px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            background: '#10b981',
+            color: 'white',
+            transition: 'all 0.2s',
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.background = '#059669';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.background = '#10b981';
+          }}
+        >
+          ➕ 新增維修
+        </button>
       </div>
 
       {/* Dashboard Tab */}
@@ -205,6 +243,16 @@ export default function HardwarePage() {
         sheetName={sheetName}
         onClose={handleCloseEditModal}
         onSuccess={handleEditSuccess}
+      />
+
+      <AddModal
+        isOpen={addModal.isOpen}
+        sheetName={sheetName}
+        onClose={handleCloseAddModal}
+        onSuccess={() => {
+          setSheetName((prev) => prev);
+          handleCloseAddModal();
+        }}
       />
     </div>
   );
