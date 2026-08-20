@@ -8,10 +8,12 @@ const NAV_ITEMS = [
   { href: "/schedule", label: "每日行程" },
   { href: "/repair", label: "報修紀錄" },
   { href: "/school-info", label: "學校資訊" },
+  { href: "/inspect", label: "巡檢管理" },
+  { href: "/hardware", label: "硬體維修" },
+  { href: "/serial-management", label: "序號管理" },
+  { href: "/todo", label: "待辦事項" },
   { href: "/weekly-report", label: "週報產生器" },
   { href: "/training", label: "教育訓練" },
-  { href: "/hardware", label: "硬體維修" },
-  { href: "/todo", label: "待辦事項" },
 ];
 
 export default function Sidebar() {
