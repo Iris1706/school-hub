@@ -188,12 +188,22 @@ export default function InspectPage() {
       (d) => !isChecked(getFieldValue(d, FIELDS.UPLOAD_CHECK)) && !isChecked(getFieldValue(d, FIELDS.EMAIL_CHECK))
     ).length;
 
-    // THSD 統計 - 基於 AJ 欄位（是否完成）
-    const thsdCompleted = allData.filter((d) => isChecked(getFieldValue(d, FIELDS.THSD_COMPLETE)))
-      .length;
-    const thsdIncomplete = allData.filter((d) => !isChecked(getFieldValue(d, FIELDS.THSD_COMPLETE)))
-      .length;
-    const thsdTotal = allData.length;
+    // THSD 統計 - 修改邏輯
+    // 只計算有 THSD 數據的行
+    const thsdDataRows = allData.filter((d) => {
+      const hasThsdData =
+        getFieldValue(d, FIELDS.THSD_SCHOOL) ||
+        getFieldValue(d, FIELDS.THSD_DEVICES) ||
+        getFieldValue(d, FIELDS.THSD_COMPLETE);
+      return hasThsdData;
+    });
+
+    // 未完成數 = THSD 數據中 AJ 未打勾的數量
+    const thsdIncomplete = thsdDataRows.filter((d) => !isChecked(getFieldValue(d, FIELDS.THSD_COMPLETE))).length;
+    // 完成數 = THSD 數據中 AJ 打勾的數量
+    const thsdCompleted = thsdDataRows.filter((d) => isChecked(getFieldValue(d, FIELDS.THSD_COMPLETE))).length;
+    // 總計 = 所有有 THSD 數據的行數
+    const thsdTotal = thsdDataRows.length;
 
     return {
       tablet: {
@@ -253,7 +263,10 @@ export default function InspectPage() {
 
     // 根據負責人篩選
     if (selectedResponsible !== "全部") {
-      filtered = filtered.filter((d) => getFieldValue(d, FIELDS.RESPONSIBLE) === selectedResponsible);
+      filtered = filtered.filter((d) => {
+        const responsible = getFieldValue(d, FIELDS.RESPONSIBLE) || "";
+        return responsible === selectedResponsible;
+      });
     }
 
     return filtered;
@@ -294,87 +307,85 @@ export default function InspectPage() {
     return Math.round((completed / total) * 100);
   };
 
-  // 統計區塊組件 - 高度降低 20%
+  // 商業風格統計區塊組件
   const StatBlock = ({ title, completed, incomplete, total, variant }) => {
     const isTablet = variant === "tablet";
+    // 商業風格配色方案
     const bgGradient = isTablet
-      ? "linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%)"
-      : "linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(249, 115, 22, 0.12) 100%)";
-    const borderColor = isTablet
-      ? "rgba(99, 102, 241, 0.3)"
-      : "rgba(239, 68, 68, 0.3)";
-    const shadowColor = isTablet
-      ? "rgba(99, 102, 241, 0.1)"
-      : "rgba(239, 68, 68, 0.1)";
+      ? "linear-gradient(135deg, #f8f9fc 0%, #f0f4ff 100%)"
+      : "linear-gradient(135deg, #f8f9fc 0%, #fff5f0 100%)";
+    const borderColor = isTablet ? "#d0d9ff" : "#ffd9cc";
+    const accentColor = isTablet ? "#4F46E5" : "#DC2626";
+    const shadowColor = isTablet ? "rgba(79, 70, 229, 0.08)" : "rgba(220, 38, 38, 0.08)";
 
     return (
       <div
         style={{
           background: bgGradient,
-          border: `1px solid ${borderColor}`,
-          borderRadius: 12,
-          padding: "16px 20px",
-          boxShadow: `0 4px 12px ${shadowColor}`,
+          border: `1.5px solid ${borderColor}`,
+          borderRadius: 8,
+          padding: "20px 24px",
+          boxShadow: `0 2px 8px ${shadowColor}`,
         }}
       >
         <div
           style={{
-            fontSize: 13,
-            color: "var(--text-muted)",
-            fontWeight: 600,
-            marginBottom: 14,
+            fontSize: 12,
+            color: "#6B7280",
+            fontWeight: 700,
+            marginBottom: 16,
             textTransform: "uppercase",
-            letterSpacing: 0.5,
+            letterSpacing: 0.8,
           }}
         >
           {title}
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 14 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 16 }}>
           <div>
-            <div style={{ fontSize: 24, fontWeight: 700, color: "#10b981", marginBottom: 2 }}>
+            <div style={{ fontSize: 28, fontWeight: 800, color: "#059669", marginBottom: 4 }}>
               {completed}
             </div>
-            <div style={{ fontSize: 11, color: "var(--text-muted)" }}>已完成</div>
+            <div style={{ fontSize: 12, color: "#6B7280", fontWeight: 500 }}>已完成</div>
           </div>
           <div>
-            <div style={{ fontSize: 24, fontWeight: 700, color: "#ef4444", marginBottom: 2 }}>
+            <div style={{ fontSize: 28, fontWeight: 800, color: "#DC2626", marginBottom: 4 }}>
               {incomplete}
             </div>
-            <div style={{ fontSize: 11, color: "var(--text-muted)" }}>未完成</div>
+            <div style={{ fontSize: 12, color: "#6B7280", fontWeight: 500 }}>未完成</div>
           </div>
           <div>
-            <div style={{ fontSize: 24, fontWeight: 700, color: "#6b7280", marginBottom: 2 }}>
+            <div style={{ fontSize: 28, fontWeight: 800, color: accentColor, marginBottom: 4 }}>
               {total}
             </div>
-            <div style={{ fontSize: 11, color: "var(--text-muted)" }}>總計</div>
+            <div style={{ fontSize: 12, color: "#6B7280", fontWeight: 500 }}>總計</div>
           </div>
         </div>
 
-        <div style={{ height: 6, background: "#e5e7eb", borderRadius: 4, overflow: "hidden", marginBottom: 8 }}>
+        <div style={{ height: 4, background: "#E5E7EB", borderRadius: 2, overflow: "hidden", marginBottom: 8 }}>
           <div
             style={{
               height: "100%",
-              background: "linear-gradient(90deg, #10b981 0%, #3b82f6 100%)",
+              background: `linear-gradient(90deg, ${accentColor} 0%, ${isTablet ? "#8B5CF6" : "#F97316"} 100%)`,
               width: `${getProgressPercent(completed, total)}%`,
               transition: "width 0.3s ease",
             }}
           />
         </div>
 
-        <div style={{ fontSize: 11, color: "var(--text-muted)", textAlign: "right" }}>
+        <div style={{ fontSize: 12, color: "#6B7280", textAlign: "right", fontWeight: 500 }}>
           {getProgressPercent(completed, total)}% 完成
         </div>
       </div>
     );
   };
 
-  // 表格組件
+  // 表格組件 - 商業風格
   const DataTable = ({ data, columnKeys, columnDisplay, variant = "default" }) => {
-    const bgColor = variant === "incomplete" ? "rgba(239, 68, 68, 0.05)" : "rgba(99, 102, 241, 0.05)";
-    const headerBg = variant === "incomplete" ? "rgba(239, 68, 68, 0.1)" : "rgba(99, 102, 241, 0.1)";
-    const borderColor = variant === "incomplete" ? "rgba(239, 68, 68, 0.2)" : "rgba(99, 102, 241, 0.2)";
-    const borderStyle = variant === "incomplete" ? "rgba(239, 68, 68, 0.1)" : "rgba(99, 102, 241, 0.1)";
+    const accentColor = variant === "incomplete" ? "#DC2626" : "#4F46E5";
+    const bgColor = variant === "incomplete" ? "rgba(220, 38, 38, 0.02)" : "rgba(79, 70, 229, 0.02)";
+    const headerBg = variant === "incomplete" ? "#FEF2F2" : "#F0F4FF";
+    const borderColor = variant === "incomplete" ? "#FED7D7" : "#D0D9FF";
 
     return (
       <div
@@ -382,8 +393,8 @@ export default function InspectPage() {
           overflowX: "auto",
           background: "white",
           border: `1px solid ${borderColor}`,
-          borderRadius: 8,
-          boxShadow: `0 2px 8px ${variant === "incomplete" ? "rgba(239, 68, 68, 0.08)" : "rgba(99, 102, 241, 0.08)"}`,
+          borderRadius: 6,
+          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05)",
         }}
       >
         <table
@@ -394,7 +405,7 @@ export default function InspectPage() {
           }}
         >
           <thead>
-            <tr style={{ background: headerBg, borderBottom: `2px solid ${borderColor}` }}>
+            <tr style={{ background: headerBg, borderBottom: `1px solid ${borderColor}` }}>
               {columnDisplay.map((col, idx) => (
                 <th
                   key={idx}
@@ -402,8 +413,9 @@ export default function InspectPage() {
                     padding: "12px 16px",
                     textAlign: "left",
                     fontWeight: 600,
-                    color: "var(--text-primary)",
+                    color: "#1F2937",
                     whiteSpace: "nowrap",
+                    fontSize: 12,
                   }}
                 >
                   {col}
@@ -416,22 +428,21 @@ export default function InspectPage() {
               <tr
                 key={idx}
                 style={{
-                  borderBottom: `1px solid ${borderStyle}`,
-                  background: idx % 2 === 0 ? "transparent" : bgColor,
+                  borderBottom: `1px solid #E5E7EB`,
+                  background: idx % 2 === 0 ? "white" : bgColor,
                 }}
               >
                 {columnKeys.map((colKey, colIdx) => {
                   let cellContent = "-";
-                  let cellColor = "var(--text-secondary)";
+                  let cellColor = "#6B7280";
 
                   if (variant === "thsd" || variant === "search" || variant === "incomplete") {
-                    // 對於直接物件的表格
                     cellContent = row[colKey] || "-";
                   }
 
                   // THSD 按鈕的是否完成欄位著色
                   if (colKey === "是否完成" && variant === "thsd") {
-                    cellColor = row.是否完成狀態 === "completed" ? "#10b981" : "#ef4444";
+                    cellColor = row.是否完成狀態 === "completed" ? "#059669" : "#DC2626";
                   }
 
                   return (
@@ -440,7 +451,8 @@ export default function InspectPage() {
                       style={{
                         padding: "12px 16px",
                         color: cellColor,
-                        fontWeight: colKey === "是否完成" ? 600 : 400,
+                        fontWeight: colKey === "是否完成" ? 700 : 500,
+                        fontSize: 13,
                       }}
                     >
                       {cellContent}
@@ -456,12 +468,69 @@ export default function InspectPage() {
   };
 
   return (
-    <div>
+    <div style={{ background: "#F9FAFB", minHeight: "100vh", padding: "32px" }}>
+      <style>{`
+        .page-title {
+          font-size: 28px;
+          font-weight: 800;
+          color: #111827;
+          margin-bottom: 32px;
+          letter-spacing: -0.5px;
+        }
+
+        .section-title {
+          font-size: 12px;
+          color: #6B7280;
+          fontWeight: 700;
+          marginBottom: 16px;
+          textTransform: uppercase;
+          letterSpacing: 0.8px;
+        }
+
+        input[type="search"] {
+          width: 100%;
+          padding: 10px 14px;
+          border: 1px solid #D1D5DB;
+          borderRadius: 6px;
+          fontSize: 14px;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
+          color: #111827;
+        }
+
+        input[type="search"]:focus {
+          outline: none;
+          border-color: #4F46E5;
+          box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        select {
+          padding: 8px 12px;
+          borderRadius: 6px;
+          border: 1px solid #D1D5DB;
+          background: white;
+          color: #111827;
+          cursor: pointer;
+          fontWeight: 500;
+          fontSize: 13px;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
+        }
+
+        select:focus {
+          outline: none;
+          border-color: #4F46E5;
+          box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        button {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
+        }
+      `}</style>
+
       <h1 className="page-title">巡檢管理</h1>
 
       {/* 統計區塊 - 並排 */}
       {!loading && !error && (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 32 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 40 }}>
           <StatBlock
             title="生生用平板"
             completed={stats.tablet.completed}
@@ -481,27 +550,16 @@ export default function InspectPage() {
 
       {/* 人員進度表格 */}
       {!loading && !error && staffProgress.length > 0 && (
-        <div style={{ marginBottom: 32 }}>
-          <div
-            style={{
-              fontSize: 14,
-              color: "var(--text-muted)",
-              fontWeight: 600,
-              marginBottom: 16,
-              textTransform: "uppercase",
-              letterSpacing: 0.5,
-            }}
-          >
-            人員進度
-          </div>
+        <div style={{ marginBottom: 40 }}>
+          <div className="section-title">人員進度</div>
 
           <div
             style={{
               overflowX: "auto",
               background: "white",
-              border: "1px solid rgba(99, 102, 241, 0.2)",
-              borderRadius: 8,
-              boxShadow: "0 2px 8px rgba(99, 102, 241, 0.08)",
+              border: "1px solid #D1D5DB",
+              borderRadius: 6,
+              boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05)",
             }}
           >
             <table
@@ -512,7 +570,7 @@ export default function InspectPage() {
               }}
             >
               <thead>
-                <tr style={{ background: "rgba(99, 102, 241, 0.1)", borderBottom: "2px solid rgba(99, 102, 241, 0.2)" }}>
+                <tr style={{ background: "#F0F4FF", borderBottom: "1px solid #D0D9FF" }}>
                   {STAFF_PROGRESS_FIELDS.map((field) => (
                     <th
                       key={field}
@@ -520,8 +578,9 @@ export default function InspectPage() {
                         padding: "12px 16px",
                         textAlign: "left",
                         fontWeight: 600,
-                        color: "var(--text-primary)",
+                        color: "#1F2937",
                         whiteSpace: "nowrap",
+                        fontSize: 12,
                       }}
                     >
                       {field}
@@ -534,8 +593,8 @@ export default function InspectPage() {
                   <tr
                     key={idx}
                     style={{
-                      borderBottom: "1px solid rgba(99, 102, 241, 0.1)",
-                      background: idx % 2 === 0 ? "transparent" : "rgba(99, 102, 241, 0.05)",
+                      borderBottom: "1px solid #E5E7EB",
+                      background: idx % 2 === 0 ? "white" : "rgba(79, 70, 229, 0.02)",
                     }}
                   >
                     {STAFF_PROGRESS_FIELDS.map((field) => (
@@ -543,7 +602,8 @@ export default function InspectPage() {
                         key={`${idx}-${field}`}
                         style={{
                           padding: "12px 16px",
-                          color: "var(--text-secondary)",
+                          color: "#374151",
+                          fontWeight: 500,
                         }}
                       >
                         {row[field] || "-"}
@@ -558,19 +618,8 @@ export default function InspectPage() {
       )}
 
       {/* 學校搜尋區塊 */}
-      <div style={{ marginBottom: 32 }}>
-        <div
-          style={{
-            fontSize: 14,
-            color: "var(--text-muted)",
-            fontWeight: 600,
-            marginBottom: 16,
-            textTransform: "uppercase",
-            letterSpacing: 0.5,
-          }}
-        >
-          學校搜尋
-        </div>
+      <div style={{ marginBottom: 40 }}>
+        <div className="section-title">學校搜尋</div>
 
         <input
           type="search"
@@ -578,12 +627,6 @@ export default function InspectPage() {
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           style={{
-            width: "100%",
-            padding: "10px 12px",
-            border: "1px solid rgba(99, 102, 241, 0.2)",
-            borderRadius: 8,
-            fontSize: 14,
-            boxShadow: "0 2px 8px rgba(99, 102, 241, 0.08)",
             marginBottom: 16,
           }}
         />
@@ -604,7 +647,7 @@ export default function InspectPage() {
         )}
 
         {search && searchResults.length === 0 && (
-          <p style={{ color: "var(--text-muted)", textAlign: "center" }}>
+          <p style={{ color: "#6B7280", textAlign: "center", fontSize: 14 }}>
             查詢「{search}」沒有符合的學校。
           </p>
         )}
@@ -612,16 +655,16 @@ export default function InspectPage() {
 
       {/* 切換按鈕和數據表格 */}
       <div style={{ marginBottom: 32 }}>
-        <div style={{ display: "flex", gap: 8, marginBottom: 16, alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", gap: 12, marginBottom: 20, alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", gap: 12 }}>
             <button
               onClick={() => setActiveTab("incomplete")}
               style={{
-                padding: "8px 16px",
+                padding: "8px 18px",
                 borderRadius: 6,
-                border: "1px solid rgba(99, 102, 241, 0.3)",
-                background: activeTab === "incomplete" ? "var(--accent)" : "transparent",
-                color: activeTab === "incomplete" ? "white" : "var(--text-primary)",
+                border: activeTab === "incomplete" ? "1px solid #DC2626" : "1px solid #D1D5DB",
+                background: activeTab === "incomplete" ? "#DC2626" : "white",
+                color: activeTab === "incomplete" ? "white" : "#374151",
                 cursor: "pointer",
                 fontWeight: 600,
                 fontSize: 13,
@@ -633,11 +676,11 @@ export default function InspectPage() {
             <button
               onClick={() => setActiveTab("thsd")}
               style={{
-                padding: "8px 16px",
+                padding: "8px 18px",
                 borderRadius: 6,
-                border: "1px solid rgba(99, 102, 241, 0.3)",
-                background: activeTab === "thsd" ? "var(--accent)" : "transparent",
-                color: activeTab === "thsd" ? "white" : "var(--text-primary)",
+                border: activeTab === "thsd" ? "1px solid #4F46E5" : "1px solid #D1D5DB",
+                background: activeTab === "thsd" ? "#4F46E5" : "white",
+                color: activeTab === "thsd" ? "white" : "#374151",
                 cursor: "pointer",
                 fontWeight: 600,
                 fontSize: 13,
@@ -652,16 +695,6 @@ export default function InspectPage() {
           <select
             value={selectedResponsible}
             onChange={(e) => setSelectedResponsible(e.target.value)}
-            style={{
-              padding: "8px 12px",
-              borderRadius: 6,
-              border: "1px solid rgba(99, 102, 241, 0.3)",
-              background: "white",
-              color: "var(--text-primary)",
-              cursor: "pointer",
-              fontWeight: 500,
-              fontSize: 13,
-            }}
           >
             {RESPONSIBLE_OPTIONS.map((option) => (
               <option key={option} value={option}>
@@ -688,7 +721,7 @@ export default function InspectPage() {
                 variant="incomplete"
               />
             ) : (
-              <p style={{ color: "var(--text-muted)", textAlign: "center" }}>
+              <p style={{ color: "#6B7280", textAlign: "center", fontSize: 14 }}>
                 {selectedResponsible === "全部"
                   ? "暫無未完成的學校。"
                   : `${selectedResponsible} 沒有未完成的學校。`}
@@ -708,7 +741,7 @@ export default function InspectPage() {
                 variant="thsd"
               />
             ) : (
-              <p style={{ color: "var(--text-muted)", textAlign: "center" }}>
+              <p style={{ color: "#6B7280", textAlign: "center", fontSize: 14 }}>
                 {selectedResponsible === "全部"
                   ? "暫無 THSD 資料。"
                   : `${selectedResponsible} 沒有 THSD 資料。`}
@@ -718,9 +751,9 @@ export default function InspectPage() {
         )}
       </div>
 
-      {loading && <p style={{ color: "var(--text-muted)" }}>讀取中...</p>}
+      {loading && <p style={{ color: "#6B7280" }}>讀取中...</p>}
       {error && (
-        <p style={{ color: "var(--danger)" }}>
+        <p style={{ color: "#DC2626" }}>
           讀取失敗：{error}（請確認環境變數與試算表分享權限）
         </p>
       )}
