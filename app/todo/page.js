@@ -4,6 +4,16 @@ import { useState, useEffect } from 'react';
 
 const STATUS_OPTIONS = ['急', '不急', '一般'];
 
+// 日期格式化函數
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  // 如果是 YYYY-MM-DD 格式，轉換為 YYYY/MM/DD
+  if (dateString.includes('-')) {
+    return dateString.replace(/-/g, '/');
+  }
+  return dateString;
+};
+
 export default function TodoPage() {
   const [todos, setTodos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,6 +23,7 @@ export default function TodoPage() {
   // 模態框狀態
   const [editingTodo, setEditingTodo] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
 
   // 新增表單狀態
   const [formData, setFormData] = useState({
@@ -142,6 +153,24 @@ export default function TodoPage() {
     }
   };
 
+  // 刪除待辦事項
+  const handleDeleteTodo = async (todo) => {
+    try {
+      const res = await fetch('/api/todos', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ __row: todo.__row }),
+      });
+
+      if (!res.ok) throw new Error('刪除失敗');
+
+      setDeleteConfirm(null);
+      await fetchTodos();
+    } catch (err) {
+      alert('錯誤: ' + err.message);
+    }
+  };
+
   // 更新待辦事項（特別是完成狀態）
   const handleToggleComplete = async (todo) => {
     try {
@@ -214,7 +243,7 @@ export default function TodoPage() {
           </span>
         )}
       </td>
-      <td style={{ padding: '12px 8px', fontSize: '13px' }}>{todo.日期}</td>
+      <td style={{ padding: '12px 8px', fontSize: '13px' }}>{formatDate(todo.日期)}</td>
       <td style={{ padding: '12px 8px', fontSize: '13px' }}>{todo.學校}</td>
       <td style={{
         padding: '12px 8px',
@@ -230,24 +259,42 @@ export default function TodoPage() {
         {todo.電話 && <div style={{ fontSize: '12px', color: 'var(--text-secondary, #666)' }}>{todo.電話}</div>}
         {todo.郵件 && <div style={{ fontSize: '12px', color: 'var(--text-secondary, #666)' }}>{todo.郵件}</div>}
       </td>
-      <td style={{ padding: '12px 8px', fontSize: '13px' }}>{todo.預計處理日期}</td>
+      <td style={{ padding: '12px 8px', fontSize: '13px' }}>{formatDate(todo.預計處理日期)}</td>
       <td style={{ padding: '12px 8px', textAlign: 'center' }}>
-        <button
-          onClick={() => handleOpenEdit(todo)}
-          style={{
-            backgroundColor: 'var(--accent, #2f6f63)',
-            color: 'white',
-            border: 'none',
-            padding: '4px 8px',
-            borderRadius: '4px',
-            fontSize: '12px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          編輯
-        </button>
+        <div style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
+          <button
+            onClick={() => handleOpenEdit(todo)}
+            style={{
+              backgroundColor: 'var(--accent, #2f6f63)',
+              color: 'white',
+              border: 'none',
+              padding: '4px 8px',
+              borderRadius: '4px',
+              fontSize: '12px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            編輯
+          </button>
+          <button
+            onClick={() => setDeleteConfirm(todo)}
+            style={{
+              backgroundColor: '#dc2626',
+              color: 'white',
+              border: 'none',
+              padding: '4px 8px',
+              borderRadius: '4px',
+              fontSize: '12px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            刪除
+          </button>
+        </div>
       </td>
       <td style={{ padding: '12px 8px', textAlign: 'center' }}>
         <input
@@ -475,7 +522,7 @@ export default function TodoPage() {
                       <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>事件</th>
                       <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>聯絡人</th>
                       <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>預計處理日期</th>
-                      <th style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600' }}>編輯</th>
+                      <th style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600' }}>操作</th>
                       <th style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600' }}>完成</th>
                     </tr>
                   </thead>
@@ -523,7 +570,7 @@ export default function TodoPage() {
                       <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>事件</th>
                       <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>聯絡人</th>
                       <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>預計處理日期</th>
-                      <th style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600' }}>編輯</th>
+                      <th style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600' }}>操作</th>
                       <th style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600' }}>取消</th>
                     </tr>
                   </thead>
@@ -708,6 +755,97 @@ export default function TodoPage() {
                 }}
               >
                 保存
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 刪除確認對話框 */}
+      {deleteConfirm && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1001,
+        }}>
+          <div style={{
+            backgroundColor: 'var(--surface-1, white)',
+            borderRadius: '10px',
+            padding: '24px',
+            maxWidth: '400px',
+            width: '90%',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+          }}>
+            <h2 style={{
+              fontSize: '16px',
+              fontWeight: '600',
+              marginTop: 0,
+              marginBottom: '16px',
+              color: 'var(--text-primary, black)',
+            }}>
+              確認刪除
+            </h2>
+
+            <p style={{
+              fontSize: '14px',
+              color: 'var(--text-secondary)',
+              marginBottom: '20px',
+            }}>
+              確定要刪除這筆待辦事項嗎？此操作無法恢復。
+            </p>
+
+            <div style={{
+              backgroundColor: 'var(--background-secondary, #f9f9f9)',
+              padding: '12px',
+              borderRadius: '8px',
+              marginBottom: '20px',
+              fontSize: '13px',
+              fontWeight: '500',
+            }}>
+              {deleteConfirm.事件}
+            </div>
+
+            <div style={{
+              display: 'flex',
+              gap: '8px',
+              justifyContent: 'flex-end',
+            }}>
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                style={{
+                  backgroundColor: 'transparent',
+                  color: 'var(--text-secondary)',
+                  border: '1px solid var(--border, #e1e3e8)',
+                  padding: '8px 12px',
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                }}
+              >
+                取消
+              </button>
+              <button
+                onClick={() => handleDeleteTodo(deleteConfirm)}
+                style={{
+                  backgroundColor: '#dc2626',
+                  color: 'white',
+                  border: 'none',
+                  padding: '8px 12px',
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                }}
+              >
+                確認刪除
               </button>
             </div>
           </div>
