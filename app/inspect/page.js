@@ -2,9 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-// 欄位對應
+// 欄位對應 - 使用 Google Sheet 中的確切欄位名稱
 const FIELDS = {
-  CODE: "學校代碼",
+  CODE: "學校代碼 (藍色代表已完成)",
   NAME: "學校名稱",
   ADMIN_AREA: "行政區",
   SCHOOL_TYPE: "學制",
@@ -49,20 +49,29 @@ const STAFF_PROGRESS_FIELDS = [
   FIELDS.SHOULD_PROGRESS,
 ];
 
+// 搜尋欄位（已刪除 jamf、THSD、實際預約日期、備註）
 const SEARCH_FIELDS = [
   FIELDS.CODE,
   FIELDS.SCHOOL_TYPE,
   FIELDS.ADMIN_AREA,
   FIELDS.NAME,
-  FIELDS.JAMF,
-  FIELDS.THSD,
   FIELDS.DEVICES_TOTAL,
   FIELDS.CHARGER_TYPE,
   FIELDS.CHARGER_COUNT,
-  FIELDS.RESPONSIBLE,
   FIELDS.WEEK,
-  FIELDS.BOOKING_TIME,
-  FIELDS.REMARKS,
+];
+
+// 未完成按鈕欄位（負責人放最後）
+const INCOMPLETE_FIELDS = [
+  FIELDS.CODE,
+  FIELDS.SCHOOL_TYPE,
+  FIELDS.ADMIN_AREA,
+  FIELDS.NAME,
+  FIELDS.DEVICES_TOTAL,
+  FIELDS.CHARGER_TYPE,
+  FIELDS.CHARGER_COUNT,
+  FIELDS.WEEK,
+  FIELDS.RESPONSIBLE,
 ];
 
 export default function InspectPage() {
@@ -117,11 +126,12 @@ export default function InspectPage() {
       (d) => !isChecked(d[FIELDS.UPLOAD_CHECK]) && !isChecked(d[FIELDS.EMAIL_CHECK])
     ).length;
 
-    // THSD 統計
+    // THSD 統計 - 基於 AJ 欄位（是否完成）
     const thsdCompleted = allData.filter((d) => isChecked(d[FIELDS.THSD_COMPLETE]))
       .length;
     const thsdIncomplete = allData.filter((d) => !isChecked(d[FIELDS.THSD_COMPLETE]))
       .length;
+    const thsdTotal = allData.length;
 
     return {
       tablet: {
@@ -132,7 +142,7 @@ export default function InspectPage() {
       thsd: {
         completed: thsdCompleted,
         incomplete: thsdIncomplete,
-        total: allData.length,
+        total: thsdTotal,
       },
     };
   }, [allData]);
@@ -196,7 +206,7 @@ export default function InspectPage() {
     return Math.round((completed / total) * 100);
   };
 
-  // 統計區塊組件
+  // 統計區塊組件 - 高度降低 20%
   const StatBlock = ({ title, completed, incomplete, total, variant }) => {
     const isTablet = variant === "tablet";
     const bgGradient = isTablet
@@ -215,16 +225,16 @@ export default function InspectPage() {
           background: bgGradient,
           border: `1px solid ${borderColor}`,
           borderRadius: 12,
-          padding: 24,
+          padding: "16px 20px",
           boxShadow: `0 4px 12px ${shadowColor}`,
         }}
       >
         <div
           style={{
-            fontSize: 14,
+            fontSize: 13,
             color: "var(--text-muted)",
             fontWeight: 600,
-            marginBottom: 20,
+            marginBottom: 14,
             textTransform: "uppercase",
             letterSpacing: 0.5,
           }}
@@ -232,28 +242,28 @@ export default function InspectPage() {
           {title}
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24, marginBottom: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 14 }}>
           <div>
-            <div style={{ fontSize: 32, fontWeight: 700, color: "#10b981", marginBottom: 4 }}>
+            <div style={{ fontSize: 24, fontWeight: 700, color: "#10b981", marginBottom: 2 }}>
               {completed}
             </div>
-            <div style={{ fontSize: 12, color: "var(--text-muted)" }}>已完成</div>
+            <div style={{ fontSize: 11, color: "var(--text-muted)" }}>已完成</div>
           </div>
           <div>
-            <div style={{ fontSize: 32, fontWeight: 700, color: "#ef4444", marginBottom: 4 }}>
+            <div style={{ fontSize: 24, fontWeight: 700, color: "#ef4444", marginBottom: 2 }}>
               {incomplete}
             </div>
-            <div style={{ fontSize: 12, color: "var(--text-muted)" }}>未完成</div>
+            <div style={{ fontSize: 11, color: "var(--text-muted)" }}>未完成</div>
           </div>
           <div>
-            <div style={{ fontSize: 32, fontWeight: 700, color: "#6b7280", marginBottom: 4 }}>
+            <div style={{ fontSize: 24, fontWeight: 700, color: "#6b7280", marginBottom: 2 }}>
               {total}
             </div>
-            <div style={{ fontSize: 12, color: "var(--text-muted)" }}>總計</div>
+            <div style={{ fontSize: 11, color: "var(--text-muted)" }}>總計</div>
           </div>
         </div>
 
-        <div style={{ height: 8, background: "#e5e7eb", borderRadius: 4, overflow: "hidden", marginBottom: 12 }}>
+        <div style={{ height: 6, background: "#e5e7eb", borderRadius: 4, overflow: "hidden", marginBottom: 8 }}>
           <div
             style={{
               height: "100%",
@@ -264,7 +274,7 @@ export default function InspectPage() {
           />
         </div>
 
-        <div style={{ fontSize: 12, color: "var(--text-muted)", textAlign: "right" }}>
+        <div style={{ fontSize: 11, color: "var(--text-muted)", textAlign: "right" }}>
           {getProgressPercent(completed, total)}% 完成
         </div>
       </div>
@@ -524,7 +534,7 @@ export default function InspectPage() {
 
         {/* 未完成列表 */}
         {activeTab === "incomplete" && (
-          <DataTable data={incompleteSchools} columns={SEARCH_FIELDS} variant="incomplete" />
+          <DataTable data={incompleteSchools} columns={INCOMPLETE_FIELDS} variant="incomplete" />
         )}
 
         {/* THSD 列表（固定 AF2:AJ11，10 行） */}
