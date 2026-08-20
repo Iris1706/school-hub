@@ -209,54 +209,71 @@ export default function DashboardPage() {
           <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>待辦事項</h2>
           <div style={{
             background: "#ffffff",
-            border: "1px solid #e5e7eb",
-            borderRadius: 8,
-            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05)",
+            border: "1px solid #d1d5db",
+            borderRadius: 12,
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08), inset 0 1px 2px rgba(255, 255, 255, 0.5)",
             overflow: "hidden"
           }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-              {todos.map((todo, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    padding: "12px 16px",
-                    borderBottom: idx < todos.length - 1 ? "1px solid #e5e7eb" : "none",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 16,
-                    flexWrap: "wrap",
-                    fontSize: 13,
-                    color: "#1f2937",
-                  }}
-                >
-                  <span style={{ fontWeight: 600, minWidth: 70, color: "#374151" }}>
-                    {todo.狀態 || "未設定"}
-                  </span>
-                  <span style={{ color: "#d1d5db" }}>|</span>
-                  <span style={{ minWidth: 110, color: "#1f2937" }}>
-                    {todo.預計處理日期 || "未設定"}
-                  </span>
-                  <span style={{ color: "#d1d5db" }}>|</span>
-                  <span style={{ minWidth: 80, color: "#1f2937" }}>
-                    {todo.學校 || "未設定"}
-                  </span>
-                  <span style={{ color: "#d1d5db" }}>|</span>
-                  <span style={{ flex: 1, fontWeight: 600, color: "#3b82f6" }}>
-                    {todo.事件 || "未命名事件"}
-                  </span>
-                  <span style={{ color: "#d1d5db" }}>|</span>
-                  <div style={{ minWidth: 140, display: "flex", flexDirection: "column", gap: 2 }}>
-                    <span style={{ color: "#1f2937", fontWeight: 500 }}>
-                      {todo.聯絡人 || "未設定"}
+              {todos.map((todo, idx) => {
+                const status = (todo.狀態 || "一般").trim();
+                let statusStyles = { background: "#f3f4f6", color: "#6b7280", border: "1px solid #e5e7eb" };
+
+                if (status.includes("急")) {
+                  statusStyles = { background: "#fce4e4", color: "#d97706", border: "1px solid #f5c5c5" };
+                } else if (status.includes("不急")) {
+                  statusStyles = { background: "#fde8d0", color: "#d97706", border: "1px solid #f5d4a8" };
+                }
+
+                return (
+                  <div
+                    key={idx}
+                    style={{
+                      padding: "12px 16px",
+                      borderBottom: idx < todos.length - 1 ? "1px solid #e5e7eb" : "none",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 12,
+                      flexWrap: "wrap",
+                      fontSize: 13,
+                      color: "#1f2937",
+                    }}
+                  >
+                    <span style={{
+                      fontWeight: 600,
+                      padding: "4px 10px",
+                      borderRadius: 6,
+                      whiteSpace: "nowrap",
+                      ...statusStyles
+                    }}>
+                      {todo.狀態 || "一般"}
                     </span>
-                    {(todo.電話 || todo.郵件) && (
-                      <span style={{ fontSize: 12, color: "#9ca3af" }}>
-                        {[todo.電話, todo.郵件].filter(Boolean).join(" • ")}
+                    <span style={{ color: "#d1d5db" }}>|</span>
+                    <span style={{ color: "#1f2937", whiteSpace: "nowrap" }}>
+                      {todo.預計處理日期 || "未設定"}
+                    </span>
+                    <span style={{ color: "#d1d5db" }}>|</span>
+                    <span style={{ color: "#1f2937", whiteSpace: "nowrap" }}>
+                      {todo.學校 || "未設定"}
+                    </span>
+                    <span style={{ color: "#d1d5db" }}>|</span>
+                    <span style={{ fontWeight: 600, color: "#3b82f6", flex: 1 }}>
+                      {todo.事件 || "未命名事件"}
+                    </span>
+                    <span style={{ color: "#d1d5db" }}>|</span>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 2, whiteSpace: "nowrap" }}>
+                      <span style={{ color: "#1f2937", fontWeight: 500 }}>
+                        {todo.聯絡人 || "未設定"}
                       </span>
-                    )}
+                      {(todo.電話 || todo.郵件) && (
+                        <span style={{ fontSize: 11, color: "#9ca3af" }}>
+                          {[todo.電話, todo.郵件].filter(Boolean).join(" • ")}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
