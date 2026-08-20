@@ -161,10 +161,10 @@ export default function DashboardPage() {
               <div key={idx} style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
                 <div style={{
                   background: "#ffffff",
-                  border: "1px solid #e5e7eb",
-                  borderRadius: 8,
+                  border: "1px solid #d1d5db",
+                  borderRadius: 15,
                   padding: 16,
-                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05)",
+                  boxShadow: "0 6px 16px rgba(0, 0, 0, 0.14), 0 3px 8px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06), inset 0 1px 2px rgba(255, 255, 255, 0.6)",
                   minWidth: 180,
                 }}>
                   <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -217,10 +217,10 @@ export default function DashboardPage() {
             <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
               {todos.map((todo, idx) => {
                 const status = (todo.狀態 || "一般").trim();
-                let statusStyles = { background: "#f3f4f6", color: "#6b7280", border: "1px solid #e5e7eb" };
+                let statusStyles = { background: "#f3f4f6", color: "#374151", border: "1px solid #e5e7eb" };
 
                 if (status.includes("急")) {
-                  statusStyles = { background: "#fce4e4", color: "#d97706", border: "1px solid #f5c5c5" };
+                  statusStyles = { background: "#fce4e4", color: "#dc2626", border: "1px solid #f5c5c5" };
                 } else if (status.includes("不急")) {
                   statusStyles = { background: "#fde8d0", color: "#d97706", border: "1px solid #f5d4a8" };
                 }
