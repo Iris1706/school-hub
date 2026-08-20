@@ -147,54 +147,30 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* 行程區塊 */}
+      {/* 當日行程區塊 */}
       {!loadingSchedules && todaySchedules.length > 0 && (
         <div style={{ marginBottom: 32 }}>
-          <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12 }}>行程</h2>
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {todaySchedules.map((schedule, idx) => (
-              <div
-                key={idx}
-                style={{
-                  background: "linear-gradient(135deg, rgba(34, 197, 94, 0.12) 0%, rgba(34, 197, 94, 0.08) 100%)",
-                  border: "1px solid rgba(34, 197, 94, 0.3)",
-                  borderRadius: 12,
-                  padding: 16,
-                  boxShadow: "0 4px 12px rgba(34, 197, 94, 0.1)",
-                }}
-              >
-                <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: 16 }}>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8, minWidth: 100 }}>
-                    <div>
-                      <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>時間</div>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary)" }}>
-                        {schedule.time || "未設定"}
-                      </div>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>日期</div>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary)" }}>
-                        {schedule.date || "未設定"}
-                      </div>
-                    </div>
+          <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>當日行程</h2>
+          <div style={{ border: "1px solid var(--text-muted)", borderRadius: 8, padding: 16 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {todaySchedules.map((schedule, idx) => (
+                <div key={idx}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--text-primary)", flexWrap: "wrap" }}>
+                    <span>日期 {schedule.date || "未設定"}</span>
+                    <span style={{ color: "var(--text-muted)" }}>|</span>
+                    <span>時間 {schedule.time || "未設定"}</span>
+                    <span style={{ color: "var(--text-muted)" }}>|</span>
+                    <span>地點 {schedule.location || "未設定"}</span>
                   </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                    <div>
-                      <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>地點</div>
-                      <div style={{ fontSize: 14, color: "var(--text-primary)" }}>
-                        {schedule.location || "未設定"}
-                      </div>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>事件</div>
-                      <div style={{ fontSize: 14, color: "var(--text-primary)" }}>
-                        {schedule.event || "未設定"}
-                      </div>
-                    </div>
+                  <div style={{ marginTop: 6, marginLeft: 0 }}>
+                    <span style={{ fontSize: 13, color: "#3b82f6", fontWeight: 500 }}>事件 {schedule.event || "未設定"}</span>
                   </div>
+                  {idx < todaySchedules.length - 1 && (
+                    <div style={{ borderBottom: "1px solid var(--text-muted)", marginTop: 12 }}></div>
+                  )}
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       )}
@@ -202,56 +178,45 @@ export default function DashboardPage() {
       {/* 待辦事項區塊 */}
       {!loadingTodos && todos.length > 0 && (
         <div style={{ marginBottom: 32 }}>
-          <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12 }}>待辦事項</h2>
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {todos.map((todo, idx) => (
-              <div
-                key={idx}
-                style={{
-                  background: "linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(239, 68, 68, 0.08) 100%)",
-                  border: "1px solid rgba(239, 68, 68, 0.3)",
-                  borderRadius: 12,
-                  padding: 16,
-                  boxShadow: "0 4px 12px rgba(239, 68, 68, 0.1)",
-                }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary)", marginBottom: 4 }}>
-                      {todo.事件 || "未命名事件"}
-                    </div>
-                    <div style={{ fontSize: 12, color: "var(--text-muted)" }}>
-                      {todo.學校 && `${todo.學校} • `}{todo.聯絡人 && `聯絡人: ${todo.聯絡人}`}
-                    </div>
-                  </div>
-                  <div style={{ fontSize: 11, color: "var(--text-muted)", minWidth: 80, textAlign: "right" }}>
-                    {todo.狀態 && (
-                      <div style={{
-                        display: "inline-block",
-                        background: "rgba(239, 68, 68, 0.2)",
-                        color: "#dc2626",
-                        padding: "4px 8px",
-                        borderRadius: 4,
-                        fontSize: 11,
-                        fontWeight: 600,
-                      }}>
-                        {todo.狀態}
-                      </div>
-                    )}
-                  </div>
+          <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>待辦事項</h2>
+          <div style={{ border: "1px solid var(--text-muted)", borderRadius: 8, padding: 16 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+              {todos.map((todo, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    padding: "12px 0",
+                    borderBottom: idx < todos.length - 1 ? "1px solid var(--text-muted)" : "none",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                    flexWrap: "wrap",
+                    fontSize: 13,
+                    color: "var(--text-primary)",
+                  }}
+                >
+                  <span style={{ fontWeight: 500, minWidth: 60 }}>
+                    {todo.狀態 || "未設定"}
+                  </span>
+                  <span style={{ color: "var(--text-muted)" }}>|</span>
+                  <span style={{ minWidth: 100 }}>
+                    {todo.預計處理日期 || "未設定"}
+                  </span>
+                  <span style={{ color: "var(--text-muted)" }}>|</span>
+                  <span style={{ minWidth: 80 }}>
+                    {todo.學校 || "未設定"}
+                  </span>
+                  <span style={{ color: "var(--text-muted)" }}>|</span>
+                  <span style={{ flex: 1, fontWeight: 500, color: "#3b82f6" }}>
+                    {todo.事件 || "未命名事件"}
+                  </span>
+                  <span style={{ color: "var(--text-muted)" }}>|</span>
+                  <span style={{ minWidth: 80 }}>
+                    {todo.聯絡人 || "未設定"}
+                  </span>
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, fontSize: 12 }}>
-                  <div>
-                    <div style={{ color: "var(--text-muted)", marginBottom: 2 }}>日期</div>
-                    <div style={{ color: "var(--text-primary)" }}>{todo.日期 || "未設定"}</div>
-                  </div>
-                  <div>
-                    <div style={{ color: "var(--text-muted)", marginBottom: 2 }}>預計處理日期</div>
-                    <div style={{ color: "var(--text-primary)" }}>{todo.預計處理日期 || "未設定"}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       )}
