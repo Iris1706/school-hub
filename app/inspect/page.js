@@ -50,7 +50,7 @@ const STAFF_PROGRESS_FIELDS = [
 ];
 
 // 搜尋欄位（已刪除 jamf、THSD、實際預約日期、備註）
-const SEARCH_FIELDS = [
+const SEARCH_FIELDS_KEYS = [
   FIELDS.CODE,
   FIELDS.SCHOOL_TYPE,
   FIELDS.ADMIN_AREA,
@@ -61,8 +61,20 @@ const SEARCH_FIELDS = [
   FIELDS.WEEK,
 ];
 
+// 搜尋欄位顯示名稱
+const SEARCH_FIELDS_DISPLAY = [
+  "[學校代碼]",
+  "學制",
+  "行政區",
+  "學校名稱",
+  "載具目前總數",
+  "充電車",
+  "車數",
+  "週次",
+];
+
 // 未完成按鈕欄位（負責人放最後）
-const INCOMPLETE_FIELDS = [
+const INCOMPLETE_FIELDS_KEYS = [
   FIELDS.CODE,
   FIELDS.SCHOOL_TYPE,
   FIELDS.ADMIN_AREA,
@@ -72,6 +84,18 @@ const INCOMPLETE_FIELDS = [
   FIELDS.CHARGER_COUNT,
   FIELDS.WEEK,
   FIELDS.RESPONSIBLE,
+];
+
+const INCOMPLETE_FIELDS_DISPLAY = [
+  "[學校代碼]",
+  "學制",
+  "行政區",
+  "學校名稱",
+  "載具目前總數",
+  "充電車",
+  "車數",
+  "週次",
+  "負責人",
 ];
 
 // 下拉選項 - 負責人列表
@@ -90,6 +114,7 @@ const RESPONSIBLE_OPTIONS = [
 
 export default function InspectPage() {
   const [allData, setAllData] = useState([]);
+  const [headers, setHeaders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchInput, setSearchInput] = useState("");
@@ -111,6 +136,7 @@ export default function InspectPage() {
       const res = await fetch("/api/inspect");
       const json = await res.json();
       if (json.error) throw new Error(json.error);
+      setHeaders(json.headers || []);
       setAllData(json.data || []);
     } catch (err) {
       setError(err.message);
@@ -131,20 +157,41 @@ export default function InspectPage() {
     return str === "true" || str === "✓" || str === "☑" || str === "✔";
   };
 
+  // 取得欄位值 - 容錯處理（尋找相似欄位名稱）
+  const getFieldValue = (obj, fieldName) => {
+    if (!obj) return "";
+
+    // 首先嘗試直接匹配
+    if (obj[fieldName] !== undefined) {
+      return obj[fieldName] || "";
+    }
+
+    // 如果直接匹配失敗，尋找相似的欄位名稱（去除空格和換行符）
+    const normalizedFieldName = fieldName.replace(/\s+/g, "").toLowerCase();
+    for (const key in obj) {
+      const normalizedKey = key.replace(/\s+/g, "").toLowerCase();
+      if (normalizedKey === normalizedFieldName) {
+        return obj[key] || "";
+      }
+    }
+
+    return "";
+  };
+
   // 計算統計數據
   const stats = useMemo(() => {
     // 生生用平板統計
     const tabletCompleted = allData.filter(
-      (d) => isChecked(d[FIELDS.UPLOAD_CHECK]) && isChecked(d[FIELDS.EMAIL_CHECK])
+      (d) => isChecked(getFieldValue(d, FIELDS.UPLOAD_CHECK)) && isChecked(getFieldValue(d, FIELDS.EMAIL_CHECK))
     ).length;
     const tabletIncomplete = allData.filter(
-      (d) => !isChecked(d[FIELDS.UPLOAD_CHECK]) && !isChecked(d[FIELDS.EMAIL_CHECK])
+      (d) => !isChecked(getFieldValue(d, FIELDS.UPLOAD_CHECK)) && !isChecked(getFieldValue(d, FIELDS.EMAIL_CHECK))
     ).length;
 
     // THSD 統計 - 基於 AJ 欄位（是否完成）
-    const thsdCompleted = allData.filter((d) => isChecked(d[FIELDS.THSD_COMPLETE]))
+    const thsdCompleted = allData.filter((d) => isChecked(getFieldValue(d, FIELDS.THSD_COMPLETE)))
       .length;
-    const thsdIncomplete = allData.filter((d) => !isChecked(d[FIELDS.THSD_COMPLETE]))
+    const thsdIncomplete = allData.filter((d) => !isChecked(getFieldValue(d, FIELDS.THSD_COMPLETE)))
       .length;
     const thsdTotal = allData.length;
 
@@ -169,7 +216,7 @@ export default function InspectPage() {
     // 按人員分組
     const staffMap = {};
     allData.forEach((d) => {
-      const staff = d[FIELDS.STAFF] || "未指定";
+      const staff = getFieldValue(d, FIELDS.STAFF) || "未指定";
       if (!staffMap[staff]) {
         staffMap[staff] = d;
       }
@@ -177,13 +224,13 @@ export default function InspectPage() {
 
     return Object.entries(staffMap).map(([name, data]) => ({
       人員: name,
-      負責學校: data[FIELDS.RESPONSIBLE_SCHOOL] || "",
-      附屬學校間數: data[FIELDS.AFFILIATE_COUNT] || "",
-      扣除附屬: data[FIELDS.AFFILIATE_DEDUCT] || "",
-      已完成數量: data[FIELDS.COMPLETED_COUNT] || "",
-      "目前進度%": data[FIELDS.CURRENT_PROGRESS] || "",
-      應完成間數: data[FIELDS.SHOULD_COMPLETE] || "",
-      "應完成進度%": data[FIELDS.SHOULD_PROGRESS] || "",
+      負責學校: getFieldValue(data, FIELDS.RESPONSIBLE_SCHOOL) || "",
+      附屬學校間數: getFieldValue(data, FIELDS.AFFILIATE_COUNT) || "",
+      扣除附屬: getFieldValue(data, FIELDS.AFFILIATE_DEDUCT) || "",
+      已完成數量: getFieldValue(data, FIELDS.COMPLETED_COUNT) || "",
+      "目前進度%": getFieldValue(data, FIELDS.CURRENT_PROGRESS) || "",
+      應完成間數: getFieldValue(data, FIELDS.SHOULD_COMPLETE) || "",
+      "應完成進度%": getFieldValue(data, FIELDS.SHOULD_PROGRESS) || "",
     }));
   }, [allData]);
 
@@ -193,45 +240,54 @@ export default function InspectPage() {
     const lowerSearch = search.toLowerCase();
     return allData.filter(
       (d) =>
-        (d[FIELDS.CODE] || "").toLowerCase().includes(lowerSearch) ||
-        (d[FIELDS.NAME] || "").toLowerCase().includes(lowerSearch)
+        (getFieldValue(d, FIELDS.CODE) || "").toLowerCase().includes(lowerSearch) ||
+        (getFieldValue(d, FIELDS.NAME) || "").toLowerCase().includes(lowerSearch)
     );
   }, [allData, search]);
 
-  // 未完成的學校（U 和 V 都未打勾）
+  // 未完成的學校（U 和 V 都未打勾）+ 負責人篩選
   const incompleteSchools = useMemo(() => {
     let filtered = allData.filter(
-      (d) => !isChecked(d[FIELDS.UPLOAD_CHECK]) && !isChecked(d[FIELDS.EMAIL_CHECK])
+      (d) => !isChecked(getFieldValue(d, FIELDS.UPLOAD_CHECK)) && !isChecked(getFieldValue(d, FIELDS.EMAIL_CHECK))
     );
 
     // 根據負責人篩選
     if (selectedResponsible !== "全部") {
-      filtered = filtered.filter((d) => d[FIELDS.RESPONSIBLE] === selectedResponsible);
+      filtered = filtered.filter((d) => getFieldValue(d, FIELDS.RESPONSIBLE) === selectedResponsible);
     }
 
     return filtered;
   }, [allData, selectedResponsible]);
 
-  // THSD 數據（從第 2 行開始，一直到有資訊為止）
-  const thsdData = useMemo(() => {
-    return allData.slice(1).map((d) => ({
-      學校代碼: d[FIELDS.CODE] || "",
-      THSD學校: d[FIELDS.THSD_SCHOOL] || "",
-      載具數量: d[FIELDS.THSD_DEVICES] || "",
-      負責人: d[FIELDS.RESPONSIBLE] || "",
-      是否完成: isChecked(d[FIELDS.THSD_COMPLETE]) ? "✓" : "x",
-      是否完成狀態: isChecked(d[FIELDS.THSD_COMPLETE]) ? "completed" : "incomplete",
-    }));
+  // THSD 數據（只顯示 AF:AJ 有資料的行）
+  const thsdDataRaw = useMemo(() => {
+    return allData.filter((d) => {
+      // 只顯示有 THSD 相關數據的行
+      const hasThsdData =
+        getFieldValue(d, FIELDS.THSD_SCHOOL) ||
+        getFieldValue(d, FIELDS.THSD_DEVICES) ||
+        getFieldValue(d, FIELDS.THSD_COMPLETE);
+      return hasThsdData;
+    });
   }, [allData]);
 
-  // 根據負責人篩選 THSD 數據
+  // THSD 數據（根據負責人篩選）
   const filteredThsdData = useMemo(() => {
-    let filtered = thsdData;
+    let filtered = thsdDataRaw.map((d) => ({
+      學校代碼: getFieldValue(d, FIELDS.CODE) || "",
+      THSD學校: getFieldValue(d, FIELDS.THSD_SCHOOL) || "",
+      載具數量: getFieldValue(d, FIELDS.THSD_DEVICES) || "",
+      負責人: getFieldValue(d, FIELDS.RESPONSIBLE) || "",
+      是否完成: isChecked(getFieldValue(d, FIELDS.THSD_COMPLETE)) ? "✓" : "x",
+      是否完成狀態: isChecked(getFieldValue(d, FIELDS.THSD_COMPLETE)) ? "completed" : "incomplete",
+    }));
+
     if (selectedResponsible !== "全部") {
       filtered = filtered.filter((d) => d.負責人 === selectedResponsible);
     }
+
     return filtered;
-  }, [thsdData, selectedResponsible]);
+  }, [thsdDataRaw, selectedResponsible]);
 
   const getProgressPercent = (completed, total) => {
     if (!total) return 0;
@@ -314,7 +370,7 @@ export default function InspectPage() {
   };
 
   // 表格組件
-  const DataTable = ({ data, columns, variant = "default" }) => {
+  const DataTable = ({ data, columnKeys, columnDisplay, variant = "default" }) => {
     const bgColor = variant === "incomplete" ? "rgba(239, 68, 68, 0.05)" : "rgba(99, 102, 241, 0.05)";
     const headerBg = variant === "incomplete" ? "rgba(239, 68, 68, 0.1)" : "rgba(99, 102, 241, 0.1)";
     const borderColor = variant === "incomplete" ? "rgba(239, 68, 68, 0.2)" : "rgba(99, 102, 241, 0.2)";
@@ -339,9 +395,9 @@ export default function InspectPage() {
         >
           <thead>
             <tr style={{ background: headerBg, borderBottom: `2px solid ${borderColor}` }}>
-              {columns.map((col) => (
+              {columnDisplay.map((col, idx) => (
                 <th
-                  key={col}
+                  key={idx}
                   style={{
                     padding: "12px 16px",
                     textAlign: "left",
@@ -364,22 +420,27 @@ export default function InspectPage() {
                   background: idx % 2 === 0 ? "transparent" : bgColor,
                 }}
               >
-                {columns.map((col) => {
-                  let cellContent = row[col] || "-";
+                {columnKeys.map((colKey, colIdx) => {
+                  let cellContent = "-";
                   let cellColor = "var(--text-secondary)";
 
+                  if (variant === "thsd" || variant === "search" || variant === "incomplete") {
+                    // 對於直接物件的表格
+                    cellContent = row[colKey] || "-";
+                  }
+
                   // THSD 按鈕的是否完成欄位著色
-                  if (col === "是否完成" && variant === "thsd") {
+                  if (colKey === "是否完成" && variant === "thsd") {
                     cellColor = row.是否完成狀態 === "completed" ? "#10b981" : "#ef4444";
                   }
 
                   return (
                     <td
-                      key={`${idx}-${col}`}
+                      key={`${idx}-${colIdx}`}
                       style={{
                         padding: "12px 16px",
                         color: cellColor,
-                        fontWeight: col === "是否完成" ? 600 : 400,
+                        fontWeight: colKey === "是否完成" ? 600 : 400,
                       }}
                     >
                       {cellContent}
@@ -528,7 +589,18 @@ export default function InspectPage() {
         />
 
         {search && searchResults.length > 0 && (
-          <DataTable data={searchResults} columns={SEARCH_FIELDS} variant="default" />
+          <DataTable
+            data={searchResults.map((d) => {
+              const row = {};
+              SEARCH_FIELDS_KEYS.forEach((key) => {
+                row[key] = getFieldValue(d, key);
+              });
+              return row;
+            })}
+            columnKeys={SEARCH_FIELDS_KEYS}
+            columnDisplay={SEARCH_FIELDS_DISPLAY}
+            variant="default"
+          />
         )}
 
         {search && searchResults.length === 0 && (
@@ -603,7 +675,18 @@ export default function InspectPage() {
         {activeTab === "incomplete" && (
           <>
             {incompleteSchools.length > 0 ? (
-              <DataTable data={incompleteSchools} columns={INCOMPLETE_FIELDS} variant="incomplete" />
+              <DataTable
+                data={incompleteSchools.map((d) => {
+                  const row = {};
+                  INCOMPLETE_FIELDS_KEYS.forEach((key) => {
+                    row[key] = getFieldValue(d, key);
+                  });
+                  return row;
+                })}
+                columnKeys={INCOMPLETE_FIELDS_KEYS}
+                columnDisplay={INCOMPLETE_FIELDS_DISPLAY}
+                variant="incomplete"
+              />
             ) : (
               <p style={{ color: "var(--text-muted)", textAlign: "center" }}>
                 {selectedResponsible === "全部"
@@ -620,7 +703,8 @@ export default function InspectPage() {
             {filteredThsdData.length > 0 ? (
               <DataTable
                 data={filteredThsdData}
-                columns={["學校代碼", "THSD學校", "載具數量", "負責人", "是否完成"]}
+                columnKeys={["學校代碼", "THSD學校", "載具數量", "負責人", "是否完成"]}
+                columnDisplay={["學校代碼", "THSD學校", "載具數量", "負責人", "是否完成"]}
                 variant="thsd"
               />
             ) : (
