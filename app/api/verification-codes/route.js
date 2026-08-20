@@ -20,11 +20,14 @@ export async function GET() {
     const headers = rows[0]; // 假設是：收到時間、手機末2碼、驗證碼
 
     // 讀取資料（倒序排列，最新的在前）
-    const data = rows.slice(1).map((row) => ({
-      time: row[0] || "",
-      phone: row[1] || "",
-      code: row[2] || "",
-    }));
+    // 只有當三個欄位都有資料時才顯示
+    const data = rows.slice(1)
+      .map((row) => ({
+        time: row[0] || "",
+        phone: row[1] || "",
+        code: row[2] || "",
+      }))
+      .filter((item) => item.time && item.phone && item.code);
 
     // 倒序排列並取最新三個
     const latest = data.reverse().slice(0, 3);
