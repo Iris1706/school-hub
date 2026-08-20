@@ -8,13 +8,15 @@ const FIELDS = {
   NAME: "學校名稱",
   ADMIN_AREA: "行政區",
   SCHOOL_TYPE: "學制",
-  DEVICES_TOTAL: "載具總數",
-  CHARGER_TYPE: "充電車類型",
-  CHARGER_COUNT: "充電車數量",
+  DEVICES_TOTAL: "載具目前總數",
+  CHARGER_TYPE: "充電車",
+  CHARGER_COUNT: "車數",
   RESPONSIBLE: "負責人",
   WEEK: "週次",
-  BOOKING_TIME: "預約時間",
+  BOOKING_TIME: "實際預約日期",
   REMARKS: "備註",
+  JAMF: "jamf",
+  THSD: "THSD",
 
   // 生生用平板欄位
   UPLOAD_CHECK: "巡檢單上傳",
@@ -45,6 +47,22 @@ const STAFF_PROGRESS_FIELDS = [
   FIELDS.CURRENT_PROGRESS,
   FIELDS.SHOULD_COMPLETE,
   FIELDS.SHOULD_PROGRESS,
+];
+
+const SEARCH_FIELDS = [
+  FIELDS.CODE,
+  FIELDS.SCHOOL_TYPE,
+  FIELDS.ADMIN_AREA,
+  FIELDS.NAME,
+  FIELDS.JAMF,
+  FIELDS.THSD,
+  FIELDS.DEVICES_TOTAL,
+  FIELDS.CHARGER_TYPE,
+  FIELDS.CHARGER_COUNT,
+  FIELDS.RESPONSIBLE,
+  FIELDS.WEEK,
+  FIELDS.BOOKING_TIME,
+  FIELDS.REMARKS,
 ];
 
 export default function InspectPage() {
@@ -82,7 +100,7 @@ export default function InspectPage() {
     loadData();
   }, []);
 
-  // 檢查是否打勾（考慮多種打勾表示方式）
+  // 檢查是否打勾
   const isChecked = (value) => {
     if (!value) return false;
     const str = String(value).toLowerCase().trim();
@@ -162,9 +180,9 @@ export default function InspectPage() {
     );
   }, [allData]);
 
-  // THSD 數據
+  // THSD 數據（固定 AF2:AJ11，即第 1-10 行）
   const thsdData = useMemo(() => {
-    return allData.map((d) => ({
+    return allData.slice(0, 10).map((d) => ({
       學校代碼: d[FIELDS.CODE] || "",
       THSD學校: d[FIELDS.THSD_SCHOOL] || "",
       載具數量: d[FIELDS.THSD_DEVICES] || "",
@@ -178,130 +196,172 @@ export default function InspectPage() {
     return Math.round((completed / total) * 100);
   };
 
+  // 統計區塊組件
+  const StatBlock = ({ title, completed, incomplete, total, variant }) => {
+    const isTablet = variant === "tablet";
+    const bgGradient = isTablet
+      ? "linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%)"
+      : "linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(249, 115, 22, 0.12) 100%)";
+    const borderColor = isTablet
+      ? "rgba(99, 102, 241, 0.3)"
+      : "rgba(239, 68, 68, 0.3)";
+    const shadowColor = isTablet
+      ? "rgba(99, 102, 241, 0.1)"
+      : "rgba(239, 68, 68, 0.1)";
+
+    return (
+      <div
+        style={{
+          background: bgGradient,
+          border: `1px solid ${borderColor}`,
+          borderRadius: 12,
+          padding: 24,
+          boxShadow: `0 4px 12px ${shadowColor}`,
+        }}
+      >
+        <div
+          style={{
+            fontSize: 14,
+            color: "var(--text-muted)",
+            fontWeight: 600,
+            marginBottom: 20,
+            textTransform: "uppercase",
+            letterSpacing: 0.5,
+          }}
+        >
+          {title}
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24, marginBottom: 20 }}>
+          <div>
+            <div style={{ fontSize: 32, fontWeight: 700, color: "#10b981", marginBottom: 4 }}>
+              {completed}
+            </div>
+            <div style={{ fontSize: 12, color: "var(--text-muted)" }}>已完成</div>
+          </div>
+          <div>
+            <div style={{ fontSize: 32, fontWeight: 700, color: "#ef4444", marginBottom: 4 }}>
+              {incomplete}
+            </div>
+            <div style={{ fontSize: 12, color: "var(--text-muted)" }}>未完成</div>
+          </div>
+          <div>
+            <div style={{ fontSize: 32, fontWeight: 700, color: "#6b7280", marginBottom: 4 }}>
+              {total}
+            </div>
+            <div style={{ fontSize: 12, color: "var(--text-muted)" }}>總計</div>
+          </div>
+        </div>
+
+        <div style={{ height: 8, background: "#e5e7eb", borderRadius: 4, overflow: "hidden", marginBottom: 12 }}>
+          <div
+            style={{
+              height: "100%",
+              background: "linear-gradient(90deg, #10b981 0%, #3b82f6 100%)",
+              width: `${getProgressPercent(completed, total)}%`,
+              transition: "width 0.3s ease",
+            }}
+          />
+        </div>
+
+        <div style={{ fontSize: 12, color: "var(--text-muted)", textAlign: "right" }}>
+          {getProgressPercent(completed, total)}% 完成
+        </div>
+      </div>
+    );
+  };
+
+  // 表格組件
+  const DataTable = ({ data, columns, variant = "default" }) => {
+    const bgColor = variant === "incomplete" ? "rgba(239, 68, 68, 0.05)" : "rgba(99, 102, 241, 0.05)";
+    const headerBg = variant === "incomplete" ? "rgba(239, 68, 68, 0.1)" : "rgba(99, 102, 241, 0.1)";
+    const borderColor = variant === "incomplete" ? "rgba(239, 68, 68, 0.2)" : "rgba(99, 102, 241, 0.2)";
+    const borderStyle = variant === "incomplete" ? "rgba(239, 68, 68, 0.1)" : "rgba(99, 102, 241, 0.1)";
+
+    return (
+      <div
+        style={{
+          overflowX: "auto",
+          background: "white",
+          border: `1px solid ${borderColor}`,
+          borderRadius: 8,
+          boxShadow: `0 2px 8px ${variant === "incomplete" ? "rgba(239, 68, 68, 0.08)" : "rgba(99, 102, 241, 0.08)"}`,
+        }}
+      >
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            fontSize: 13,
+          }}
+        >
+          <thead>
+            <tr style={{ background: headerBg, borderBottom: `2px solid ${borderColor}` }}>
+              {columns.map((col) => (
+                <th
+                  key={col}
+                  style={{
+                    padding: "12px 16px",
+                    textAlign: "left",
+                    fontWeight: 600,
+                    color: "var(--text-primary)",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {col}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((row, idx) => (
+              <tr
+                key={idx}
+                style={{
+                  borderBottom: `1px solid ${borderStyle}`,
+                  background: idx % 2 === 0 ? "transparent" : bgColor,
+                }}
+              >
+                {columns.map((col) => (
+                  <td
+                    key={`${idx}-${col}`}
+                    style={{
+                      padding: "12px 16px",
+                      color: "var(--text-secondary)",
+                    }}
+                  >
+                    {row[col] || "-"}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
   return (
     <div>
       <h1 className="page-title">巡檢管理</h1>
 
-      {/* 生生用平板區塊 */}
+      {/* 統計區塊 - 並排 */}
       {!loading && !error && (
-        <div style={{ marginBottom: 32 }}>
-          <div
-            style={{
-              background: "linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%)",
-              border: "1px solid rgba(99, 102, 241, 0.3)",
-              borderRadius: 12,
-              padding: 24,
-              boxShadow: "0 4px 12px rgba(99, 102, 241, 0.1)",
-            }}
-          >
-            <div
-              style={{
-                fontSize: 14,
-                color: "var(--text-muted)",
-                fontWeight: 600,
-                marginBottom: 20,
-                textTransform: "uppercase",
-                letterSpacing: 0.5,
-              }}
-            >
-              生生用平板
-            </div>
-
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24, marginBottom: 20 }}>
-              <div>
-                <div style={{ fontSize: 32, fontWeight: 700, color: "#10b981", marginBottom: 4 }}>
-                  {stats.tablet.completed}
-                </div>
-                <div style={{ fontSize: 12, color: "var(--text-muted)" }}>已完成</div>
-              </div>
-              <div>
-                <div style={{ fontSize: 32, fontWeight: 700, color: "#ef4444", marginBottom: 4 }}>
-                  {stats.tablet.incomplete}
-                </div>
-                <div style={{ fontSize: 12, color: "var(--text-muted)" }}>未完成</div>
-              </div>
-              <div>
-                <div style={{ fontSize: 32, fontWeight: 700, color: "#6b7280", marginBottom: 4 }}>
-                  {stats.tablet.total}
-                </div>
-                <div style={{ fontSize: 12, color: "var(--text-muted)" }}>總計</div>
-              </div>
-            </div>
-
-            <div style={{ height: 8, background: "#e5e7eb", borderRadius: 4, overflow: "hidden", marginBottom: 12 }}>
-              <div
-                style={{
-                  height: "100%",
-                  background: "linear-gradient(90deg, #10b981 0%, #3b82f6 100%)",
-                  width: `${getProgressPercent(stats.tablet.completed, stats.tablet.total)}%`,
-                  transition: "width 0.3s ease",
-                }}
-              />
-            </div>
-
-            <div style={{ fontSize: 12, color: "var(--text-muted)", textAlign: "right" }}>
-              {getProgressPercent(stats.tablet.completed, stats.tablet.total)}% 完成
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* THSD 區塊 */}
-      {!loading && !error && (
-        <div style={{ marginBottom: 32 }}>
-          <div
-            style={{
-              background: "linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(249, 115, 22, 0.12) 100%)",
-              border: "1px solid rgba(239, 68, 68, 0.3)",
-              borderRadius: 12,
-              padding: 24,
-              boxShadow: "0 4px 12px rgba(239, 68, 68, 0.1)",
-            }}
-          >
-            <div
-              style={{
-                fontSize: 14,
-                color: "var(--text-muted)",
-                fontWeight: 600,
-                marginBottom: 20,
-                textTransform: "uppercase",
-                letterSpacing: 0.5,
-              }}
-            >
-              THSD
-            </div>
-
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }}>
-              <div>
-                <div style={{ fontSize: 32, fontWeight: 700, color: "#10b981", marginBottom: 4 }}>
-                  {stats.thsd.completed}
-                </div>
-                <div style={{ fontSize: 12, color: "var(--text-muted)" }}>已完成</div>
-              </div>
-              <div>
-                <div style={{ fontSize: 32, fontWeight: 700, color: "#ef4444", marginBottom: 4 }}>
-                  {stats.thsd.incomplete}
-                </div>
-                <div style={{ fontSize: 12, color: "var(--text-muted)" }}>未完成</div>
-              </div>
-              <div>
-                <div style={{ fontSize: 12, color: "var(--text-muted)", lineHeight: 1.6 }}>
-                  <div>
-                    完成率：
-                    <span
-                      style={{
-                        fontWeight: 700,
-                        fontSize: 20,
-                        color: getProgressPercent(stats.thsd.completed, stats.thsd.total) > 50 ? "#10b981" : "#ef4444",
-                      }}
-                    >
-                      {getProgressPercent(stats.thsd.completed, stats.thsd.total)}%
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 32 }}>
+          <StatBlock
+            title="生生用平板"
+            completed={stats.tablet.completed}
+            incomplete={stats.tablet.incomplete}
+            total={stats.tablet.total}
+            variant="tablet"
+          />
+          <StatBlock
+            title="THSD"
+            completed={stats.thsd.completed}
+            incomplete={stats.thsd.incomplete}
+            total={stats.thsd.total}
+            variant="thsd"
+          />
         </div>
       )}
 
@@ -415,89 +475,7 @@ export default function InspectPage() {
         />
 
         {search && searchResults.length > 0 && (
-          <div
-            style={{
-              overflowX: "auto",
-              background: "white",
-              border: "1px solid rgba(99, 102, 241, 0.2)",
-              borderRadius: 8,
-              boxShadow: "0 2px 8px rgba(99, 102, 241, 0.08)",
-            }}
-          >
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                fontSize: 13,
-              }}
-            >
-              <thead>
-                <tr style={{ background: "rgba(99, 102, 241, 0.1)", borderBottom: "2px solid rgba(99, 102, 241, 0.2)" }}>
-                  {[
-                    FIELDS.CODE,
-                    FIELDS.NAME,
-                    FIELDS.ADMIN_AREA,
-                    FIELDS.SCHOOL_TYPE,
-                    FIELDS.DEVICES_TOTAL,
-                    FIELDS.CHARGER_TYPE,
-                    FIELDS.CHARGER_COUNT,
-                    FIELDS.RESPONSIBLE,
-                    FIELDS.WEEK,
-                    FIELDS.BOOKING_TIME,
-                    FIELDS.REMARKS,
-                  ].map((field) => (
-                    <th
-                      key={field}
-                      style={{
-                        padding: "12px 16px",
-                        textAlign: "left",
-                        fontWeight: 600,
-                        color: "var(--text-primary)",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {field}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {searchResults.map((row, idx) => (
-                  <tr
-                    key={idx}
-                    style={{
-                      borderBottom: "1px solid rgba(99, 102, 241, 0.1)",
-                      background: idx % 2 === 0 ? "transparent" : "rgba(99, 102, 241, 0.05)",
-                    }}
-                  >
-                    {[
-                      FIELDS.CODE,
-                      FIELDS.NAME,
-                      FIELDS.ADMIN_AREA,
-                      FIELDS.SCHOOL_TYPE,
-                      FIELDS.DEVICES_TOTAL,
-                      FIELDS.CHARGER_TYPE,
-                      FIELDS.CHARGER_COUNT,
-                      FIELDS.RESPONSIBLE,
-                      FIELDS.WEEK,
-                      FIELDS.BOOKING_TIME,
-                      FIELDS.REMARKS,
-                    ].map((field) => (
-                      <td
-                        key={`${idx}-${field}`}
-                        style={{
-                          padding: "12px 16px",
-                          color: "var(--text-secondary)",
-                        }}
-                      >
-                        {row[field] || "-"}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DataTable data={searchResults} columns={SEARCH_FIELDS} variant="default" />
         )}
 
         {search && searchResults.length === 0 && (
@@ -546,128 +524,16 @@ export default function InspectPage() {
 
         {/* 未完成列表 */}
         {activeTab === "incomplete" && (
-          <div
-            style={{
-              overflowX: "auto",
-              background: "white",
-              border: "1px solid rgba(239, 68, 68, 0.2)",
-              borderRadius: 8,
-              boxShadow: "0 2px 8px rgba(239, 68, 68, 0.08)",
-            }}
-          >
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                fontSize: 13,
-              }}
-            >
-              <thead>
-                <tr style={{ background: "rgba(239, 68, 68, 0.1)", borderBottom: "2px solid rgba(239, 68, 68, 0.2)" }}>
-                  {[FIELDS.CODE, FIELDS.NAME, FIELDS.WEEK, FIELDS.SCHOOL_TYPE, FIELDS.ADMIN_AREA, "載具", FIELDS.CHARGER_TYPE, "車數", FIELDS.RESPONSIBLE].map((field) => (
-                    <th
-                      key={field}
-                      style={{
-                        padding: "12px 16px",
-                        textAlign: "left",
-                        fontWeight: 600,
-                        color: "var(--text-primary)",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {field}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {incompleteSchools.map((row, idx) => (
-                  <tr
-                    key={idx}
-                    style={{
-                      borderBottom: "1px solid rgba(239, 68, 68, 0.1)",
-                      background: idx % 2 === 0 ? "transparent" : "rgba(239, 68, 68, 0.05)",
-                    }}
-                  >
-                    <td style={{ padding: "12px 16px" }}>{row[FIELDS.CODE] || "-"}</td>
-                    <td style={{ padding: "12px 16px" }}>{row[FIELDS.NAME] || "-"}</td>
-                    <td style={{ padding: "12px 16px" }}>{row[FIELDS.WEEK] || "-"}</td>
-                    <td style={{ padding: "12px 16px" }}>{row[FIELDS.SCHOOL_TYPE] || "-"}</td>
-                    <td style={{ padding: "12px 16px" }}>{row[FIELDS.ADMIN_AREA] || "-"}</td>
-                    <td style={{ padding: "12px 16px" }}>{row[FIELDS.DEVICES_TOTAL] || "-"}</td>
-                    <td style={{ padding: "12px 16px" }}>{row[FIELDS.CHARGER_TYPE] || "-"}</td>
-                    <td style={{ padding: "12px 16px" }}>{row[FIELDS.CHARGER_COUNT] || "-"}</td>
-                    <td style={{ padding: "12px 16px" }}>{row[FIELDS.RESPONSIBLE] || "-"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DataTable data={incompleteSchools} columns={SEARCH_FIELDS} variant="incomplete" />
         )}
 
-        {/* THSD 列表 */}
+        {/* THSD 列表（固定 AF2:AJ11，10 行） */}
         {activeTab === "thsd" && (
-          <div
-            style={{
-              overflowX: "auto",
-              background: "white",
-              border: "1px solid rgba(99, 102, 241, 0.2)",
-              borderRadius: 8,
-              boxShadow: "0 2px 8px rgba(99, 102, 241, 0.08)",
-            }}
-          >
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                fontSize: 13,
-              }}
-            >
-              <thead>
-                <tr style={{ background: "rgba(99, 102, 241, 0.1)", borderBottom: "2px solid rgba(99, 102, 241, 0.2)" }}>
-                  {["學校代碼", "THSD學校", "載具數量", "負責人", "是否完成"].map((field) => (
-                    <th
-                      key={field}
-                      style={{
-                        padding: "12px 16px",
-                        textAlign: "left",
-                        fontWeight: 600,
-                        color: "var(--text-primary)",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {field}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {thsdData.map((row, idx) => (
-                  <tr
-                    key={idx}
-                    style={{
-                      borderBottom: "1px solid rgba(99, 102, 241, 0.1)",
-                      background: idx % 2 === 0 ? "transparent" : "rgba(99, 102, 241, 0.05)",
-                    }}
-                  >
-                    <td style={{ padding: "12px 16px" }}>{row.學校代碼 || "-"}</td>
-                    <td style={{ padding: "12px 16px" }}>{row.THSD學校 || "-"}</td>
-                    <td style={{ padding: "12px 16px" }}>{row.載具數量 || "-"}</td>
-                    <td style={{ padding: "12px 16px" }}>{row.負責人 || "-"}</td>
-                    <td
-                      style={{
-                        padding: "12px 16px",
-                        color: row.是否完成 ? "#10b981" : "#ef4444",
-                        fontWeight: 600,
-                      }}
-                    >
-                      {row.是否完成 || "✗"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DataTable
+            data={thsdData}
+            columns={["學校代碼", "THSD學校", "載具數量", "負責人", "是否完成"]}
+            variant="default"
+          />
         )}
       </div>
 
