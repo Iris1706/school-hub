@@ -10,7 +10,11 @@ export default function TodoPage() {
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
-  // 表單狀態
+  // 模態框狀態
+  const [editingTodo, setEditingTodo] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+
+  // 新增表單狀態
   const [formData, setFormData] = useState({
     日期: '',
     學校: '',
@@ -22,6 +26,19 @@ export default function TodoPage() {
     備註: '',
     狀態: '一般',
     完成: '',
+  });
+
+  // 編輯表單狀態
+  const [editFormData, setEditFormData] = useState({
+    日期: '',
+    學校: '',
+    事件: '',
+    聯絡人: '',
+    電話: '',
+    郵件: '',
+    預計處理日期: '',
+    備註: '',
+    狀態: '一般',
   });
 
   // 載入待辦事項
@@ -84,6 +101,47 @@ export default function TodoPage() {
     }
   };
 
+  // 打開編輯模態框
+  const handleOpenEdit = (todo) => {
+    setEditingTodo(todo);
+    setEditFormData({
+      日期: todo.日期,
+      學校: todo.學校,
+      事件: todo.事件,
+      聯絡人: todo.聯絡人,
+      電話: todo.電話,
+      郵件: todo.郵件,
+      預計處理日期: todo.預計處理日期,
+      備註: todo.備註,
+      狀態: todo.狀態,
+    });
+    setShowEditModal(true);
+  };
+
+  // 保存編輯
+  const handleSaveEdit = async () => {
+    try {
+      const updatedTodo = {
+        ...editingTodo,
+        ...editFormData,
+      };
+
+      const res = await fetch('/api/todos', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedTodo),
+      });
+
+      if (!res.ok) throw new Error('更新失敗');
+
+      setShowEditModal(false);
+      setEditingTodo(null);
+      await fetchTodos();
+    } catch (err) {
+      alert('錯誤: ' + err.message);
+    }
+  };
+
   // 更新待辦事項（特別是完成狀態）
   const handleToggleComplete = async (todo) => {
     try {
@@ -141,34 +199,6 @@ export default function TodoPage() {
       borderBottom: '1px solid var(--border, #e1e3e8)',
     }}>
       <td style={{ padding: '12px 8px' }}>
-        <input
-          type="checkbox"
-          checked={isCompleted}
-          onChange={() => handleToggleComplete(todo)}
-          style={{ cursor: 'pointer', width: '18px', height: '18px' }}
-        />
-      </td>
-      <td style={{ padding: '12px 8px', fontSize: '13px' }}>{todo.日期}</td>
-      <td style={{ padding: '12px 8px', fontSize: '13px' }}>{todo.學校}</td>
-      <td style={{
-        padding: '12px 8px',
-        fontSize: '13px',
-        fontWeight: '500',
-        color: isCompleted ? 'var(--text-secondary, #666)' : 'var(--text-primary, black)',
-        textDecoration: isCompleted ? 'line-through' : 'none',
-      }}>
-        {todo.事件}
-      </td>
-      <td style={{ padding: '12px 8px', fontSize: '13px' }}>
-        {todo.聯絡人}
-        {todo.電話 && <div style={{ fontSize: '12px', color: 'var(--text-secondary, #666)' }}>{todo.電話}</div>}
-        {todo.郵件 && <div style={{ fontSize: '12px', color: 'var(--text-secondary, #666)' }}>{todo.郵件}</div>}
-      </td>
-      <td style={{ padding: '12px 8px', fontSize: '13px' }}>{todo.預計處理日期}</td>
-      <td style={{ padding: '12px 8px', fontSize: '13px', color: 'var(--text-secondary, #666)' }}>
-        {todo.備註}
-      </td>
-      <td style={{ padding: '12px 8px' }}>
         {todo.狀態 && (
           <span
             style={{
@@ -183,6 +213,49 @@ export default function TodoPage() {
             {todo.狀態}
           </span>
         )}
+      </td>
+      <td style={{ padding: '12px 8px', fontSize: '13px' }}>{todo.日期}</td>
+      <td style={{ padding: '12px 8px', fontSize: '13px' }}>{todo.學校}</td>
+      <td style={{
+        padding: '12px 8px',
+        fontSize: '13px',
+        fontWeight: '500',
+        color: isCompleted ? 'var(--text-secondary, #666)' : 'var(--text-primary, black)',
+        textDecoration: isCompleted ? 'line-through' : 'none',
+      }}>
+        {todo.事件}
+      </td>
+      <td style={{ padding: '12px 8px', fontSize: '13px' }}>
+        <div>{todo.聯絡人}</div>
+        {todo.電話 && <div style={{ fontSize: '12px', color: 'var(--text-secondary, #666)' }}>{todo.電話}</div>}
+        {todo.郵件 && <div style={{ fontSize: '12px', color: 'var(--text-secondary, #666)' }}>{todo.郵件}</div>}
+      </td>
+      <td style={{ padding: '12px 8px', fontSize: '13px' }}>{todo.預計處理日期}</td>
+      <td style={{ padding: '12px 8px', textAlign: 'center' }}>
+        <button
+          onClick={() => handleOpenEdit(todo)}
+          style={{
+            backgroundColor: 'var(--accent, #2f6f63)',
+            color: 'white',
+            border: 'none',
+            padding: '4px 8px',
+            borderRadius: '4px',
+            fontSize: '12px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          編輯
+        </button>
+      </td>
+      <td style={{ padding: '12px 8px', textAlign: 'center' }}>
+        <input
+          type="checkbox"
+          checked={isCompleted}
+          onChange={() => handleToggleComplete(todo)}
+          style={{ cursor: 'pointer', width: '18px', height: '18px' }}
+        />
       </td>
     </tr>
   );
@@ -211,83 +284,109 @@ export default function TodoPage() {
 
         <form onSubmit={handleAddTodo} style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '16px',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+          gap: '12px',
+          alignItems: 'flex-end',
         }}>
-          <input
-            type="date"
-            value={formData.日期}
-            onChange={(e) => setFormData({ ...formData, 日期: e.target.value })}
-            placeholder="日期"
-            style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
-          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>日期</label>
+            <input
+              type="date"
+              value={formData.日期}
+              onChange={(e) => setFormData({ ...formData, 日期: e.target.value })}
+              style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
+            />
+          </div>
 
-          <input
-            type="text"
-            value={formData.學校}
-            onChange={(e) => setFormData({ ...formData, 學校: e.target.value })}
-            placeholder="學校"
-            style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
-          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>學校</label>
+            <input
+              type="text"
+              value={formData.學校}
+              onChange={(e) => setFormData({ ...formData, 學校: e.target.value })}
+              placeholder="學校"
+              style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
+            />
+          </div>
 
-          <input
-            type="text"
-            value={formData.事件}
-            onChange={(e) => setFormData({ ...formData, 事件: e.target.value })}
-            placeholder="事件（必填）"
-            required
-            style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
-          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>事件 *</label>
+            <input
+              type="text"
+              value={formData.事件}
+              onChange={(e) => setFormData({ ...formData, 事件: e.target.value })}
+              placeholder="事件（必填）"
+              required
+              style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
+            />
+          </div>
 
-          <input
-            type="text"
-            value={formData.聯絡人}
-            onChange={(e) => setFormData({ ...formData, 聯絡人: e.target.value })}
-            placeholder="聯絡人"
-            style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
-          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>聯絡人</label>
+            <input
+              type="text"
+              value={formData.聯絡人}
+              onChange={(e) => setFormData({ ...formData, 聯絡人: e.target.value })}
+              placeholder="聯絡人"
+              style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
+            />
+          </div>
 
-          <input
-            type="tel"
-            value={formData.電話}
-            onChange={(e) => setFormData({ ...formData, 電話: e.target.value })}
-            placeholder="電話"
-            style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
-          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>電話</label>
+            <input
+              type="tel"
+              value={formData.電話}
+              onChange={(e) => setFormData({ ...formData, 電話: e.target.value })}
+              placeholder="電話"
+              style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
+            />
+          </div>
 
-          <input
-            type="email"
-            value={formData.郵件}
-            onChange={(e) => setFormData({ ...formData, 郵件: e.target.value })}
-            placeholder="郵件"
-            style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
-          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>郵件</label>
+            <input
+              type="email"
+              value={formData.郵件}
+              onChange={(e) => setFormData({ ...formData, 郵件: e.target.value })}
+              placeholder="郵件"
+              style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
+            />
+          </div>
 
-          <input
-            type="date"
-            value={formData.預計處理日期}
-            onChange={(e) => setFormData({ ...formData, 預計處理日期: e.target.value })}
-            placeholder="預計處理日期"
-            style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
-          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>預計處理日期</label>
+            <input
+              type="date"
+              value={formData.預計處理日期}
+              onChange={(e) => setFormData({ ...formData, 預計處理日期: e.target.value })}
+              style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
+            />
+          </div>
 
-          <input
-            type="text"
-            value={formData.備註}
-            onChange={(e) => setFormData({ ...formData, 備註: e.target.value })}
-            placeholder="備註"
-            style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
-          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>備註</label>
+            <input
+              type="text"
+              value={formData.備註}
+              onChange={(e) => setFormData({ ...formData, 備註: e.target.value })}
+              placeholder="備註"
+              style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
+            />
+          </div>
 
-          <select
-            value={formData.狀態}
-            onChange={(e) => setFormData({ ...formData, 狀態: e.target.value })}
-            style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
-          >
-            {STATUS_OPTIONS.map((opt) => (
-              <option key={opt} value={opt}>{opt}</option>
-            ))}
-          </select>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>狀態</label>
+            <select
+              value={formData.狀態}
+              onChange={(e) => setFormData({ ...formData, 狀態: e.target.value })}
+              style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
+            >
+              {STATUS_OPTIONS.map((opt) => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
+          </div>
 
           <button
             type="submit"
@@ -295,13 +394,15 @@ export default function TodoPage() {
             style={{
               backgroundColor: 'var(--accent, #2f6f63)',
               color: 'white',
-              padding: '8px 14px',
+              padding: '8px 12px',
               fontSize: '13px',
               fontWeight: '600',
               border: 'none',
               borderRadius: '8px',
               cursor: submitting ? 'not-allowed' : 'pointer',
               opacity: submitting ? 0.6 : 1,
+              whiteSpace: 'nowrap',
+              height: 'fit-content',
             }}
           >
             {submitting ? '新增中...' : '新增'}
@@ -368,14 +469,14 @@ export default function TodoPage() {
                       backgroundColor: 'var(--background-secondary, #f9f9f9)',
                       borderBottom: '2px solid var(--border, #e1e3e8)',
                     }}>
-                      <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>完成</th>
+                      <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>狀態</th>
                       <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>日期</th>
                       <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>學校</th>
                       <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>事件</th>
                       <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>聯絡人</th>
                       <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>預計處理日期</th>
-                      <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>備註</th>
-                      <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>狀態</th>
+                      <th style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600' }}>編輯</th>
+                      <th style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600' }}>完成</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -416,14 +517,14 @@ export default function TodoPage() {
                       backgroundColor: 'var(--background-secondary, #f9f9f9)',
                       borderBottom: '2px solid var(--border, #e1e3e8)',
                     }}>
-                      <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>取消</th>
+                      <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>狀態</th>
                       <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>日期</th>
                       <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>學校</th>
                       <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>事件</th>
                       <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>聯絡人</th>
                       <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>預計處理日期</th>
-                      <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>備註</th>
-                      <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>狀態</th>
+                      <th style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600' }}>編輯</th>
+                      <th style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600' }}>取消</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -436,6 +537,181 @@ export default function TodoPage() {
             </div>
           )}
         </>
+      )}
+
+      {/* 編輯模態框 */}
+      {showEditModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+        }}>
+          <div style={{
+            backgroundColor: 'var(--surface-1, white)',
+            borderRadius: '10px',
+            padding: '24px',
+            maxWidth: '600px',
+            width: '90%',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+          }}>
+            <h2 style={{
+              fontSize: '16px',
+              fontWeight: '600',
+              marginTop: 0,
+              marginBottom: '16px',
+              color: 'var(--text-primary, black)',
+            }}>
+              編輯待辦事項
+            </h2>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '12px',
+              marginBottom: '16px',
+            }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>日期</label>
+                <input
+                  type="date"
+                  value={editFormData.日期}
+                  onChange={(e) => setEditFormData({ ...editFormData, 日期: e.target.value })}
+                  style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>學校</label>
+                <input
+                  type="text"
+                  value={editFormData.學校}
+                  onChange={(e) => setEditFormData({ ...editFormData, 學校: e.target.value })}
+                  style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', gridColumn: '1 / -1' }}>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>事件</label>
+                <input
+                  type="text"
+                  value={editFormData.事件}
+                  onChange={(e) => setEditFormData({ ...editFormData, 事件: e.target.value })}
+                  style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>聯絡人</label>
+                <input
+                  type="text"
+                  value={editFormData.聯絡人}
+                  onChange={(e) => setEditFormData({ ...editFormData, 聯絡人: e.target.value })}
+                  style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>電話</label>
+                <input
+                  type="tel"
+                  value={editFormData.電話}
+                  onChange={(e) => setEditFormData({ ...editFormData, 電話: e.target.value })}
+                  style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>郵件</label>
+                <input
+                  type="email"
+                  value={editFormData.郵件}
+                  onChange={(e) => setEditFormData({ ...editFormData, 郵件: e.target.value })}
+                  style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>預計處理日期</label>
+                <input
+                  type="date"
+                  value={editFormData.預計處理日期}
+                  onChange={(e) => setEditFormData({ ...editFormData, 預計處理日期: e.target.value })}
+                  style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>狀態</label>
+                <select
+                  value={editFormData.狀態}
+                  onChange={(e) => setEditFormData({ ...editFormData, 狀態: e.target.value })}
+                  style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
+                >
+                  {STATUS_OPTIONS.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', gridColumn: '1 / -1' }}>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>備註</label>
+                <input
+                  type="text"
+                  value={editFormData.備註}
+                  onChange={(e) => setEditFormData({ ...editFormData, 備註: e.target.value })}
+                  style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
+                />
+              </div>
+            </div>
+
+            <div style={{
+              display: 'flex',
+              gap: '8px',
+              justifyContent: 'flex-end',
+              marginTop: '20px',
+            }}>
+              <button
+                onClick={() => setShowEditModal(false)}
+                style={{
+                  backgroundColor: 'transparent',
+                  color: 'var(--text-secondary)',
+                  border: '1px solid var(--border, #e1e3e8)',
+                  padding: '8px 12px',
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                }}
+              >
+                取消
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                style={{
+                  backgroundColor: 'var(--accent, #2f6f63)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '8px 12px',
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                }}
+              >
+                保存
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
