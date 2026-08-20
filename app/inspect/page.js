@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 
 // 欄位對應 - 使用 Google Sheet 中的確切欄位名稱
 const FIELDS = {
-  CODE: "學校代碼 (藍色代表已完成)",
+  CODE: "學校代碼\n(藍色代表已完成)",
   NAME: "學校名稱",
   ADMIN_AREA: "行政區",
   SCHOOL_TYPE: "學制",
@@ -74,13 +74,28 @@ const INCOMPLETE_FIELDS = [
   FIELDS.RESPONSIBLE,
 ];
 
+// 下拉選項 - 負責人列表
+const RESPONSIBLE_OPTIONS = [
+  "全部",
+  "Pawn",
+  "Esther",
+  "Iris",
+  "Hongkun",
+  "May",
+  "Zephyr",
+  "Jimmy",
+  "Andy",
+  "Jenna",
+];
+
 export default function InspectPage() {
   const [allData, setAllData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
-  const [activeTab, setActiveTab] = useState("overview"); // overview, incomplete, thsd
+  const [activeTab, setActiveTab] = useState("incomplete"); // 預設 incomplete
+  const [selectedResponsible, setSelectedResponsible] = useState("全部");
 
   // 防抖搜尋
   useEffect(() => {
@@ -185,21 +200,38 @@ export default function InspectPage() {
 
   // 未完成的學校（U 和 V 都未打勾）
   const incompleteSchools = useMemo(() => {
-    return allData.filter(
+    let filtered = allData.filter(
       (d) => !isChecked(d[FIELDS.UPLOAD_CHECK]) && !isChecked(d[FIELDS.EMAIL_CHECK])
     );
-  }, [allData]);
 
-  // THSD 數據（固定 AF2:AJ11，即第 1-10 行）
+    // 根據負責人篩選
+    if (selectedResponsible !== "全部") {
+      filtered = filtered.filter((d) => d[FIELDS.RESPONSIBLE] === selectedResponsible);
+    }
+
+    return filtered;
+  }, [allData, selectedResponsible]);
+
+  // THSD 數據（從第 2 行開始，一直到有資訊為止）
   const thsdData = useMemo(() => {
-    return allData.slice(0, 10).map((d) => ({
+    return allData.slice(1).map((d) => ({
       學校代碼: d[FIELDS.CODE] || "",
       THSD學校: d[FIELDS.THSD_SCHOOL] || "",
       載具數量: d[FIELDS.THSD_DEVICES] || "",
       負責人: d[FIELDS.RESPONSIBLE] || "",
-      是否完成: isChecked(d[FIELDS.THSD_COMPLETE]) ? "✓" : "",
+      是否完成: isChecked(d[FIELDS.THSD_COMPLETE]) ? "✓" : "x",
+      是否完成狀態: isChecked(d[FIELDS.THSD_COMPLETE]) ? "completed" : "incomplete",
     }));
   }, [allData]);
+
+  // 根據負責人篩選 THSD 數據
+  const filteredThsdData = useMemo(() => {
+    let filtered = thsdData;
+    if (selectedResponsible !== "全部") {
+      filtered = filtered.filter((d) => d.負責人 === selectedResponsible);
+    }
+    return filtered;
+  }, [thsdData, selectedResponsible]);
 
   const getProgressPercent = (completed, total) => {
     if (!total) return 0;
@@ -332,17 +364,28 @@ export default function InspectPage() {
                   background: idx % 2 === 0 ? "transparent" : bgColor,
                 }}
               >
-                {columns.map((col) => (
-                  <td
-                    key={`${idx}-${col}`}
-                    style={{
-                      padding: "12px 16px",
-                      color: "var(--text-secondary)",
-                    }}
-                  >
-                    {row[col] || "-"}
-                  </td>
-                ))}
+                {columns.map((col) => {
+                  let cellContent = row[col] || "-";
+                  let cellColor = "var(--text-secondary)";
+
+                  // THSD 按鈕的是否完成欄位著色
+                  if (col === "是否完成" && variant === "thsd") {
+                    cellColor = row.是否完成狀態 === "completed" ? "#10b981" : "#ef4444";
+                  }
+
+                  return (
+                    <td
+                      key={`${idx}-${col}`}
+                      style={{
+                        padding: "12px 16px",
+                        color: cellColor,
+                        fontWeight: col === "是否完成" ? 600 : 400,
+                      }}
+                    >
+                      {cellContent}
+                    </td>
+                  );
+                })}
               </tr>
             ))}
           </tbody>
@@ -497,53 +540,97 @@ export default function InspectPage() {
 
       {/* 切換按鈕和數據表格 */}
       <div style={{ marginBottom: 32 }}>
-        <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-          <button
-            onClick={() => setActiveTab("incomplete")}
+        <div style={{ display: "flex", gap: 8, marginBottom: 16, alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button
+              onClick={() => setActiveTab("incomplete")}
+              style={{
+                padding: "8px 16px",
+                borderRadius: 6,
+                border: "1px solid rgba(99, 102, 241, 0.3)",
+                background: activeTab === "incomplete" ? "var(--accent)" : "transparent",
+                color: activeTab === "incomplete" ? "white" : "var(--text-primary)",
+                cursor: "pointer",
+                fontWeight: 600,
+                fontSize: 13,
+                transition: "all 0.2s ease",
+              }}
+            >
+              未完成
+            </button>
+            <button
+              onClick={() => setActiveTab("thsd")}
+              style={{
+                padding: "8px 16px",
+                borderRadius: 6,
+                border: "1px solid rgba(99, 102, 241, 0.3)",
+                background: activeTab === "thsd" ? "var(--accent)" : "transparent",
+                color: activeTab === "thsd" ? "white" : "var(--text-primary)",
+                cursor: "pointer",
+                fontWeight: 600,
+                fontSize: 13,
+                transition: "all 0.2s ease",
+              }}
+            >
+              THSD
+            </button>
+          </div>
+
+          {/* 負責人下拉選項 */}
+          <select
+            value={selectedResponsible}
+            onChange={(e) => setSelectedResponsible(e.target.value)}
             style={{
-              padding: "8px 16px",
+              padding: "8px 12px",
               borderRadius: 6,
               border: "1px solid rgba(99, 102, 241, 0.3)",
-              background: activeTab === "incomplete" ? "var(--accent)" : "transparent",
-              color: activeTab === "incomplete" ? "white" : "var(--text-primary)",
+              background: "white",
+              color: "var(--text-primary)",
               cursor: "pointer",
-              fontWeight: 600,
+              fontWeight: 500,
               fontSize: 13,
-              transition: "all 0.2s ease",
             }}
           >
-            未完成
-          </button>
-          <button
-            onClick={() => setActiveTab("thsd")}
-            style={{
-              padding: "8px 16px",
-              borderRadius: 6,
-              border: "1px solid rgba(99, 102, 241, 0.3)",
-              background: activeTab === "thsd" ? "var(--accent)" : "transparent",
-              color: activeTab === "thsd" ? "white" : "var(--text-primary)",
-              cursor: "pointer",
-              fontWeight: 600,
-              fontSize: 13,
-              transition: "all 0.2s ease",
-            }}
-          >
-            THSD
-          </button>
+            {RESPONSIBLE_OPTIONS.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* 未完成列表 */}
         {activeTab === "incomplete" && (
-          <DataTable data={incompleteSchools} columns={INCOMPLETE_FIELDS} variant="incomplete" />
+          <>
+            {incompleteSchools.length > 0 ? (
+              <DataTable data={incompleteSchools} columns={INCOMPLETE_FIELDS} variant="incomplete" />
+            ) : (
+              <p style={{ color: "var(--text-muted)", textAlign: "center" }}>
+                {selectedResponsible === "全部"
+                  ? "暫無未完成的學校。"
+                  : `${selectedResponsible} 沒有未完成的學校。`}
+              </p>
+            )}
+          </>
         )}
 
-        {/* THSD 列表（固定 AF2:AJ11，10 行） */}
+        {/* THSD 列表 */}
         {activeTab === "thsd" && (
-          <DataTable
-            data={thsdData}
-            columns={["學校代碼", "THSD學校", "載具數量", "負責人", "是否完成"]}
-            variant="default"
-          />
+          <>
+            {filteredThsdData.length > 0 ? (
+              <DataTable
+                data={filteredThsdData}
+                columns={["學校代碼", "THSD學校", "載具數量", "負責人", "是否完成"]}
+                variant="thsd"
+              />
+            ) : (
+              <p style={{ color: "var(--text-muted)", textAlign: "center" }}>
+                {selectedResponsible === "全部"
+                  ? "暫無 THSD 資料。"
+                  : `${selectedResponsible} 沒有 THSD 資料。`}
+              </p>
+            )}
+          </>
         )}
       </div>
 
