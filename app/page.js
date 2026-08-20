@@ -202,7 +202,10 @@ export default function DashboardPage() {
                     userSelect: "none",
                     display: "flex",
                     alignItems: "center",
-                    padding: "0 2px"
+                    justifyContent: "center",
+                    padding: "0 2px",
+                    height: "100%",
+                    minHeight: "auto"
                   }}>|</div>
                 )}
               </div>
@@ -265,7 +268,7 @@ export default function DashboardPage() {
                       {todo.學校 || "未設定"}
                     </span>
                     <span style={{ color: "#d1d5db" }}>|</span>
-                    <span style={{ fontWeight: 600, color: "#3b82f6", flex: 1 }}>
+                    <span style={{ fontWeight: 600, color: "#3b82f6", whiteSpace: "nowrap" }}>
                       {todo.事件 || "未命名事件"}
                     </span>
                     <span style={{ color: "#d1d5db" }}>|</span>
