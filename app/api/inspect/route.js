@@ -22,7 +22,7 @@ function getInspectSheetsClient() {
   return google.sheets({ version: "v4", auth });
 }
 
-// GET: 從巡檢 Sheet 讀取所有數據
+// GET: 從巡檢 Sheet 讀取所有數據（讀取到 AJ 欄位確保包含所有需要的資訊）
 export async function GET() {
   try {
     const INSPECT_SHEET_ID = process.env.Inspect_SHEET_ID;
@@ -38,7 +38,7 @@ export async function GET() {
     const sheets = getInspectSheetsClient();
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId: INSPECT_SHEET_ID,
-      range: `'${INSPECT_TAB}'!A1:Z1000`,
+      range: `'${INSPECT_TAB}'!A1:AJ1000`,
     });
 
     const rows = res.data.values || [];
