@@ -153,12 +153,12 @@ export default function DashboardPage() {
           <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>當日行程</h2>
           <div style={{
             display: "flex",
-            gap: 16,
+            gap: 4,
             flexWrap: "wrap",
-            alignItems: "flex-start"
+            alignItems: "stretch"
           }}>
             {todaySchedules.map((schedule, idx) => (
-              <div key={idx} style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+              <div key={idx} style={{ display: "flex", alignItems: "stretch", gap: 4 }}>
                 <div style={{
                   background: "#ffffff",
                   border: "1px solid #d1d5db",
@@ -195,7 +195,15 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 {idx < todaySchedules.length - 1 && (
-                  <div style={{ fontSize: 20, color: "#d1d5db", fontWeight: 300, marginTop: 8, userSelect: "none" }}>|</div>
+                  <div style={{
+                    fontSize: 24,
+                    color: "#d1d5db",
+                    fontWeight: 200,
+                    userSelect: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    padding: "0 2px"
+                  }}>|</div>
                 )}
               </div>
             ))}
