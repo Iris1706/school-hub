@@ -79,30 +79,39 @@ export default function ReportGenerator() {
   const handleExport = async (format) => {
     try {
       if (format === 'PDF') {
-        const element = document.getElementById('report-content');
-        const html2pdf = (await import('html2pdf.js')).default;
-        html2pdf()
-          .set({
+        // 動態加載 html2pdf
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+        script.onload = () => {
+          const element = document.getElementById('report-content');
+          const opt = {
             margin: 10,
             filename: `報表_${new Date().toLocaleDateString('zh-TW')}.pdf`,
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 2 },
             jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' },
-          })
-          .from(element)
-          .save();
+          };
+          window.html2pdf().set(opt).from(element).save();
+        };
+        document.head.appendChild(script);
       } else if (format === 'PNG') {
-        const element = document.getElementById('report-content');
-        const html2canvas = (await import('html2canvas')).default;
-        const canvas = await html2canvas(element, { scale: 2 });
-        const link = document.createElement('a');
-        link.href = canvas.toDataURL('image/png');
-        link.download = `報表_${new Date().toLocaleDateString('zh-TW')}.png`;
-        link.click();
+        // 動態加載 html2canvas
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+        script.onload = () => {
+          const element = document.getElementById('report-content');
+          window.html2canvas(element, { scale: 2 }).then((canvas) => {
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = `報表_${new Date().toLocaleDateString('zh-TW')}.png`;
+            link.click();
+          });
+        };
+        document.head.appendChild(script);
       } else if (format === 'HTML') {
         const element = document.getElementById('report-content');
         const htmlContent = element.outerHTML;
-        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = `報表_${new Date().toLocaleDateString('zh-TW')}.html`;
