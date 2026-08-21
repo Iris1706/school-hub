@@ -48,9 +48,15 @@ export default function ReportGenerator() {
     for (let i = 0; i < 7; i++) {
       const date = new Date(startDate);
       date.setDate(date.getDate() + i);
+      // 格式化日期為 yyyy/m/d（與 Google Sheets 格式一致）
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      const dateStr = `${year}/${month}/${day}`;
+
       days.push({
         date,
-        dateStr: date.toLocaleDateString('zh-TW'),
+        dateStr,
         dayName: ['一', '二', '三', '四', '五', '六', '日'][date.getDay() === 0 ? 6 : date.getDay() - 1],
       });
     }
@@ -560,13 +566,29 @@ export default function ReportGenerator() {
                           daySchedules.map((schedule, sidx) => {
                             // 根據事件欄位決定標籤顏色
                             const getEventColor = (event) => {
-                              if (!event) return { bgColor: '#e5e7eb', textColor: '#6b7280' };
-                              const eventStr = String(event).toLowerCase();
-                              if (eventStr.includes('駐點')) return { bgColor: '#dbeafe', textColor: '#1e40af' };
-                              if (eventStr.includes('巡檢')) return { bgColor: '#dcfce7', textColor: '#166534' };
-                              if (eventStr.includes('下午') || eventStr.includes('外')) return { bgColor: '#fed7aa', textColor: '#b45309' };
-                              if (eventStr.includes('報修')) return { bgColor: '#fee2e2', textColor: '#991b1b' };
-                              return { bgColor: '#e5e7eb', textColor: '#6b7280' };
+                              if (!event) return { bgColor: '#d4edbb', textColor: '#374151' };
+                              const eventStr = String(event).trim();
+
+                              // 完整的顏色映射表
+                              const colorMap = {
+                                '三多': { bgColor: '#d4edbb', textColor: '#374151' },
+                                '上午(外)': { bgColor: '#c6dbe1', textColor: '#374151' },
+                                '下午(外)': { bgColor: '#ffcfc8', textColor: '#374151' },
+                                '特休': { bgColor: '#ca3750', textColor: '#ffffff' },
+                                '排休': { bgColor: '#ffe59f', textColor: '#374151' },
+                                '巡檢': { bgColor: '#c0e1f6', textColor: '#374151' },
+                                '上午(巡)': { bgColor: '#5b3286', textColor: '#ffffff' },
+                                '下午(巡)': { bgColor: '#5b3286', textColor: '#ffffff' },
+                                '國定假日': { bgColor: '#d81b91', textColor: '#ffffff' },
+                                '彈性假': { bgColor: '#a7adb6', textColor: '#374151' },
+                                '病假': { bgColor: '#7d9ac4', textColor: '#374151' },
+                                '事假': { bgColor: '#473822', textColor: '#ffffff' },
+                                '駐點': { bgColor: '#e28d38', textColor: '#374151' },
+                                '上午(特)': { bgColor: '#b10202', textColor: '#ffffff' },
+                                '下午(特)': { bgColor: '#b10202', textColor: '#ffffff' },
+                              };
+
+                              return colorMap[eventStr] || { bgColor: '#d4edbb', textColor: '#374151' };
                             };
 
                             const eventColor = getEventColor(schedule.event);
