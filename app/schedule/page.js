@@ -195,7 +195,7 @@ export default function SchedulePage() {
                         color: isWeekend ? "#c41e3a" : "var(--text-primary)",
                         borderRight: "1px solid rgba(200, 200, 200, 0.3)",
                         background: isWeekend ? "rgba(196, 30, 58, 0.08)" : "transparent",
-                        minWidth: 40,
+                        minWidth: 75,
                         textAlign: "center",
                         fontSize: 12,
                       }}
@@ -221,7 +221,7 @@ export default function SchedulePage() {
                         color: isWeekend ? "#c41e3a" : "rgba(100, 100, 100, 0.6)",
                         borderRight: "1px solid rgba(200, 200, 200, 0.3)",
                         background: isWeekend ? "rgba(196, 30, 58, 0.08)" : "transparent",
-                        minWidth: 40,
+                        minWidth: 75,
                         textAlign: "center",
                         fontSize: 10,
                       }}
@@ -414,42 +414,42 @@ export default function SchedulePage() {
             <table style={{
               width: "auto",
               borderCollapse: "collapse",
-              fontSize: 12,
+              fontSize: 14,
               border: "1px solid var(--accent)",
             }}>
               <thead>
                 <tr style={{ background: "rgba(99, 102, 241, 0.1)", borderBottom: "1px solid var(--accent)" }}>
-                  <th style={{ padding: "8px 12px", textAlign: "center", fontWeight: 600, borderRight: "1px solid var(--accent)", whiteSpace: "nowrap" }}>日期</th>
-                  <th style={{ padding: "8px 12px", textAlign: "center", fontWeight: 600, borderRight: "1px solid var(--accent)", whiteSpace: "nowrap" }}>時間</th>
-                  <th style={{ padding: "8px 12px", textAlign: "center", fontWeight: 600, borderRight: "1px solid var(--accent)", whiteSpace: "nowrap" }}>負責人</th>
-                  <th style={{ padding: "8px 12px", textAlign: "center", fontWeight: 600, borderRight: "1px solid var(--accent)", whiteSpace: "nowrap" }}>地點</th>
-                  <th style={{ padding: "8px 12px", textAlign: "center", fontWeight: 600, borderRight: "1px solid var(--accent)", whiteSpace: "nowrap" }}>事件</th>
-                  <th style={{ padding: "8px 12px", textAlign: "center", fontWeight: 600, borderRight: "1px solid var(--accent)", whiteSpace: "nowrap" }}>備註</th>
-                  <th style={{ padding: "8px 12px", textAlign: "center", fontWeight: 600, whiteSpace: "nowrap" }}>台數</th>
+                  <th style={{ padding: "10px 14px", textAlign: "center", fontWeight: 600, borderRight: "1px solid var(--accent)", whiteSpace: "nowrap" }}>日期</th>
+                  <th style={{ padding: "10px 14px", textAlign: "center", fontWeight: 600, borderRight: "1px solid var(--accent)", whiteSpace: "nowrap" }}>時間</th>
+                  <th style={{ padding: "10px 14px", textAlign: "center", fontWeight: 600, borderRight: "1px solid var(--accent)", whiteSpace: "nowrap" }}>負責人</th>
+                  <th style={{ padding: "10px 14px", textAlign: "center", fontWeight: 600, borderRight: "1px solid var(--accent)", whiteSpace: "nowrap" }}>地點</th>
+                  <th style={{ padding: "10px 14px", textAlign: "center", fontWeight: 600, borderRight: "1px solid var(--accent)", whiteSpace: "nowrap" }}>事件</th>
+                  <th style={{ padding: "10px 14px", textAlign: "center", fontWeight: 600, borderRight: "1px solid var(--accent)", whiteSpace: "nowrap" }}>備註</th>
+                  <th style={{ padding: "10px 14px", textAlign: "center", fontWeight: 600, whiteSpace: "nowrap" }}>台數</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredSchedules.map((schedule, index) => (
                   <tr key={index} style={{ borderBottom: "1px solid var(--accent)" }}>
-                    <td style={{ padding: "8px 12px", borderRight: "1px solid var(--accent)", color: "var(--text-primary)", textAlign: "center", whiteSpace: "nowrap" }}>
+                    <td style={{ padding: "10px 14px", borderRight: "1px solid var(--accent)", color: "var(--text-primary)", textAlign: "center", whiteSpace: "nowrap" }}>
                       {schedule.date}
                     </td>
-                    <td style={{ padding: "8px 12px", borderRight: "1px solid var(--accent)", color: "var(--text-secondary)", textAlign: "center", whiteSpace: "nowrap" }}>
+                    <td style={{ padding: "10px 14px", borderRight: "1px solid var(--accent)", color: "var(--text-secondary)", textAlign: "center", whiteSpace: "nowrap" }}>
                       {schedule.time}
                     </td>
-                    <td style={{ padding: "8px 12px", borderRight: "1px solid var(--accent)", color: "var(--text-secondary)", textAlign: "center", whiteSpace: "nowrap" }}>
+                    <td style={{ padding: "10px 14px", borderRight: "1px solid var(--accent)", color: "var(--text-secondary)", textAlign: "center", whiteSpace: "nowrap" }}>
                       {schedule.person}
                     </td>
-                    <td style={{ padding: "8px 12px", borderRight: "1px solid var(--accent)", color: "var(--text-secondary)", textAlign: "center", whiteSpace: "nowrap" }}>
+                    <td style={{ padding: "10px 14px", borderRight: "1px solid var(--accent)", color: "var(--text-secondary)", textAlign: "center", whiteSpace: "nowrap" }}>
                       {schedule.location}
                     </td>
-                    <td style={{ padding: "8px 12px", borderRight: "1px solid var(--accent)", color: "var(--text-secondary)", textAlign: "center", whiteSpace: "nowrap" }}>
+                    <td style={{ padding: "10px 14px", borderRight: "1px solid var(--accent)", color: "var(--text-secondary)", textAlign: "center", whiteSpace: "nowrap" }}>
                       {schedule.event}
                     </td>
-                    <td style={{ padding: "8px 12px", borderRight: "1px solid var(--accent)", color: "var(--text-secondary)", textAlign: "center", whiteSpace: "nowrap" }}>
+                    <td style={{ padding: "10px 14px", borderRight: "1px solid var(--accent)", color: "var(--text-secondary)", textAlign: "center", whiteSpace: "nowrap" }}>
                       {schedule.note}
                     </td>
-                    <td style={{ padding: "8px 12px", color: "var(--text-secondary)", textAlign: "center", whiteSpace: "nowrap" }}>
+                    <td style={{ padding: "10px 14px", color: "var(--text-secondary)", textAlign: "center", whiteSpace: "nowrap" }}>
                       {schedule.devices || ""}
                     </td>
                   </tr>
