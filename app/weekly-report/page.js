@@ -490,11 +490,11 @@ export default function ReportGenerator() {
               <div
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(6, 1fr)',
+                  gridTemplateColumns: 'repeat(5, 1fr)',
                   gap: '12px',
                 }}
               >
-                {weekDays.slice(0, 6).map((dayData, idx) => {
+                {weekDays.slice(0, 5).map((dayData, idx) => {
                   // 直接掃描資料找當週日期（使用字符串比對）
                   const daySchedules = Array.isArray(data.schedule)
                     ? data.schedule.filter((s) => {
@@ -557,31 +557,64 @@ export default function ReportGenerator() {
                       {/* 行程列表 */}
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '7px', flex: 1 }}>
                         {daySchedules.length > 0 ? (
-                          daySchedules.map((schedule, sidx) => (
-                            <div
-                              key={sidx}
-                              style={{
-                                padding: '6px 8px',
-                                backgroundColor: 'white',
-                                border: '2px solid #2563eb',
-                                borderRadius: '6px',
-                                color: '#2563eb',
-                                fontSize: '11px',
-                                fontWeight: '500',
-                                lineHeight: '1.2',
-                              }}
-                            >
-                              {schedule.region && (
-                                <div>{schedule.region}</div>
-                              )}
-                              {(schedule.location || schedule.school) && (
-                                <div>{schedule.location || schedule.school}</div>
-                              )}
-                              {schedule.event && (
-                                <div>{schedule.event}</div>
-                              )}
-                            </div>
-                          ))
+                          daySchedules.map((schedule, sidx) => {
+                            // 根據事件欄位決定標籤顏色
+                            const getEventColor = (event) => {
+                              if (!event) return { bgColor: '#e5e7eb', textColor: '#6b7280' };
+                              const eventStr = String(event).toLowerCase();
+                              if (eventStr.includes('駐點')) return { bgColor: '#dbeafe', textColor: '#1e40af' };
+                              if (eventStr.includes('巡檢')) return { bgColor: '#dcfce7', textColor: '#166534' };
+                              if (eventStr.includes('下午') || eventStr.includes('外')) return { bgColor: '#fed7aa', textColor: '#b45309' };
+                              if (eventStr.includes('報修')) return { bgColor: '#fee2e2', textColor: '#991b1b' };
+                              return { bgColor: '#e5e7eb', textColor: '#6b7280' };
+                            };
+
+                            const eventColor = getEventColor(schedule.event);
+
+                            return (
+                              <div
+                                key={sidx}
+                                style={{
+                                  padding: '6px 8px',
+                                  backgroundColor: 'white',
+                                  border: '2px solid #2563eb',
+                                  borderRadius: '6px',
+                                  color: '#374151',
+                                  fontSize: '11px',
+                                  fontWeight: '500',
+                                  lineHeight: '1.4',
+                                }}
+                              >
+                                {/* 事件標籤 */}
+                                {schedule.event && (
+                                  <div
+                                    style={{
+                                      display: 'inline-block',
+                                      backgroundColor: eventColor.bgColor,
+                                      color: eventColor.textColor,
+                                      padding: '2px 6px',
+                                      borderRadius: '3px',
+                                      fontSize: '10px',
+                                      fontWeight: '600',
+                                      marginBottom: '4px',
+                                    }}
+                                  >
+                                    {schedule.event}
+                                  </div>
+                                )}
+                                {/* 行程詳情：區域 地點 事件 */}
+                                <div style={{ marginTop: schedule.event ? '4px' : 0 }}>
+                                  {schedule.region && schedule.location ? (
+                                    <div>{schedule.region} {schedule.location} {schedule.event}</div>
+                                  ) : schedule.location ? (
+                                    <div>{schedule.location} {schedule.event}</div>
+                                  ) : (
+                                    <div>{schedule.event}</div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })
                         ) : (
                           <div
                             style={{
