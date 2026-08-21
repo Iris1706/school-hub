@@ -3,7 +3,10 @@
 import { useState, useEffect } from 'react';
 
 export default function ReportGenerator() {
-  const [dateRange, setDateRange] = useState('week');
+  const [dateMode, setDateMode] = useState('week'); // 'week' 或 'month'
+  const [weekOffset, setWeekOffset] = useState(0); // 用於週切換 (0 = 當週, -1 = 上週, 1 = 下週)
+  const [monthOffset, setMonthOffset] = useState(0); // 用於月份切換 (0 = 當月, -1 = 上月, 1 = 下月)
+
   const [data, setData] = useState({
     inspect: [],
     repairs: [],
@@ -19,15 +22,21 @@ export default function ReportGenerator() {
     const today = new Date();
     let startDate, endDate;
 
-    if (dateRange === 'week') {
-      const day = today.getDay();
-      const diff = today.getDate() - day + (day === 0 ? -6 : 1);
-      startDate = new Date(today.setDate(diff));
+    if (dateMode === 'week') {
+      // 計算目標週
+      const targetDate = new Date(today);
+      targetDate.setDate(targetDate.getDate() + weekOffset * 7);
+
+      const day = targetDate.getDay();
+      const diff = targetDate.getDate() - day + (day === 0 ? -6 : 1);
+      startDate = new Date(targetDate.setDate(diff));
       endDate = new Date(startDate);
       endDate.setDate(endDate.getDate() + 6);
     } else {
-      startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-      endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+      // 計算目標月份
+      const targetDate = new Date(today.getFullYear(), today.getMonth() + monthOffset, 1);
+      startDate = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
+      endDate = new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0);
     }
 
     return { startDate, endDate };
@@ -70,16 +79,11 @@ export default function ReportGenerator() {
     };
 
     fetchData();
-  }, [dateRange]);
-
-  const handleDateRangeChange = (range) => {
-    setDateRange(range);
-  };
+  }, [dateMode, weekOffset, monthOffset]);
 
   const handleExport = async (format) => {
     try {
       if (format === 'PDF') {
-        // 動態加載 html2pdf
         const script = document.createElement('script');
         script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
         script.onload = () => {
@@ -95,7 +99,6 @@ export default function ReportGenerator() {
         };
         document.head.appendChild(script);
       } else if (format === 'PNG') {
-        // 動態加載 html2canvas
         const script = document.createElement('script');
         script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
         script.onload = () => {
@@ -125,6 +128,15 @@ export default function ReportGenerator() {
   const { startDate, endDate } = getDateRange();
   const dateRangeText = `${startDate.toLocaleDateString('zh-TW')} ~ ${endDate.toLocaleDateString('zh-TW')}`;
 
+  // 計算統計數據
+  const weeklyRepairs = 0; // 先空白
+  const shengshengInspect = data.inspect.filter((i) => i.type === '生生' || i.category === '生生用平板').length;
+  const shengshengTotal = data.inspect.filter((i) => i.type === '生生' || i.category === '生生用平板').length || 1;
+  const thsdInspect = data.inspect.filter((i) => i.type === 'THSD' || i.category === 'THSD').length;
+  const thsdTotal = data.inspect.filter((i) => i.type === 'THSD' || i.category === 'THSD').length || 1;
+  const saRepairsProcessing = data.repairs.filter((r) => r.status === '處理中' || r.status === '進行中').length;
+  const foreignObjectWeek = 0; // 先空白
+
   return (
     <div style={{ padding: '20px', backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
       {/* 標題 */}
@@ -132,12 +144,9 @@ export default function ReportGenerator() {
         <h1 style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '5px', color: '#1f2937' }}>
           📊 報表產生器
         </h1>
-        <p style={{ color: '#6b7280', fontSize: '14px' }}>
-          查看和匯出 {dateRangeText} 的各項報表
-        </p>
       </div>
 
-      {/* 篩選區域 + 匯出功能 */}
+      {/* 頂部控制欄 - 匯出功能 + 日期範圍 */}
       <div
         style={{
           display: 'flex',
@@ -150,46 +159,7 @@ export default function ReportGenerator() {
           boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
         }}
       >
-        {/* 左側：日期範圍篩選 */}
-        <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-          <label style={{ fontSize: '14px', fontWeight: 'bold', color: '#1f2937' }}>
-            日期範圍：
-          </label>
-          <button
-            onClick={() => handleDateRangeChange('week')}
-            style={{
-              padding: '8px 20px',
-              backgroundColor: dateRange === 'week' ? '#2563eb' : '#e5e7eb',
-              color: dateRange === 'week' ? 'white' : '#374151',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '500',
-              transition: 'all 0.3s ease',
-            }}
-          >
-            📅 每週
-          </button>
-          <button
-            onClick={() => handleDateRangeChange('month')}
-            style={{
-              padding: '8px 20px',
-              backgroundColor: dateRange === 'month' ? '#2563eb' : '#e5e7eb',
-              color: dateRange === 'month' ? 'white' : '#374151',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '500',
-              transition: 'all 0.3s ease',
-            }}
-          >
-            📆 每月
-          </button>
-        </div>
-
-        {/* 右側：匯出功能 */}
+        {/* 左側：匯出功能 */}
         <div style={{ display: 'flex', gap: '10px' }}>
           <button
             onClick={() => handleExport('PDF')}
@@ -202,7 +172,6 @@ export default function ReportGenerator() {
               cursor: 'pointer',
               fontSize: '14px',
               fontWeight: 'bold',
-              transition: 'background-color 0.3s ease',
             }}
             onMouseEnter={(e) => (e.target.style.backgroundColor = '#0052a3')}
             onMouseLeave={(e) => (e.target.style.backgroundColor = '#0066cc')}
@@ -220,7 +189,6 @@ export default function ReportGenerator() {
               cursor: 'pointer',
               fontSize: '14px',
               fontWeight: 'bold',
-              transition: 'background-color 0.3s ease',
             }}
             onMouseEnter={(e) => (e.target.style.backgroundColor = '#d97706')}
             onMouseLeave={(e) => (e.target.style.backgroundColor = '#f59e0b')}
@@ -238,7 +206,6 @@ export default function ReportGenerator() {
               cursor: 'pointer',
               fontSize: '14px',
               fontWeight: 'bold',
-              transition: 'background-color 0.3s ease',
             }}
             onMouseEnter={(e) => (e.target.style.backgroundColor = '#059669')}
             onMouseLeave={(e) => (e.target.style.backgroundColor = '#10b981')}
@@ -246,6 +213,174 @@ export default function ReportGenerator() {
             🌐 HTML
           </button>
         </div>
+
+        {/* 右側：日期範圍篩選 */}
+        {dateMode === 'week' ? (
+          // 週視圖：顯示左右箭頭和周信息
+          <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+            <button
+              onClick={() => setWeekOffset(weekOffset - 1)}
+              style={{
+                padding: '8px 12px',
+                backgroundColor: '#e5e7eb',
+                color: '#1f2937',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '16px',
+                fontWeight: 'bold',
+              }}
+            >
+              ◀ 上週
+            </button>
+            <div style={{ textAlign: 'center', minWidth: '200px' }}>
+              <p style={{ margin: 0, fontSize: '12px', color: '#6b7280' }}>本週</p>
+              <p style={{ margin: '5px 0 0 0', fontSize: '14px', fontWeight: 'bold', color: '#1f2937' }}>
+                {dateRangeText}
+              </p>
+            </div>
+            <button
+              onClick={() => setWeekOffset(weekOffset + 1)}
+              style={{
+                padding: '8px 12px',
+                backgroundColor: '#e5e7eb',
+                color: '#1f2937',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '16px',
+                fontWeight: 'bold',
+              }}
+            >
+              下週 ▶
+            </button>
+            <button
+              onClick={() => setDateMode('month')}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: '#f3f4f6',
+                color: '#6b7280',
+                border: '1px solid #d1d5db',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '12px',
+              }}
+            >
+              切換到月份
+            </button>
+          </div>
+        ) : (
+          // 月視圖：顯示左右箭頭和月信息
+          <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+            <button
+              onClick={() => setMonthOffset(monthOffset - 1)}
+              style={{
+                padding: '8px 12px',
+                backgroundColor: '#e5e7eb',
+                color: '#1f2937',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '16px',
+                fontWeight: 'bold',
+              }}
+            >
+              ◀ 上月
+            </button>
+            <div style={{ textAlign: 'center', minWidth: '200px' }}>
+              <p style={{ margin: 0, fontSize: '12px', color: '#6b7280' }}>本月</p>
+              <p style={{ margin: '5px 0 0 0', fontSize: '14px', fontWeight: 'bold', color: '#1f2937' }}>
+                {dateRangeText}
+              </p>
+            </div>
+            <button
+              onClick={() => setMonthOffset(monthOffset + 1)}
+              style={{
+                padding: '8px 12px',
+                backgroundColor: '#e5e7eb',
+                color: '#1f2937',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '16px',
+                fontWeight: 'bold',
+              }}
+            >
+              下月 ▶
+            </button>
+            <button
+              onClick={() => setDateMode('week')}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: '#f3f4f6',
+                color: '#6b7280',
+                border: '1px solid #d1d5db',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '12px',
+              }}
+            >
+              切換到週份
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* 統計卡片區域 */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+          gap: '15px',
+          marginBottom: '30px',
+        }}
+      >
+        {/* 本週報修 */}
+        <StatCard
+          title="本週報修"
+          value={weeklyRepairs}
+          backgroundColor="#fef3c7"
+          borderColor="#f59e0b"
+          icon="🔧"
+        />
+
+        {/* 生生巡檢 */}
+        <StatCard
+          title="生生巡檢"
+          value={`${shengshengInspect}/${shengshengTotal}`}
+          percentage={(shengshengTotal > 0 ? (shengshengInspect / shengshengTotal * 100).toFixed(0) : 0) + '%'}
+          backgroundColor="#dbeafe"
+          borderColor="#3b82f6"
+          icon="👥"
+        />
+
+        {/* THSD 巡檢 */}
+        <StatCard
+          title="THSD 巡檢"
+          value={`${thsdInspect}/${thsdTotal}`}
+          percentage={(thsdTotal > 0 ? (thsdInspect / thsdTotal * 100).toFixed(0) : 0) + '%'}
+          backgroundColor="#e9d5ff"
+          borderColor="#a855f7"
+          icon="🏫"
+        />
+
+        {/* SA 維修處理中 */}
+        <StatCard
+          title="SA 維修處理中"
+          value={saRepairsProcessing}
+          backgroundColor="#fee2e2"
+          borderColor="#ef4444"
+          icon="🔨"
+        />
+
+        {/* 夾異物（本週） */}
+        <StatCard
+          title="夾異物（本週）"
+          value={foreignObjectWeek}
+          backgroundColor="#f3f4f6"
+          borderColor="#9ca3af"
+          icon="⚠️"
+        />
       </div>
 
       {/* 錯誤提示 */}
@@ -370,9 +505,9 @@ export default function ReportGenerator() {
                 padding: '15px',
               }}
             >
-              <StatCard label="總巡檢數" value={data.inspect.length} color="#10b981" />
-              <StatCard label="總維修數" value={data.repairs.length} color="#f59e0b" />
-              <StatCard label="待辦事項" value={data.todos.length} color="#8b5cf6" />
+              <StatCard2 label="總巡檢數" value={data.inspect.length} color="#10b981" />
+              <StatCard2 label="總維修數" value={data.repairs.length} color="#f59e0b" />
+              <StatCard2 label="待辦事項" value={data.todos.length} color="#8b5cf6" />
             </div>
           </ReportCard>
 
@@ -625,7 +760,6 @@ export default function ReportGenerator() {
                     width: '65%',
                     height: '100%',
                     backgroundColor: '#10b981',
-                    transition: 'width 0.3s ease',
                   }}
                 />
               </div>
@@ -766,6 +900,7 @@ function ReportCard({ title, children }) {
           paddingBottom: '12px',
           borderBottom: '2px solid #f3f4f6',
           color: '#1f2937',
+          margin: 0,
         }}
       >
         {title}
@@ -775,8 +910,38 @@ function ReportCard({ title, children }) {
   );
 }
 
-// 統計卡片元件
-function StatCard({ label, value, color }) {
+// 統計卡片元件（頂部）
+function StatCard({ title, value, percentage, backgroundColor, borderColor, icon }) {
+  return (
+    <div
+      style={{
+        padding: '15px',
+        backgroundColor: backgroundColor,
+        borderRadius: '8px',
+        border: `2px solid ${borderColor}`,
+        textAlign: 'center',
+      }}
+    >
+      <p style={{ fontSize: '24px', margin: '0 0 8px 0' }}>
+        {icon}
+      </p>
+      <p style={{ fontSize: '12px', color: '#6b7280', margin: '0 0 8px 0' }}>
+        {title}
+      </p>
+      <p style={{ fontSize: '24px', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>
+        {value}
+      </p>
+      {percentage && (
+        <p style={{ fontSize: '12px', color: '#6b7280', margin: '8px 0 0 0' }}>
+          {percentage}
+        </p>
+      )}
+    </div>
+  );
+}
+
+// 統計卡片元件2（年度統計內）
+function StatCard2({ label, value, color }) {
   return (
     <div
       style={{
@@ -787,7 +952,7 @@ function StatCard({ label, value, color }) {
         border: `2px solid ${color}20`,
       }}
     >
-      <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px', margin: 0 }}>
+      <p style={{ fontSize: '12px', color: '#6b7280', margin: 0 }}>
         {label}
       </p>
       <p
@@ -795,7 +960,7 @@ function StatCard({ label, value, color }) {
           fontSize: '28px',
           fontWeight: 'bold',
           color: color,
-          margin: 0,
+          margin: '8px 0 0 0',
         }}
       >
         {value}
