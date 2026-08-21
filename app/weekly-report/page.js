@@ -63,28 +63,36 @@ export default function ReportGenerator() {
       setLoading(true);
       setError('');
       try {
-        const responses = await Promise.all([
-          fetch('/api/inspect'),
-          fetch('/api/repairs'),
-          fetch('/api/daily-schedule'),
-          fetch('/api/todos'),
-          fetch('/api/weekly-status'),
-        ]);
+        const endpoints = [
+          { key: 'inspect', url: '/api/inspect' },
+          { key: 'repairs', url: '/api/repairs' },
+          { key: 'schedule', url: '/api/daily-schedule' },
+          { key: 'todos', url: '/api/todos' },
+          { key: 'weeklyStatus', url: '/api/weekly-status' },
+        ];
 
-        if (!responses.every((r) => r.ok)) {
-          throw new Error('無法獲取部分數據');
+        const newData = {
+          inspect: [],
+          repairs: [],
+          schedule: [],
+          todos: [],
+          weeklyStatus: [],
+        };
+
+        // 嘗試獲取每個 API，失敗時使用空陣列
+        for (const endpoint of endpoints) {
+          try {
+            const response = await fetch(endpoint.url);
+            if (response.ok) {
+              const json = await response.json();
+              newData[endpoint.key] = json || [];
+            }
+          } catch (err) {
+            console.warn(`無法獲取 ${endpoint.url}:`, err.message);
+          }
         }
 
-        const [inspectData, repairsData, scheduleData, todosData, weeklyStatusData] =
-          await Promise.all(responses.map((r) => r.json()));
-
-        setData({
-          inspect: inspectData || [],
-          repairs: repairsData || [],
-          schedule: scheduleData || [],
-          todos: todosData || [],
-          weeklyStatus: weeklyStatusData || [],
-        });
+        setData(newData);
       } catch (err) {
         setError('獲取數據失敗：' + err.message);
         console.error(err);
