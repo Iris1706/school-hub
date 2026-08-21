@@ -495,13 +495,18 @@ export default function ReportGenerator() {
                 }}
               >
                 {weekDays.slice(0, 6).map((dayData, idx) => {
-                  // 直接掃描資料找當週日期
+                  // 直接掃描資料找當週日期（使用字符串比對）
                   const daySchedules = Array.isArray(data.schedule)
                     ? data.schedule.filter((s) => {
                         try {
-                          const scheduleDate = new Date(s?.date || s?.datetime);
-                          const scheduleStr = scheduleDate.toLocaleDateString('zh-TW');
-                          return scheduleStr === dayData.dateStr;
+                          // 將日期轉為 yyyy/m/d 或 yyyy/mm/dd 格式
+                          const dateStr = String(s?.date || '').trim();
+                          // 取得卡片日期（已是 yyyy/m/d 格式）
+                          const [year, month, day] = dayData.dateStr.split('/');
+                          const normalizedCardDate = `${year}/${parseInt(month)}/${parseInt(day)}`;
+
+                          // 比對日期
+                          return dateStr === dayData.dateStr || dateStr === normalizedCardDate;
                         } catch {
                           return false;
                         }
@@ -587,7 +592,7 @@ export default function ReportGenerator() {
                               border: '2px solid #2563eb',
                               borderRadius: '8px',
                               color: '#2563eb',
-                              fontSize: '16px',
+                              fontSize: '14px',
                               fontWeight: '600',
                               textAlign: 'center',
                               display: 'flex',
@@ -596,7 +601,7 @@ export default function ReportGenerator() {
                               flex: 1,
                             }}
                           >
-                            ...
+                            三多
                           </div>
                         )}
                       </div>
