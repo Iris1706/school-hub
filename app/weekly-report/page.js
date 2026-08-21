@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 
 export default function ReportGenerator() {
-  const [dateMode, setDateMode] = useState('week'); // 'week' 或 'month'
-  const [weekOffset, setWeekOffset] = useState(0); // 用於週切換 (0 = 當週, -1 = 上週, 1 = 下週)
-  const [monthOffset, setMonthOffset] = useState(0); // 用於月份切換 (0 = 當月, -1 = 上月, 1 = 下月)
+  const [dateMode, setDateMode] = useState('week');
+  const [weekOffset, setWeekOffset] = useState(0);
+  const [monthOffset, setMonthOffset] = useState(0);
 
   const [data, setData] = useState({
     inspect: [],
@@ -23,7 +23,6 @@ export default function ReportGenerator() {
     let startDate, endDate;
 
     if (dateMode === 'week') {
-      // 計算目標週
       const targetDate = new Date(today);
       targetDate.setDate(targetDate.getDate() + weekOffset * 7);
 
@@ -33,7 +32,6 @@ export default function ReportGenerator() {
       endDate = new Date(startDate);
       endDate.setDate(endDate.getDate() + 6);
     } else {
-      // 計算目標月份
       const targetDate = new Date(today.getFullYear(), today.getMonth() + monthOffset, 1);
       startDate = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
       endDate = new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0);
@@ -128,24 +126,17 @@ export default function ReportGenerator() {
   const { startDate, endDate } = getDateRange();
   const dateRangeText = `${startDate.toLocaleDateString('zh-TW')} ~ ${endDate.toLocaleDateString('zh-TW')}`;
 
-  // 計算統計數據
-  const weeklyRepairs = 0; // 先空白
-  const shengshengInspect = data.inspect.filter((i) => i.type === '生生' || i.category === '生生用平板').length;
-  const shengshengTotal = data.inspect.filter((i) => i.type === '生生' || i.category === '生生用平板').length || 1;
-  const thsdInspect = data.inspect.filter((i) => i.type === 'THSD' || i.category === 'THSD').length;
-  const thsdTotal = data.inspect.filter((i) => i.type === 'THSD' || i.category === 'THSD').length || 1;
+  // 計算生生巡檢和 THSD 巡檢數據
+  const shengshengInspect = data.inspect.filter((i) => i.type === '生生' || i.category === '生生用平板' || i.name?.includes('生生')).length;
+  const shengshengTotal = data.inspect.filter((i) => i.type === '生生' || i.category === '生生用平板' || i.name?.includes('生生')).length || 1;
+
+  const thsdInspect = data.inspect.filter((i) => i.type === 'THSD' || i.category === 'THSD' || i.name?.includes('THSD')).length;
+  const thsdTotal = data.inspect.filter((i) => i.type === 'THSD' || i.category === 'THSD' || i.name?.includes('THSD')).length || 1;
+
   const saRepairsProcessing = data.repairs.filter((r) => r.status === '處理中' || r.status === '進行中').length;
-  const foreignObjectWeek = 0; // 先空白
 
   return (
     <div style={{ padding: '20px', backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
-      {/* 標題 */}
-      <div style={{ marginBottom: '30px' }}>
-        <h1 style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '5px', color: '#1f2937' }}>
-          📊 報表產生器
-        </h1>
-      </div>
-
       {/* 頂部控制欄 - 匯出功能 + 日期範圍 */}
       <div
         style={{
@@ -216,7 +207,6 @@ export default function ReportGenerator() {
 
         {/* 右側：日期範圍篩選 */}
         {dateMode === 'week' ? (
-          // 週視圖：顯示左右箭頭和周信息
           <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
             <button
               onClick={() => setWeekOffset(weekOffset - 1)}
@@ -258,19 +248,19 @@ export default function ReportGenerator() {
               onClick={() => setDateMode('month')}
               style={{
                 padding: '8px 16px',
-                backgroundColor: '#f3f4f6',
-                color: '#6b7280',
-                border: '1px solid #d1d5db',
+                backgroundColor: 'white',
+                color: '#2563eb',
+                border: '1.5px solid #2563eb',
                 borderRadius: '6px',
                 cursor: 'pointer',
                 fontSize: '12px',
+                fontWeight: 'bold',
               }}
             >
-              切換到月份
+              月份
             </button>
           </div>
         ) : (
-          // 月視圖：顯示左右箭頭和月信息
           <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
             <button
               onClick={() => setMonthOffset(monthOffset - 1)}
@@ -312,15 +302,16 @@ export default function ReportGenerator() {
               onClick={() => setDateMode('week')}
               style={{
                 padding: '8px 16px',
-                backgroundColor: '#f3f4f6',
-                color: '#6b7280',
-                border: '1px solid #d1d5db',
+                backgroundColor: 'white',
+                color: '#2563eb',
+                border: '1.5px solid #2563eb',
                 borderRadius: '6px',
                 cursor: 'pointer',
                 fontSize: '12px',
+                fontWeight: 'bold',
               }}
             >
-              切換到週份
+              月份
             </button>
           </div>
         )}
@@ -330,57 +321,25 @@ export default function ReportGenerator() {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
           gap: '15px',
           marginBottom: '30px',
         }}
       >
         {/* 本週報修 */}
-        <StatCard
-          title="本週報修"
-          value={weeklyRepairs}
-          backgroundColor="#fef3c7"
-          borderColor="#f59e0b"
-          icon="🔧"
-        />
+        <StatCard title="本週報修" value="－" />
 
         {/* 生生巡檢 */}
-        <StatCard
-          title="生生巡檢"
-          value={`${shengshengInspect}/${shengshengTotal}`}
-          percentage={(shengshengTotal > 0 ? (shengshengInspect / shengshengTotal * 100).toFixed(0) : 0) + '%'}
-          backgroundColor="#dbeafe"
-          borderColor="#3b82f6"
-          icon="👥"
-        />
+        <StatCard title="生生巡檢" value={`${shengshengInspect}/${shengshengTotal}`} />
 
         {/* THSD 巡檢 */}
-        <StatCard
-          title="THSD 巡檢"
-          value={`${thsdInspect}/${thsdTotal}`}
-          percentage={(thsdTotal > 0 ? (thsdInspect / thsdTotal * 100).toFixed(0) : 0) + '%'}
-          backgroundColor="#e9d5ff"
-          borderColor="#a855f7"
-          icon="🏫"
-        />
+        <StatCard title="THSD 巡檢" value={`${thsdInspect}/${thsdTotal}`} />
 
         {/* SA 維修處理中 */}
-        <StatCard
-          title="SA 維修處理中"
-          value={saRepairsProcessing}
-          backgroundColor="#fee2e2"
-          borderColor="#ef4444"
-          icon="🔨"
-        />
+        <StatCard title="SA 維修處理中" value={saRepairsProcessing} />
 
         {/* 夾異物（本週） */}
-        <StatCard
-          title="夾異物（本週）"
-          value={foreignObjectWeek}
-          backgroundColor="#f3f4f6"
-          borderColor="#9ca3af"
-          icon="⚠️"
-        />
+        <StatCard title="夾異物（本週）" value="－" />
       </div>
 
       {/* 錯誤提示 */}
@@ -420,7 +379,7 @@ export default function ReportGenerator() {
       {!loading && (
         <div id="report-content" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* 1. 本週重點 */}
-          <ReportCard title="1️⃣ 本週重點">
+          <ReportCard title="本週重點">
             <div style={{ padding: '15px' }}>
               {data.weeklyStatus && data.weeklyStatus.length > 0 ? (
                 <div>
@@ -449,7 +408,7 @@ export default function ReportGenerator() {
           </ReportCard>
 
           {/* 2. 本週班表 */}
-          <ReportCard title="2️⃣ 本週班表">
+          <ReportCard title="本週班表">
             <div style={{ padding: '15px', overflowX: 'auto' }}>
               {data.schedule && data.schedule.length > 0 ? (
                 <table
@@ -496,7 +455,7 @@ export default function ReportGenerator() {
           </ReportCard>
 
           {/* 3. 年度統計 */}
-          <ReportCard title="3️⃣ 年度統計">
+          <ReportCard title="年度統計">
             <div
               style={{
                 display: 'grid',
@@ -512,7 +471,7 @@ export default function ReportGenerator() {
           </ReportCard>
 
           {/* 4. 個人處理案件數（本週） */}
-          <ReportCard title="4️⃣ 個人處理案件數（本週）">
+          <ReportCard title="個人處理案件數（本週）">
             <div style={{ padding: '15px' }}>
               {data.inspect && data.inspect.length > 0 ? (
                 <div>
@@ -580,7 +539,7 @@ export default function ReportGenerator() {
           </ReportCard>
 
           {/* 5. 每日統計與問題分類 */}
-          <ReportCard title="5️⃣ 每日統計與問題分類">
+          <ReportCard title="每日統計與問題分類">
             <div style={{ padding: '15px' }}>
               {data.inspect && data.inspect.length > 0 ? (
                 <div>
@@ -613,7 +572,7 @@ export default function ReportGenerator() {
           </ReportCard>
 
           {/* 6. 本週報修明細 */}
-          <ReportCard title="6️⃣ 本週報修明細">
+          <ReportCard title="本週報修明細">
             <div style={{ padding: '15px', overflowX: 'auto' }}>
               {data.repairs && data.repairs.length > 0 ? (
                 <table
@@ -675,7 +634,7 @@ export default function ReportGenerator() {
           </ReportCard>
 
           {/* 7. 南區維修情況 */}
-          <ReportCard title="7️⃣ 南區維修情況">
+          <ReportCard title="南區維修情況">
             <div style={{ padding: '15px' }}>
               <div
                 style={{
@@ -733,7 +692,7 @@ export default function ReportGenerator() {
           </ReportCard>
 
           {/* 8. 巡檢進度 */}
-          <ReportCard title="8️⃣ 巡檢進度">
+          <ReportCard title="巡檢進度">
             <div style={{ padding: '15px' }}>
               <p
                 style={{
@@ -770,7 +729,7 @@ export default function ReportGenerator() {
           </ReportCard>
 
           {/* 9. 巡檢個人進度（學期） */}
-          <ReportCard title="9️⃣ 巡檢個人進度（學期）">
+          <ReportCard title="巡檢個人進度（學期）">
             <div style={{ padding: '15px' }}>
               {data.inspect && data.inspect.length > 0 ? (
                 <div>
@@ -804,7 +763,7 @@ export default function ReportGenerator() {
           </ReportCard>
 
           {/* 10. 高雄巡檢報告（週別） */}
-          <ReportCard title="🔟 高雄巡檢報告（週別）">
+          <ReportCard title="高雄巡檢報告（週別）">
             <div style={{ padding: '15px' }}>
               {data.inspect && data.inspect.length > 0 ? (
                 <div>
@@ -910,32 +869,25 @@ function ReportCard({ title, children }) {
   );
 }
 
-// 統計卡片元件（頂部）
-function StatCard({ title, value, percentage, backgroundColor, borderColor, icon }) {
+// 統計卡片元件（頂部）- 深立體風格
+function StatCard({ title, value }) {
   return (
     <div
       style={{
-        padding: '15px',
-        backgroundColor: backgroundColor,
-        borderRadius: '8px',
-        border: `2px solid ${borderColor}`,
+        padding: '20px',
+        backgroundColor: '#f0f9ff',
+        borderRadius: '12px',
+        border: '2px solid #0284c7',
         textAlign: 'center',
+        boxShadow: '0 4px 6px rgba(2, 132, 199, 0.2)',
       }}
     >
-      <p style={{ fontSize: '24px', margin: '0 0 8px 0' }}>
-        {icon}
-      </p>
-      <p style={{ fontSize: '12px', color: '#6b7280', margin: '0 0 8px 0' }}>
+      <p style={{ fontSize: '12px', color: '#0c4a6e', margin: '0 0 12px 0', fontWeight: 'bold' }}>
         {title}
       </p>
-      <p style={{ fontSize: '24px', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>
+      <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#0284c7', margin: 0 }}>
         {value}
       </p>
-      {percentage && (
-        <p style={{ fontSize: '12px', color: '#6b7280', margin: '8px 0 0 0' }}>
-          {percentage}
-        </p>
-      )}
     </div>
   );
 }
