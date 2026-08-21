@@ -23,10 +23,23 @@ export async function GET(request) {
     const sheetName = `${year}/${month}`;
 
     // 先讀取員編-姓名映射表（A5:B13）
-    const employeeMapRes = await sheets.spreadsheets.values.get({
-      spreadsheetId: SCHEDULE_SHEET_ID,
-      range: `'${sheetName}'!A5:B13`,
-    });
+    let employeeMapRes;
+    try {
+      employeeMapRes = await sheets.spreadsheets.values.get({
+        spreadsheetId: SCHEDULE_SHEET_ID,
+        range: `'${sheetName}'!A5:B13`,
+      });
+    } catch (error) {
+      // 分頁不存在時，返回空數據
+      if (error.message && error.message.includes("Unable to parse range")) {
+        return Response.json({
+          data: [],
+          weekStart: new Date().toISOString().split("T")[0],
+          weekEnd: new Date().toISOString().split("T")[0],
+        });
+      }
+      throw error;
+    }
 
     const employeeMapRows = employeeMapRes.data.values || [];
     const employeeMap = {}; // 姓名 -> 員編
@@ -89,6 +102,14 @@ export async function GET(request) {
     });
   } catch (error) {
     console.error("讀取行程表失敗：", error);
+    // 若分頁不存在，返回空數據而不顯示錯誤
+    if (error.message && error.message.includes("Unable to parse range")) {
+      return Response.json({
+        data: [],
+        weekStart: new Date().toISOString().split("T")[0],
+        weekEnd: new Date().toISOString().split("T")[0],
+      });
+    }
     return Response.json(
       { error: error.message },
       { status: 500 }

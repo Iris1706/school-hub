@@ -255,12 +255,22 @@ export default function SchedulePage() {
                       if (status.includes("巡檢")) return "#c0e1f6";
                       if (status.includes("上午(巡)")) return "#5b3286";
                       if (status.includes("下午(巡)")) return "#5b3286";
+                      if (status.includes("上午(特)")) return "#b10202";
+                      if (status.includes("下午(特)")) return "#b10202";
                       if (status.includes("國定假日")) return "#d81b91";
                       if (status.includes("彈性假")) return "#a7adb6";
                       if (status.includes("病假")) return "#7d9ac4";
                       if (status.includes("事假")) return "#473822";
                       if (status.includes("駐點")) return "#e28d38";
                       return "#7a7a7a"; // 深灰色 - 預設
+                    };
+
+                    const getTextColor = () => {
+                      if (!status) return "var(--text-primary)";
+                      if (status.includes("上午(巡)") || status.includes("下午(巡)")) return "white";
+                      if (status.includes("上午(特)") || status.includes("下午(特)")) return "white";
+                      if (status.includes("事假")) return "white";
+                      return "var(--text-primary)";
                     };
 
                     return (
@@ -272,7 +282,7 @@ export default function SchedulePage() {
                           borderBottom: "1px solid rgba(200, 200, 200, 0.3)",
                           backgroundColor: getBgColor(),
                           textAlign: "center",
-                          color: isWeekend && !status ? "rgba(100, 100, 100, 0.3)" : "var(--text-primary)",
+                          color: isWeekend && !status ? "rgba(100, 100, 100, 0.3)" : getTextColor(),
                           fontSize: 10,
                         }}
                       >
