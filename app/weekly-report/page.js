@@ -152,34 +152,38 @@ export default function ReportGenerator() {
   const dateRangeText = `${startDate.toLocaleDateString('zh-TW')} ~ ${endDate.toLocaleDateString('zh-TW')}`;
 
   // 計算生生巡檢和 THSD 巡檢數據
-  const shengshengInspect = data.inspect.filter((i) => i.type === '生生' || i.category === '生生用平板' || i.name?.includes('生生')).length;
-  const shengshengTotal = data.inspect.filter((i) => i.type === '生生' || i.category === '生生用平板' || i.name?.includes('生生')).length || 1;
+  const inspectArray = Array.isArray(data.inspect) ? data.inspect : [];
+  const repairsArray = Array.isArray(data.repairs) ? data.repairs : [];
 
-  const thsdInspect = data.inspect.filter((i) => i.type === 'THSD' || i.category === 'THSD' || i.name?.includes('THSD')).length;
-  const thsdTotal = data.inspect.filter((i) => i.type === 'THSD' || i.category === 'THSD' || i.name?.includes('THSD')).length || 1;
+  const shengshengInspect = inspectArray.filter((i) => i?.type === '生生' || i?.category === '生生用平板' || i?.name?.includes('生生')).length;
+  const shengshengTotal = shengshengInspect || 1;
 
-  const saRepairsProcessing = data.repairs.filter((r) => r.status === '處理中' || r.status === '進行中').length;
+  const thsdInspect = inspectArray.filter((i) => i?.type === 'THSD' || i?.category === 'THSD' || i?.name?.includes('THSD')).length;
+  const thsdTotal = thsdInspect || 1;
+
+  const saRepairsProcessing = repairsArray.filter((r) => r?.status === '處理中' || r?.status === '進行中').length;
 
   // 計算南區維修數據
   const getRepairStats = () => {
     const { startDate, endDate } = getDateRange();
-    const tabletRepairs = data.repairs.filter((r) =>
-      r.category === '一期生生平板維修' || r.category === '二期生生平板維修'
+    const repairs = Array.isArray(data.repairs) ? data.repairs : [];
+    const tabletRepairs = repairs.filter((r) =>
+      r?.category === '一期生生平板維修' || r?.category === '二期生生平板維修'
     );
 
     const completed = tabletRepairs.filter((r) => {
-      const repairDate = new Date(r.date);
-      return repairDate >= startDate && repairDate <= endDate && (r.status === '已完成' || r.status === '完成');
+      const repairDate = new Date(r?.date);
+      return repairDate >= startDate && repairDate <= endDate && (r?.status === '已完成' || r?.status === '完成');
     }).length;
 
     const newRepairs = tabletRepairs.filter((r) => {
-      const createdDate = new Date(r.createdDate || r.date);
+      const createdDate = new Date(r?.createdDate || r?.date);
       return createdDate >= startDate && createdDate <= endDate;
     }).length;
 
     const processing = tabletRepairs.filter((r) => {
-      const repairDate = new Date(r.date);
-      return repairDate >= startDate && repairDate <= endDate && (r.status === '處理中' || r.status === '進行中');
+      const repairDate = new Date(r?.date);
+      return repairDate >= startDate && repairDate <= endDate && (r?.status === '處理中' || r?.status === '進行中');
     }).length;
 
     return { completed, newRepairs, processing };
@@ -191,11 +195,16 @@ export default function ReportGenerator() {
   // 按日期組織行程數據，並過濾排休日（沒有行程的日期不顯示）
   const getScheduleByDay = () => {
     const scheduleByDay = {};
+    const schedule = Array.isArray(data.schedule) ? data.schedule : [];
 
     weekDays.forEach((day) => {
-      const daySchedules = data.schedule.filter((s) => {
-        const scheduleDate = new Date(s.date || s.datetime);
-        return scheduleDate.toLocaleDateString('zh-TW') === day.dateStr;
+      const daySchedules = schedule.filter((s) => {
+        try {
+          const scheduleDate = new Date(s?.date || s?.datetime);
+          return scheduleDate.toLocaleDateString('zh-TW') === day.dateStr;
+        } catch {
+          return false;
+        }
       });
 
       if (daySchedules.length > 0) {
@@ -578,7 +587,7 @@ export default function ReportGenerator() {
           {/* 4. 個人處理案件數（本週） */}
           <ReportCard title="個人處理案件數（本週）">
             <div style={{ padding: '15px' }}>
-              {data.inspect && data.inspect.length > 0 ? (
+              {Array.isArray(data.inspect) && data.inspect.length > 0 ? (
                 <div>
                   <p
                     style={{
@@ -610,7 +619,7 @@ export default function ReportGenerator() {
                           margin: 0,
                         }}
                       >
-                        {data.inspect.length}
+                        {inspectArray.length}
                       </p>
                     </div>
                     <div
@@ -632,7 +641,7 @@ export default function ReportGenerator() {
                           margin: 0,
                         }}
                       >
-                        {data.repairs.length}
+                        {repairsArray.length}
                       </p>
                     </div>
                   </div>
@@ -646,7 +655,7 @@ export default function ReportGenerator() {
           {/* 5. 每日統計與問題分類 */}
           <ReportCard title="每日統計與問題分類">
             <div style={{ padding: '15px' }}>
-              {data.inspect && data.inspect.length > 0 ? (
+              {Array.isArray(data.inspect) && data.inspect.length > 0 ? (
                 <div>
                   <p
                     style={{
@@ -666,7 +675,7 @@ export default function ReportGenerator() {
                     }}
                   >
                     <p style={{ margin: 0, color: '#6b7280', fontSize: '14px' }}>
-                      共檢測到 <strong style={{ color: '#1f2937' }}>{data.inspect.length}</strong> 項巡檢紀錄
+                      共檢測到 <strong style={{ color: '#1f2937' }}>{inspectArray.length}</strong> 項巡檢紀錄
                     </p>
                   </div>
                 </div>
@@ -679,7 +688,7 @@ export default function ReportGenerator() {
           {/* 6. 本週報修明細 */}
           <ReportCard title="本週報修明細">
             <div style={{ padding: '15px', overflowX: 'auto' }}>
-              {data.repairs && data.repairs.length > 0 ? (
+              {Array.isArray(data.repairs) && data.repairs.length > 0 ? (
                 <table
                   style={{
                     width: '100%',
@@ -706,13 +715,13 @@ export default function ReportGenerator() {
                     </tr>
                   </thead>
                   <tbody>
-                    {data.repairs.slice(0, 7).map((item, idx) => (
+                    {repairsArray.slice(0, 7).map((item, idx) => (
                       <tr key={idx} style={{ borderBottom: '1px solid #e5e7eb' }}>
                         <td style={{ padding: '10px', color: '#374151' }}>
-                          {item.date || '待定'}
+                          {item?.date || '待定'}
                         </td>
                         <td style={{ padding: '10px', color: '#374151' }}>
-                          {item.category || item.type || '其他'}
+                          {item?.category || item?.type || '其他'}
                         </td>
                         <td style={{ padding: '10px' }}>
                           <span
@@ -725,7 +734,7 @@ export default function ReportGenerator() {
                               fontWeight: '500',
                             }}
                           >
-                            {item.status || '待處理'}
+                            {item?.status || '待處理'}
                           </span>
                         </td>
                       </tr>
@@ -858,7 +867,7 @@ export default function ReportGenerator() {
           {/* 9. 巡檢個人進度（學期） */}
           <ReportCard title="巡檢個人進度（學期）">
             <div style={{ padding: '15px' }}>
-              {data.inspect && data.inspect.length > 0 ? (
+              {Array.isArray(data.inspect) && data.inspect.length > 0 ? (
                 <div>
                   <p
                     style={{
@@ -892,7 +901,7 @@ export default function ReportGenerator() {
           {/* 10. 高雄巡檢報告（週別） */}
           <ReportCard title="高雄巡檢報告（週別）">
             <div style={{ padding: '15px' }}>
-              {data.inspect && data.inspect.length > 0 ? (
+              {Array.isArray(data.inspect) && data.inspect.length > 0 ? (
                 <div>
                   <p
                     style={{
@@ -929,7 +938,7 @@ export default function ReportGenerator() {
                           margin: 0,
                         }}
                       >
-                        {Array.from(new Set(data.inspect.map((i) => i.school || i.location))).length}
+                        {Array.from(new Set(inspectArray.map((i) => i?.school || i?.location))).length}
                       </p>
                     </div>
                     <div
@@ -950,7 +959,7 @@ export default function ReportGenerator() {
                           margin: 0,
                         }}
                       >
-                        {data.inspect.length}
+                        {inspectArray.length}
                       </p>
                     </div>
                   </div>
