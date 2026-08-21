@@ -499,14 +499,12 @@ export default function ReportGenerator() {
                   const daySchedules = Array.isArray(data.schedule)
                     ? data.schedule.filter((s) => {
                         try {
-                          // 將日期轉為 yyyy/m/d 或 yyyy/mm/dd 格式
-                          const dateStr = String(s?.date || '').trim();
-                          // 取得卡片日期（已是 yyyy/m/d 格式）
-                          const [year, month, day] = dayData.dateStr.split('/');
-                          const normalizedCardDate = `${year}/${parseInt(month)}/${parseInt(day)}`;
+                          // 直接比對日期字符串（去除空格）
+                          const apiDate = String(s?.date || '').trim();
+                          const cardDate = String(dayData.dateStr).trim();
 
-                          // 比對日期
-                          return dateStr === dayData.dateStr || dateStr === normalizedCardDate;
+                          // 精確比對
+                          return apiDate === cardDate;
                         } catch {
                           return false;
                         }
@@ -563,14 +561,14 @@ export default function ReportGenerator() {
                             <div
                               key={sidx}
                               style={{
-                                padding: '9px 11px',
+                                padding: '6px 8px',
                                 backgroundColor: 'white',
                                 border: '2px solid #2563eb',
-                                borderRadius: '8px',
+                                borderRadius: '6px',
                                 color: '#2563eb',
-                                fontSize: '12px',
+                                fontSize: '11px',
                                 fontWeight: '500',
-                                lineHeight: '1.3',
+                                lineHeight: '1.2',
                               }}
                             >
                               {schedule.region && (
@@ -587,12 +585,12 @@ export default function ReportGenerator() {
                         ) : (
                           <div
                             style={{
-                              padding: '9px 11px',
+                              padding: '6px 8px',
                               backgroundColor: 'white',
                               border: '2px solid #2563eb',
-                              borderRadius: '8px',
+                              borderRadius: '6px',
                               color: '#2563eb',
-                              fontSize: '14px',
+                              fontSize: '13px',
                               fontWeight: '600',
                               textAlign: 'center',
                               display: 'flex',
