@@ -6,6 +6,7 @@ export default function ReportGenerator() {
   const [dateMode, setDateMode] = useState('week');
   const [weekOffset, setWeekOffset] = useState(0);
   const [monthOffset, setMonthOffset] = useState(0);
+  const [weeklyHighlights, setWeeklyHighlights] = useState('');
 
   const [data, setData] = useState({
     inspect: [],
@@ -38,6 +39,22 @@ export default function ReportGenerator() {
     }
 
     return { startDate, endDate };
+  };
+
+  // 獲取本週日期（週一到週日）
+  const getWeekDays = () => {
+    const { startDate } = getDateRange();
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(startDate);
+      date.setDate(date.getDate() + i);
+      days.push({
+        date,
+        dateStr: date.toLocaleDateString('zh-TW'),
+        dayName: ['一', '二', '三', '四', '五', '六', '日'][date.getDay() === 0 ? 6 : date.getDay() - 1],
+      });
+    }
+    return days;
   };
 
   // 從 API 獲取數據
@@ -134,6 +151,34 @@ export default function ReportGenerator() {
   const thsdTotal = data.inspect.filter((i) => i.type === 'THSD' || i.category === 'THSD' || i.name?.includes('THSD')).length || 1;
 
   const saRepairsProcessing = data.repairs.filter((r) => r.status === '處理中' || r.status === '進行中').length;
+
+  // 計算南區維修數據
+  const getRepairStats = () => {
+    const { startDate, endDate } = getDateRange();
+    const tabletRepairs = data.repairs.filter((r) =>
+      r.category === '一期生生平板維修' || r.category === '二期生生平板維修'
+    );
+
+    const completed = tabletRepairs.filter((r) => {
+      const repairDate = new Date(r.date);
+      return repairDate >= startDate && repairDate <= endDate && (r.status === '已完成' || r.status === '完成');
+    }).length;
+
+    const newRepairs = tabletRepairs.filter((r) => {
+      const createdDate = new Date(r.createdDate || r.date);
+      return createdDate >= startDate && createdDate <= endDate;
+    }).length;
+
+    const processing = tabletRepairs.filter((r) => {
+      const repairDate = new Date(r.date);
+      return repairDate >= startDate && repairDate <= endDate && (r.status === '處理中' || r.status === '進行中');
+    }).length;
+
+    return { completed, newRepairs, processing };
+  };
+
+  const repairStats = getRepairStats();
+  const weekDays = getWeekDays();
 
   return (
     <div style={{ padding: '20px', backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
@@ -381,76 +426,94 @@ export default function ReportGenerator() {
           {/* 1. 本週重點 */}
           <ReportCard title="本週重點">
             <div style={{ padding: '15px' }}>
-              {data.weeklyStatus && data.weeklyStatus.length > 0 ? (
-                <div>
-                  <p style={{ marginBottom: '10px', fontWeight: 'bold', color: '#1f2937' }}>
-                    本週關鍵事項：
-                  </p>
-                  <ul style={{ paddingLeft: '20px', margin: 0 }}>
-                    {data.weeklyStatus.slice(0, 5).map((item, idx) => (
-                      <li
-                        key={idx}
-                        style={{
-                          marginBottom: '8px',
-                          color: '#374151',
-                          fontSize: '14px',
-                        }}
-                      >
-                        {item.title || item.content || '待定'}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : (
-                <p style={{ color: '#9ca3af', fontSize: '14px' }}>暫無本週重點數據</p>
-              )}
+              <textarea
+                value={weeklyHighlights}
+                onChange={(e) => setWeeklyHighlights(e.target.value)}
+                placeholder="請輸入本週重點內容..."
+                style={{
+                  width: '100%',
+                  minHeight: '120px',
+                  padding: '12px',
+                  borderRadius: '6px',
+                  border: '1px solid #d1d5db',
+                  fontSize: '14px',
+                  fontFamily: 'inherit',
+                  resize: 'vertical',
+                }}
+              />
             </div>
           </ReportCard>
 
           {/* 2. 本週班表 */}
           <ReportCard title="本週班表">
-            <div style={{ padding: '15px', overflowX: 'auto' }}>
-              {data.schedule && data.schedule.length > 0 ? (
-                <table
-                  style={{
-                    width: '100%',
-                    borderCollapse: 'collapse',
-                    fontSize: '14px',
-                  }}
-                >
-                  <thead>
-                    <tr
+            <div style={{ padding: '15px' }}>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+                  gap: '12px',
+                }}
+              >
+                {weekDays.map((day, idx) => {
+                  const daySchedules = data.schedule.filter((s) => {
+                    const scheduleDate = new Date(s.date || s.datetime);
+                    return (
+                      scheduleDate.toLocaleDateString('zh-TW') === day.dateStr
+                    );
+                  });
+
+                  return (
+                    <div
+                      key={idx}
                       style={{
+                        padding: '12px',
                         backgroundColor: '#f3f4f6',
-                        borderBottom: '2px solid #d1d5db',
+                        borderRadius: '8px',
+                        border: '1px solid #e5e7eb',
                       }}
                     >
-                      <th style={{ padding: '10px', textAlign: 'left', fontWeight: 'bold', color: '#1f2937' }}>日期</th>
-                      <th style={{ padding: '10px', textAlign: 'left', fontWeight: 'bold', color: '#1f2937' }}>
-                        負責人
-                      </th>
-                      <th style={{ padding: '10px', textAlign: 'left', fontWeight: 'bold', color: '#1f2937' }}>地點</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.schedule.slice(0, 7).map((item, idx) => (
-                      <tr key={idx} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                        <td style={{ padding: '10px', color: '#374151' }}>
-                          {item.date || '待定'}
-                        </td>
-                        <td style={{ padding: '10px', color: '#374151' }}>
-                          {item.person || item.name || '待定'}
-                        </td>
-                        <td style={{ padding: '10px', color: '#374151' }}>
-                          {item.location || item.school || '待定'}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <p style={{ color: '#9ca3af', fontSize: '14px' }}>暫無本週班表數據</p>
-              )}
+                      <p
+                        style={{
+                          margin: '0 0 12px 0',
+                          fontSize: '14px',
+                          fontWeight: 'bold',
+                          color: '#1f2937',
+                        }}
+                      >
+                        週{day.dayName}
+                        <br />
+                        <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: 'normal' }}>
+                          {day.dateStr}
+                        </span>
+                      </p>
+                      {daySchedules.length > 0 ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          {daySchedules.slice(0, 3).map((schedule, sidx) => (
+                            <div
+                              key={sidx}
+                              style={{
+                                padding: '8px',
+                                backgroundColor: 'white',
+                                borderRadius: '4px',
+                                borderLeft: '3px solid #2563eb',
+                              }}
+                            >
+                              <p style={{ fontSize: '12px', color: '#374151', margin: 0 }}>
+                                {schedule.person || schedule.name || '待定'}
+                              </p>
+                              <p style={{ fontSize: '11px', color: '#6b7280', margin: '4px 0 0 0' }}>
+                                {schedule.location || schedule.school || '待定'}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p style={{ fontSize: '12px', color: '#9ca3af', margin: 0 }}>無行程</p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </ReportCard>
 
@@ -464,9 +527,9 @@ export default function ReportGenerator() {
                 padding: '15px',
               }}
             >
-              <StatCard2 label="總巡檢數" value={data.inspect.length} color="#10b981" />
-              <StatCard2 label="總維修數" value={data.repairs.length} color="#f59e0b" />
-              <StatCard2 label="待辦事項" value={data.todos.length} color="#8b5cf6" />
+              <div style={{ padding: '20px', textAlign: 'center', color: '#9ca3af' }}>
+                尚未帶入資料
+              </div>
             </div>
           </ReportCard>
 
@@ -639,10 +702,32 @@ export default function ReportGenerator() {
               <div
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
                   gap: '15px',
                 }}
               >
+                <div
+                  style={{
+                    padding: '12px',
+                    backgroundColor: '#dcfce7',
+                    borderRadius: '6px',
+                    borderLeft: '4px solid #10b981',
+                  }}
+                >
+                  <p style={{ fontSize: '12px', color: '#6b7280', margin: '0 0 5px 0' }}>
+                    本週完修
+                  </p>
+                  <p
+                    style={{
+                      fontSize: '20px',
+                      fontWeight: 'bold',
+                      color: '#10b981',
+                      margin: 0,
+                    }}
+                  >
+                    {repairStats.completed}
+                  </p>
+                </div>
                 <div
                   style={{
                     padding: '12px',
@@ -652,7 +737,7 @@ export default function ReportGenerator() {
                   }}
                 >
                   <p style={{ fontSize: '12px', color: '#6b7280', margin: '0 0 5px 0' }}>
-                    維修總數
+                    本週新增
                   </p>
                   <p
                     style={{
@@ -662,7 +747,7 @@ export default function ReportGenerator() {
                       margin: 0,
                     }}
                   >
-                    {data.repairs.length}
+                    {repairStats.newRepairs}
                   </p>
                 </div>
                 <div
@@ -674,7 +759,7 @@ export default function ReportGenerator() {
                   }}
                 >
                   <p style={{ fontSize: '12px', color: '#6b7280', margin: '0 0 5px 0' }}>
-                    待完成
+                    維修處理中
                   </p>
                   <p
                     style={{
@@ -684,7 +769,7 @@ export default function ReportGenerator() {
                       margin: 0,
                     }}
                   >
-                    {data.repairs.filter((r) => r.status !== '已完成').length}
+                    {repairStats.processing}
                   </p>
                 </div>
               </div>
@@ -886,35 +971,6 @@ function StatCard({ title, value }) {
         {title}
       </p>
       <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#0284c7', margin: 0 }}>
-        {value}
-      </p>
-    </div>
-  );
-}
-
-// 統計卡片元件2（年度統計內）
-function StatCard2({ label, value, color }) {
-  return (
-    <div
-      style={{
-        padding: '15px',
-        backgroundColor: '#f9fafb',
-        borderRadius: '8px',
-        textAlign: 'center',
-        border: `2px solid ${color}20`,
-      }}
-    >
-      <p style={{ fontSize: '12px', color: '#6b7280', margin: 0 }}>
-        {label}
-      </p>
-      <p
-        style={{
-          fontSize: '28px',
-          fontWeight: 'bold',
-          color: color,
-          margin: '8px 0 0 0',
-        }}
-      >
         {value}
       </p>
     </div>
