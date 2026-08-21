@@ -247,12 +247,15 @@ export default function SchedulePage() {
                     const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
                     const getBgColor = () => {
                       if (!status) return "#7a7a7a"; // 深灰色 - 沒有排班內容
-                      if (status.includes("排休")) return "#FFF4CC"; // 黃色
-                      if (status.includes("駐點")) return "#D4EDDA"; // 綠色
-                      if (status.includes("巡檢")) return "#D1ECF1"; // 藍色
-                      if (status.includes("上午") || status.includes("下午")) return "#E6D5F5"; // 紫色
-                      if (status.includes("(外)")) return "#F8D7DA"; // 紅色
-                      if (status.includes("病假")) return "#E2E3E5"; // 灰色
+                      if (status.includes("三多")) return "#d4edbb";
+                      if (status.includes("上午")) return "#c6dbe1";
+                      if (status.includes("下午")) return "#ffcfc8";
+                      if (status.includes("特休")) return "#ffe59f";
+                      if (status.includes("排休")) return "#e28d38";
+                      if (status.includes("國定假日")) return "#d81b91";
+                      if (status.includes("彈性假")) return "#a7adb6";
+                      if (status.includes("病假")) return "#7d9ac4";
+                      if (status.includes("駐點")) return "#e28d38";
                       return "#7a7a7a"; // 深灰色 - 預設
                     };
 
@@ -407,39 +410,43 @@ export default function SchedulePage() {
             <table style={{
               width: "100%",
               borderCollapse: "collapse",
-              fontSize: 13,
+              fontSize: 12,
               border: "1px solid var(--accent)",
             }}>
               <thead>
                 <tr style={{ background: "rgba(99, 102, 241, 0.1)", borderBottom: "1px solid var(--accent)" }}>
-                  <th style={{ padding: 10, textAlign: "center", fontWeight: 600, borderRight: "1px solid var(--accent)" }}>日期</th>
-                  <th style={{ padding: 10, textAlign: "center", fontWeight: 600, borderRight: "1px solid var(--accent)" }}>時間</th>
-                  <th style={{ padding: 10, textAlign: "center", fontWeight: 600, borderRight: "1px solid var(--accent)" }}>負責人</th>
-                  <th style={{ padding: 10, textAlign: "center", fontWeight: 600, borderRight: "1px solid var(--accent)" }}>地點</th>
-                  <th style={{ padding: 10, textAlign: "center", fontWeight: 600, borderRight: "1px solid var(--accent)" }}>事件</th>
-                  <th style={{ padding: 10, textAlign: "center", fontWeight: 600 }}>備註</th>
+                  <th style={{ padding: 8, textAlign: "center", fontWeight: 600, borderRight: "1px solid var(--accent)", minWidth: 80 }}>日期</th>
+                  <th style={{ padding: 8, textAlign: "center", fontWeight: 600, borderRight: "1px solid var(--accent)", minWidth: 60 }}>時間</th>
+                  <th style={{ padding: 8, textAlign: "center", fontWeight: 600, borderRight: "1px solid var(--accent)", minWidth: 70 }}>負責人</th>
+                  <th style={{ padding: 8, textAlign: "center", fontWeight: 600, borderRight: "1px solid var(--accent)", minWidth: 80 }}>地點</th>
+                  <th style={{ padding: 8, textAlign: "center", fontWeight: 600, borderRight: "1px solid var(--accent)", minWidth: 80 }}>事件</th>
+                  <th style={{ padding: 8, textAlign: "center", fontWeight: 600, borderRight: "1px solid var(--accent)", minWidth: 60 }}>備註</th>
+                  <th style={{ padding: 8, textAlign: "center", fontWeight: 600, minWidth: 50 }}>台數</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredSchedules.map((schedule, index) => (
                   <tr key={index} style={{ borderBottom: "1px solid var(--accent)" }}>
-                    <td style={{ padding: 10, borderRight: "1px solid var(--accent)", color: "var(--text-primary)", textAlign: "center" }}>
+                    <td style={{ padding: 8, borderRight: "1px solid var(--accent)", color: "var(--text-primary)", textAlign: "center" }}>
                       {schedule.date}
                     </td>
-                    <td style={{ padding: 10, borderRight: "1px solid var(--accent)", color: "var(--text-secondary)", textAlign: "center" }}>
+                    <td style={{ padding: 8, borderRight: "1px solid var(--accent)", color: "var(--text-secondary)", textAlign: "center" }}>
                       {schedule.time}
                     </td>
-                    <td style={{ padding: 10, borderRight: "1px solid var(--accent)", color: "var(--text-secondary)", textAlign: "center" }}>
+                    <td style={{ padding: 8, borderRight: "1px solid var(--accent)", color: "var(--text-secondary)", textAlign: "center" }}>
                       {schedule.person}
                     </td>
-                    <td style={{ padding: 10, borderRight: "1px solid var(--accent)", color: "var(--text-secondary)", textAlign: "center" }}>
+                    <td style={{ padding: 8, borderRight: "1px solid var(--accent)", color: "var(--text-secondary)", textAlign: "center" }}>
                       {schedule.location}
                     </td>
-                    <td style={{ padding: 10, borderRight: "1px solid var(--accent)", color: "var(--text-secondary)", textAlign: "center" }}>
+                    <td style={{ padding: 8, borderRight: "1px solid var(--accent)", color: "var(--text-secondary)", textAlign: "center" }}>
                       {schedule.event}
                     </td>
-                    <td style={{ padding: 10, color: "var(--text-secondary)", textAlign: "center" }}>
+                    <td style={{ padding: 8, borderRight: "1px solid var(--accent)", color: "var(--text-secondary)", textAlign: "center" }}>
                       {schedule.note}
+                    </td>
+                    <td style={{ padding: 8, color: "var(--text-secondary)", textAlign: "center" }}>
+                      {schedule.quantity || ""}
                     </td>
                   </tr>
                 ))}
