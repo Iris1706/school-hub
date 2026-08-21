@@ -57,6 +57,21 @@ export default function ReportGenerator() {
     return days;
   };
 
+  // 從 Google Sheets 獲取每日行程數據
+  const fetchScheduleFromSheets = async () => {
+    try {
+      const response = await fetch('/api/sheets/schedule');
+      if (!response.ok) {
+        throw new Error('無法獲取 Google Sheets 數據');
+      }
+      const sheetData = await response.json();
+      return sheetData || [];
+    } catch (err) {
+      console.error('Google Sheets 讀取錯誤:', err);
+      return [];
+    }
+  };
+
   // 從 API 獲取數據
   useEffect(() => {
     const fetchData = async () => {
@@ -66,17 +81,18 @@ export default function ReportGenerator() {
         const responses = await Promise.all([
           fetch('/api/inspect'),
           fetch('/api/repairs'),
-          fetch('/api/daily-schedule'),
+          fetchScheduleFromSheets(), // 優先使用 Google Sheets
           fetch('/api/todos'),
           fetch('/api/weekly-status'),
         ]);
 
-        if (!responses.every((r) => r.ok)) {
-          throw new Error('無法獲取部分數據');
-        }
-
-        const [inspectData, repairsData, scheduleData, todosData, weeklyStatusData] =
-          await Promise.all(responses.map((r) => r.json()));
+        const [inspectData, repairsData, scheduleData, todosData, weeklyStatusData] = [
+          await responses[0].json(),
+          await responses[1].json(),
+          responses[2], // 已經處理
+          await responses[3].json(),
+          await responses[4].json(),
+        ];
 
         setData({
           inspect: inspectData || [],
@@ -179,6 +195,29 @@ export default function ReportGenerator() {
 
   const repairStats = getRepairStats();
   const weekDays = getWeekDays();
+
+  // 按日期組織行程數據，並過濾排休日（沒有行程的日期不顯示）
+  const getScheduleByDay = () => {
+    const scheduleByDay = {};
+
+    weekDays.forEach((day) => {
+      const daySchedules = data.schedule.filter((s) => {
+        const scheduleDate = new Date(s.date || s.datetime);
+        return scheduleDate.toLocaleDateString('zh-TW') === day.dateStr;
+      });
+
+      if (daySchedules.length > 0) {
+        scheduleByDay[day.dateStr] = {
+          ...day,
+          schedules: daySchedules,
+        };
+      }
+    });
+
+    return Object.values(scheduleByDay);
+  };
+
+  const scheduleByDay = getScheduleByDay();
 
   return (
     <div style={{ padding: '20px', backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
@@ -449,70 +488,81 @@ export default function ReportGenerator() {
             <div style={{ padding: '15px' }}>
               <div
                 style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+                  display: 'flex',
+                  flexDirection: 'column',
                   gap: '12px',
                 }}
               >
-                {weekDays.map((day, idx) => {
-                  const daySchedules = data.schedule.filter((s) => {
-                    const scheduleDate = new Date(s.date || s.datetime);
-                    return (
-                      scheduleDate.toLocaleDateString('zh-TW') === day.dateStr
-                    );
-                  });
-
-                  return (
-                    <div
-                      key={idx}
-                      style={{
-                        padding: '12px',
-                        backgroundColor: '#f3f4f6',
-                        borderRadius: '8px',
-                        border: '1px solid #e5e7eb',
-                      }}
-                    >
-                      <p
+                {scheduleByDay.length > 0 ? (
+                  scheduleByDay.map((dayData, idx) => (
+                    <div key={idx}>
+                      <div
                         style={{
-                          margin: '0 0 12px 0',
                           fontSize: '14px',
                           fontWeight: 'bold',
                           color: '#1f2937',
+                          marginBottom: '8px',
+                          paddingBottom: '8px',
+                          borderBottom: '2px solid #e5e7eb',
                         }}
                       >
-                        週{day.dayName}
-                        <br />
-                        <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: 'normal' }}>
-                          {day.dateStr}
-                        </span>
-                      </p>
-                      {daySchedules.length > 0 ? (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                          {daySchedules.slice(0, 3).map((schedule, sidx) => (
-                            <div
-                              key={sidx}
-                              style={{
-                                padding: '8px',
-                                backgroundColor: 'white',
-                                borderRadius: '4px',
-                                borderLeft: '3px solid #2563eb',
-                              }}
-                            >
-                              <p style={{ fontSize: '12px', color: '#374151', margin: 0 }}>
-                                {schedule.person || schedule.name || '待定'}
-                              </p>
-                              <p style={{ fontSize: '11px', color: '#6b7280', margin: '4px 0 0 0' }}>
-                                {schedule.location || schedule.school || '待定'}
-                              </p>
+                        {dayData.dateStr} (週{dayData.dayName})
+                      </div>
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '8px',
+                          marginBottom: '12px',
+                        }}
+                      >
+                        {dayData.schedules.map((schedule, sidx) => (
+                          <div
+                            key={sidx}
+                            style={{
+                              padding: '12px',
+                              backgroundColor: '#f3f4f6',
+                              borderRadius: '6px',
+                              borderLeft: '4px solid #2563eb',
+                            }}
+                          >
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                              {schedule.region && (
+                                <p style={{ fontSize: '12px', color: '#6b7280', margin: 0 }}>
+                                  <strong>區域：</strong>{schedule.region}
+                                </p>
+                              )}
+                              {schedule.school && (
+                                <p style={{ fontSize: '12px', color: '#1f2937', margin: 0, fontWeight: '500' }}>
+                                  {schedule.school}
+                                </p>
+                              )}
+                              {schedule.location && !schedule.school && (
+                                <p style={{ fontSize: '12px', color: '#1f2937', margin: 0, fontWeight: '500' }}>
+                                  {schedule.location}
+                                </p>
+                              )}
+                              {schedule.event && (
+                                <p style={{ fontSize: '12px', color: '#374151', margin: 0 }}>
+                                  {schedule.event}
+                                </p>
+                              )}
+                              {schedule.time && (
+                                <p style={{ fontSize: '11px', color: '#9ca3af', margin: 0 }}>
+                                  時間：{schedule.time}
+                                </p>
+                              )}
                             </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p style={{ fontSize: '12px', color: '#9ca3af', margin: 0 }}>無行程</p>
-                      )}
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  );
-                })}
+                  ))
+                ) : (
+                  <p style={{ color: '#9ca3af', fontSize: '14px', textAlign: 'center', padding: '20px' }}>
+                    本週無行程
+                  </p>
+                )}
               </div>
             </div>
           </ReportCard>
