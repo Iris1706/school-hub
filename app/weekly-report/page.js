@@ -57,21 +57,6 @@ export default function ReportGenerator() {
     return days;
   };
 
-  // 從 Google Sheets 獲取每日行程數據
-  const fetchScheduleFromSheets = async () => {
-    try {
-      const response = await fetch('/api/sheets/schedule');
-      if (!response.ok) {
-        throw new Error('無法獲取 Google Sheets 數據');
-      }
-      const sheetData = await response.json();
-      return sheetData || [];
-    } catch (err) {
-      console.error('Google Sheets 讀取錯誤:', err);
-      return [];
-    }
-  };
-
   // 從 API 獲取數據
   useEffect(() => {
     const fetchData = async () => {
@@ -81,18 +66,17 @@ export default function ReportGenerator() {
         const responses = await Promise.all([
           fetch('/api/inspect'),
           fetch('/api/repairs'),
-          fetchScheduleFromSheets(), // 優先使用 Google Sheets
+          fetch('/api/daily-schedule'),
           fetch('/api/todos'),
           fetch('/api/weekly-status'),
         ]);
 
-        const [inspectData, repairsData, scheduleData, todosData, weeklyStatusData] = [
-          await responses[0].json(),
-          await responses[1].json(),
-          responses[2], // 已經處理
-          await responses[3].json(),
-          await responses[4].json(),
-        ];
+        if (!responses.every((r) => r.ok)) {
+          throw new Error('無法獲取部分數據');
+        }
+
+        const [inspectData, repairsData, scheduleData, todosData, weeklyStatusData] =
+          await Promise.all(responses.map((r) => r.json()));
 
         setData({
           inspect: inspectData || [],
