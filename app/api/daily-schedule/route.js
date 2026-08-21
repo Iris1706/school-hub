@@ -49,10 +49,10 @@ export async function GET(request) {
       }
     });
 
-    // 讀取行程表資料（B20:M 欄）
+    // 讀取行程表資料（B20:M 欄，所有行）
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SCHEDULE_SHEET_ID,
-      range: `'${sheetName}'!B20:M200`, // 讀取當月的行程表
+      range: `'${sheetName}'!B20:M`, // 讀取當月的行程表（所有行）
     });
 
     const rows = response.data.values || [];

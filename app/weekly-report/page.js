@@ -490,34 +490,37 @@ export default function ReportGenerator() {
               <div
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-                  gap: '20px',
+                  gridTemplateColumns: 'repeat(6, 1fr)',
+                  gap: '12px',
                 }}
               >
-                {weekDays.map((dayData, idx) => {
-                  const daySchedules = scheduleByDay.find(
-                    (d) => d.dateStr === dayData.dateStr
-                  );
-                  const schedules = daySchedules?.schedules || [];
-                  const dayOfWeek = dayData.date.getDay();
-                  // 只顯示平日（1-5），或假日有行程
-                  const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
-                  const hasSchedules = schedules.length > 0;
-
-                  if (!isWeekday && !hasSchedules) return null;
+                {weekDays.slice(0, 6).map((dayData, idx) => {
+                  // 直接掃描資料找當週日期
+                  const daySchedules = Array.isArray(data.schedule)
+                    ? data.schedule.filter((s) => {
+                        try {
+                          const scheduleDate = new Date(s?.date || s?.datetime);
+                          const scheduleStr = scheduleDate.toLocaleDateString('zh-TW');
+                          return scheduleStr === dayData.dateStr;
+                        } catch {
+                          return false;
+                        }
+                      })
+                    : [];
 
                   return (
                     <div
                       key={idx}
                       style={{
-                        padding: '20px',
+                        padding: '14px',
                         backgroundColor: 'white',
                         borderRadius: '8px',
                         border: '1px solid #e5e7eb',
                         boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: '12px',
+                        gap: '9px',
+                        minHeight: '280px',
                       }}
                     >
                       {/* 日期和星期 - 黑色背景 */}
@@ -526,15 +529,15 @@ export default function ReportGenerator() {
                           textAlign: 'center',
                           backgroundColor: '#1f2937',
                           color: 'white',
-                          padding: '12px',
+                          padding: '9px 6px',
                           borderRadius: '6px',
-                          marginBottom: '4px',
+                          marginBottom: '2px',
                         }}
                       >
-                        <div style={{ fontSize: '16px', fontWeight: 'bold', margin: '0 0 4px 0' }}>
+                        <div style={{ fontSize: '14px', fontWeight: 'bold', margin: '0 0 2px 0' }}>
                           {dayData.dateStr}
                         </div>
-                        <div style={{ fontSize: '14px', fontWeight: '500', margin: 0 }}>
+                        <div style={{ fontSize: '12px', fontWeight: '500', margin: 0 }}>
                           週{dayData.dayName}
                         </div>
                       </div>
@@ -544,24 +547,25 @@ export default function ReportGenerator() {
                         style={{
                           height: '1px',
                           backgroundColor: '#d1d5db',
-                          margin: '8px 0',
+                          margin: '4px 0',
                         }}
                       />
 
                       {/* 行程列表 */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                        {schedules.length > 0 ? (
-                          schedules.map((schedule, sidx) => (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '7px', flex: 1 }}>
+                        {daySchedules.length > 0 ? (
+                          daySchedules.map((schedule, sidx) => (
                             <div
                               key={sidx}
                               style={{
-                                padding: '12px 14px',
+                                padding: '9px 11px',
                                 backgroundColor: 'white',
                                 border: '2px solid #2563eb',
                                 borderRadius: '8px',
                                 color: '#2563eb',
-                                fontSize: '14px',
+                                fontSize: '12px',
                                 fontWeight: '500',
+                                lineHeight: '1.3',
                               }}
                             >
                               {schedule.region && (
@@ -578,7 +582,7 @@ export default function ReportGenerator() {
                         ) : (
                           <div
                             style={{
-                              padding: '12px 14px',
+                              padding: '9px 11px',
                               backgroundColor: 'white',
                               border: '2px solid #2563eb',
                               borderRadius: '8px',
@@ -586,6 +590,10 @@ export default function ReportGenerator() {
                               fontSize: '16px',
                               fontWeight: '600',
                               textAlign: 'center',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              flex: 1,
                             }}
                           >
                             ...
@@ -596,18 +604,6 @@ export default function ReportGenerator() {
                   );
                 })}
               </div>
-              {weekDays.filter((d) => {
-                const dayOfWeek = d.date.getDay();
-                const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
-                const hasSchedules = scheduleByDay.some(
-                  (s) => s.dateStr === d.dateStr && s.schedules.length > 0
-                );
-                return isWeekday || hasSchedules;
-              }).length === 0 && (
-                <p style={{ color: '#9ca3af', fontSize: '14px', textAlign: 'center', padding: '40px 20px' }}>
-                  本週無行程
-                </p>
-              )}
             </div>
           </ReportCard>
 
