@@ -609,59 +609,64 @@ export default function ReportGenerator() {
                       />
 
                       {/* 行程列表 */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '7px', flex: 1 }}>
-                        {(dayPeople
-              .filter((person) => {
-                if (displayMonth < 9) return true;
-                return person.schedules.length > 0 || person.bandSchedule;
-              })
-              .map((person, pidx) => {
-                          // 取得顏色
-                          const getEventColor = (event) => {
-                            if (!event) return { bgColor: '#d4edbb', textColor: '#374151' };
-                            const eventStr = String(event).trim();
-
-                            const colorMap = {
-                              '三多': { bgColor: '#d4edbb', textColor: '#374151' },
-                              '上午(外)': { bgColor: '#c6dbe1', textColor: '#374151' },
-                              '下午(外)': { bgColor: '#ffcfc8', textColor: '#374151' },
-                              '特休': { bgColor: '#ca3750', textColor: '#ffffff' },
-                              '排休': { bgColor: '#ffe59f', textColor: '#374151' },
-                              '巡檢': { bgColor: '#c0e1f6', textColor: '#374151' },
-                              '上午(巡)': { bgColor: '#5b3286', textColor: '#ffffff' },
-                              '下午(巡)': { bgColor: '#5b3286', textColor: '#ffffff' },
-                              '國定假日': { bgColor: '#d81b91', textColor: '#ffffff' },
-                              '彈性假': { bgColor: '#a7adb6', textColor: '#374151' },
-                              '病假': { bgColor: '#7d9ac4', textColor: '#374151' },
-                              '事假': { bgColor: '#473822', textColor: '#ffffff' },
-                              '駐點': { bgColor: '#e28d38', textColor: '#374151' },
-                              '上午(特)': { bgColor: '#b10202', textColor: '#ffffff' },
-                              '下午(特)': { bgColor: '#b10202', textColor: '#ffffff' },
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1 }}>
+                        {dayPeople
+                          .filter((person) => {
+                            if (displayMonth < 9) return true;
+                            return person.schedules.length > 0 || person.bandSchedule;
+                          })
+                          .map((person, pidx) => {
+                            const getEventColor = (event) => {
+                              if (!event) return { bgColor: '#d4edbb', textColor: '#374151' };
+                              const eventStr = String(event).trim();
+                              const colorMap = {
+                                '三多': { bgColor: '#d4edbb', textColor: '#374151' },
+                                '上午(外)': { bgColor: '#c6dbe1', textColor: '#374151' },
+                                '下午(外)': { bgColor: '#ffcfc8', textColor: '#374151' },
+                                '特休': { bgColor: '#ca3750', textColor: '#ffffff' },
+                                '排休': { bgColor: '#ffe59f', textColor: '#374151' },
+                                '巡檢': { bgColor: '#c0e1f6', textColor: '#374151' },
+                                '上午(巡)': { bgColor: '#5b3286', textColor: '#ffffff' },
+                                '下午(巡)': { bgColor: '#5b3286', textColor: '#ffffff' },
+                                '國定假日': { bgColor: '#d81b91', textColor: '#ffffff' },
+                                '彈性假': { bgColor: '#a7adb6', textColor: '#374151' },
+                                '病假': { bgColor: '#7d9ac4', textColor: '#374151' },
+                                '事假': { bgColor: '#473822', textColor: '#ffffff' },
+                                '駐點': { bgColor: '#e28d38', textColor: '#374151' },
+                                '上午(特)': { bgColor: '#b10202', textColor: '#ffffff' },
+                                '下午(特)': { bgColor: '#b10202', textColor: '#ffffff' },
+                              };
+                              return colorMap[eventStr] || { bgColor: '#d4edbb', textColor: '#374151' };
                             };
+                            const hasSchedules = person.schedules.length > 0;
+                            const statusLabel = hasSchedules
+                              ? person.schedules[0]?.event
+                              : person.bandSchedule;
+                            const statusColor = getEventColor(statusLabel);
 
-                            return colorMap[eventStr] || { bgColor: '#d4edbb', textColor: '#374151' };
-                          };
-
-                          const hasSchedules = person.schedules.length > 0;
-                          const statusLabel = hasSchedules ? person.schedules[0]?.event : (person.bandSchedule || '三多');
-                          const statusColor = getEventColor(statusLabel);
-
-                          return (
-                            <div key={pidx}>
-                              {/* 人員名稱 + 狀態標籤 */}
-                              {shouldShowPerson && person.person && (
+                            return (
+                              <div key={pidx} style={{ marginBottom: '2px' }}>
                                 <div
                                   style={{
                                     display: 'flex',
                                     gap: '6px',
                                     alignItems: 'center',
-                                    marginBottom: '4px',
+                                    marginBottom: '3px',
                                     padding: '4px 6px',
-                                    backgroundColor: '#f9fafb',
+                                    backgroundColor: '#f3f4f6',
                                     borderRadius: '4px',
+                                    minHeight: '24px',
                                   }}
                                 >
-                                  <span style={{ fontWeight: '600', color: '#1f2937', fontSize: '12px' }}>
+                                  <span
+                                    style={{
+                                      fontWeight: '600',
+                                      color: '#1f2937',
+                                      fontSize: '12px',
+                                      minWidth: '50px',
+                                      display: shouldShowPerson ? 'block' : 'none',
+                                    }}
+                                  >
                                     {personMap[person.person] || person.person}
                                   </span>
                                   {statusLabel && (
@@ -674,71 +679,42 @@ export default function ReportGenerator() {
                                         borderRadius: '3px',
                                         fontSize: '10px',
                                         fontWeight: '600',
+                                        whiteSpace: 'nowrap',
                                       }}
                                     >
                                       {statusLabel}
                                     </span>
                                   )}
                                 </div>
-                              )}
-
-                              {/* 該人員的行程或班表狀態 */}
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                {hasSchedules ? (
-                                  person.schedules.map((schedule, sidx) => (
-                                    <div
-                                      key={sidx}
-                                      style={{
-                                        padding: '4px 6px',
-                                        backgroundColor: 'white',
-                                        borderRadius: '4px',
-                                        color: '#374151',
-                                        fontSize: '11px',
-                                        lineHeight: '1.4',
-                                      }}
-                                    >
-                                      {schedule.region && schedule.location ? (
-                                        <div>{schedule.region} {schedule.location} {schedule.event}</div>
-                                      ) : schedule.location ? (
-                                        <div>{schedule.location} {schedule.event}</div>
-                                      ) : (
-                                        <div>{schedule.event}</div>
-                                      )}
-                                    </div>
-                                  ))
-                                ) : person.bandSchedule ? (
-                                  <div
-                                    style={{
-                                      padding: '4px 6px',
-                                      backgroundColor: 'white',
-                                      borderRadius: '4px',
-                                      color: '#374151',
-                                      fontSize: '11px',
-                                      lineHeight: '1.4',
-                                      fontStyle: 'italic',
-                                    }}
-                                  >
-                                    {person.bandSchedule}
-                                  </div>
-                                ) : (
-                                  <div
-                                    style={{
-                                      padding: '4px 6px',
-                                      backgroundColor: 'white',
-                                      borderRadius: '4px',
-                                      color: '#2563eb',
-                                      fontSize: '11px',
-                                      lineHeight: '1.4',
-                                      fontWeight: '600',
-                                    }}
-                                  >
-                                    三多
+                                {hasSchedules && (
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', paddingLeft: '6px' }}>
+                                    {person.schedules.map((schedule, sidx) => (
+                                      <div
+                                        key={sidx}
+                                        style={{
+                                          padding: '3px 6px',
+                                          backgroundColor: '#f9fafb',
+                                          borderRadius: '3px',
+                                          color: '#374151',
+                                          fontSize: '10px',
+                                          lineHeight: '1.3',
+                                          borderLeft: '2px solid #e5e7eb',
+                                        }}
+                                      >
+                                        {schedule.region && schedule.location ? (
+                                          `${schedule.region} ${schedule.location}`
+                                        ) : schedule.location ? (
+                                          schedule.location
+                                        ) : (
+                                          schedule.event
+                                        )}
+                                      </div>
+                                    ))}
                                   </div>
                                 )}
                               </div>
-                            </div>
-                          );
-                        })}
+                            );
+                          })}
                       </div>
                     </div>
                   );
