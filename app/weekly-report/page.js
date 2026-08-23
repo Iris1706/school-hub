@@ -610,7 +610,12 @@ export default function ReportGenerator() {
 
                       {/* 行程列表 */}
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '7px', flex: 1 }}>
-                        {dayPeople.map((person, pidx) => {
+                        {(dayPeople
+              .filter((person) => {
+                if (displayMonth < 9) return true;
+                return person.schedules.length > 0 || person.bandSchedule;
+              })
+              .map((person, pidx) => {
                           // 取得顏色
                           const getEventColor = (event) => {
                             if (!event) return { bgColor: '#d4edbb', textColor: '#374151' };
