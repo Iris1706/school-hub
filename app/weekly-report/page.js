@@ -501,6 +501,10 @@ export default function ReportGenerator() {
                 }}
               >
                 {weekDays.slice(0, 5).map((dayData, idx) => {
+                  // 判斷是否應該顯示人員名稱（8月及之前顯示，9月開始不顯示）
+                  const displayMonth = startDate.getMonth() + 1; // 1-12
+                  const shouldShowPerson = displayMonth < 9;
+
                   // 直接掃描資料找當週日期（使用字符串比對）
                   const daySchedules = Array.isArray(data.schedule)
                     ? data.schedule.filter((s) => {
@@ -606,25 +610,31 @@ export default function ReportGenerator() {
                                   lineHeight: '1.4',
                                 }}
                               >
-                                {/* 事件標籤 */}
-                                {schedule.event && (
-                                  <div
-                                    style={{
-                                      display: 'inline-block',
-                                      backgroundColor: eventColor.bgColor,
-                                      color: eventColor.textColor,
-                                      padding: '2px 6px',
-                                      borderRadius: '3px',
-                                      fontSize: '10px',
-                                      fontWeight: '600',
-                                      marginBottom: '4px',
-                                    }}
-                                  >
-                                    {schedule.event}
-                                  </div>
-                                )}
+                                {/* 人員名稱和事件標籤 */}
+                                <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
+                                  {shouldShowPerson && schedule.person && (
+                                    <span style={{ fontWeight: '600', color: '#1f2937' }}>
+                                      {schedule.person}
+                                    </span>
+                                  )}
+                                  {schedule.event && (
+                                    <span
+                                      style={{
+                                        display: 'inline-block',
+                                        backgroundColor: eventColor.bgColor,
+                                        color: eventColor.textColor,
+                                        padding: '2px 6px',
+                                        borderRadius: '3px',
+                                        fontSize: '10px',
+                                        fontWeight: '600',
+                                      }}
+                                    >
+                                      {schedule.event}
+                                    </span>
+                                  )}
+                                </div>
                                 {/* 行程詳情：區域 地點 事件 */}
-                                <div style={{ marginTop: schedule.event ? '4px' : 0 }}>
+                                <div>
                                   {schedule.region && schedule.location ? (
                                     <div>{schedule.region} {schedule.location} {schedule.event}</div>
                                   ) : schedule.location ? (
