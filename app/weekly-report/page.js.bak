@@ -27,9 +27,6 @@ export default function ReportGenerator() {
     attendance: [],
     todos: [],
     weeklyStatus: [],
-    foreignObjects: { count: 0 },
-    annualStats: { data: [], total: 0 },
-    repairDetails: { headers: [], data: [], count: 0 },
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -92,9 +89,6 @@ export default function ReportGenerator() {
           { key: 'attendance', url: '/api/schedule' },
           { key: 'todos', url: '/api/todos' },
           { key: 'weeklyStatus', url: '/api/weekly-status' },
-          { key: 'foreignObjects', url: '/api/foreign-objects' },
-          { key: 'annualStats', url: '/api/annual-stats' },
-          { key: 'repairDetails', url: '/api/repair-details' },
         ];
 
         const newData = {
@@ -104,9 +98,6 @@ export default function ReportGenerator() {
           attendance: [],
           todos: [],
           weeklyStatus: [],
-          foreignObjects: { count: 0 },
-          annualStats: { data: [], total: 0 },
-          repairDetails: { headers: [], data: [], count: 0 },
         };
 
         // 嘗試獲取每個 API，失敗時使用空陣列
@@ -117,11 +108,6 @@ export default function ReportGenerator() {
               const json = await response.json();
               // 處理兩種 API 格式：{ data: [...] } 或直接 [...]
               newData[endpoint.key] = json?.data || json || [];
-
-              // 調試日志
-              if (endpoint.key === 'attendance') {
-                console.log(`班表數據 (${endpoint.key}):`, newData[endpoint.key]);
-              }
             }
           } catch (err) {
             console.warn(`無法獲取 ${endpoint.url}:`, err.message);
@@ -129,7 +115,6 @@ export default function ReportGenerator() {
         }
 
         setData(newData);
-        console.log('最終數據:', newData);
       } catch (err) {
         setError('獲取數據失敗：' + err.message);
         console.error(err);
@@ -297,27 +282,18 @@ export default function ReportGenerator() {
       });
     });
 
-    // 2. 填入班表狀態
+    // 2. 填入班表狀態（作為備用）
     attendance.forEach((att) => {
       const person = String(att?.person || '').trim();
       const attDate = String(att?.date || '').trim();
 
       if (person && attDate === dateStr && peopleData[person]) {
-        const status = String(att?.status || '').trim();
-        if (status) {
-          peopleData[person].bandSchedule = status;
-          // 調試：打印成功匹配的數據
-          if (dateStr === '2026/8/23') {
-            console.log(`✓ 匹配班表: ${person} - ${dateStr} - ${status}`);
-          }
+        if (peopleData[person].schedules.length === 0) {
+          // 只有在沒有特定行程時才使用班表狀態
+          peopleData[person].bandSchedule = att.status || att.event || '三多';
         }
       }
     });
-
-    // 調試：顯示該日期的所有數據
-    if (dateStr === '2026/8/23') {
-      console.log(`日期 ${dateStr} 的班表數據:`, Object.values(peopleData).filter(p => p.bandSchedule));
-    }
 
     return Object.values(peopleData);
   };
@@ -508,7 +484,7 @@ export default function ReportGenerator() {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(5, 1fr)',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
           gap: '15px',
           marginBottom: '30px',
         }}
@@ -526,7 +502,7 @@ export default function ReportGenerator() {
         <StatCard title="SA 維修處理中" value={saRepairsProcessing} />
 
         {/* 夾異物（本週） */}
-        <StatCard title="夾異物（本週）" value={data.foreignObjects?.count || 0} />
+        <StatCard title="夾異物（本週）" value="－" />
       </div>
 
       {/* 錯誤提示 */}
@@ -633,64 +609,54 @@ export default function ReportGenerator() {
                       />
 
                       {/* 行程列表 */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1 }}>
-                        {dayPeople
-                          .filter((person) => {
-                            if (displayMonth < 9) return true;
-                            return person.schedules.length > 0 || person.bandSchedule;
-                          })
-                          .map((person, pidx) => {
-                            const getEventColor = (event) => {
-                              if (!event) return { bgColor: '#d4edbb', textColor: '#374151' };
-                              const eventStr = String(event).trim();
-                              const colorMap = {
-                                '三多': { bgColor: '#d4edbb', textColor: '#374151' },
-                                '上午(外)': { bgColor: '#c6dbe1', textColor: '#374151' },
-                                '下午(外)': { bgColor: '#ffcfc8', textColor: '#374151' },
-                                '特休': { bgColor: '#ca3750', textColor: '#ffffff' },
-                                '排休': { bgColor: '#ffe59f', textColor: '#374151' },
-                                '巡檢': { bgColor: '#c0e1f6', textColor: '#374151' },
-                                '上午(巡)': { bgColor: '#5b3286', textColor: '#ffffff' },
-                                '下午(巡)': { bgColor: '#5b3286', textColor: '#ffffff' },
-                                '國定假日': { bgColor: '#d81b91', textColor: '#ffffff' },
-                                '彈性假': { bgColor: '#a7adb6', textColor: '#374151' },
-                                '病假': { bgColor: '#7d9ac4', textColor: '#374151' },
-                                '事假': { bgColor: '#473822', textColor: '#ffffff' },
-                                '駐點': { bgColor: '#e28d38', textColor: '#374151' },
-                                '上午(特)': { bgColor: '#b10202', textColor: '#ffffff' },
-                                '下午(特)': { bgColor: '#b10202', textColor: '#ffffff' },
-                              };
-                              return colorMap[eventStr] || { bgColor: '#d4edbb', textColor: '#374151' };
-                            };
-                            const hasSchedules = person.schedules.length > 0;
-                            const statusLabel = hasSchedules
-                              ? person.schedules[0]?.event
-                              : person.bandSchedule;
-                            const statusColor = getEventColor(statusLabel);
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '7px', flex: 1 }}>
+                        {dayPeople.map((person, pidx) => {
+                          // 取得顏色
+                          const getEventColor = (event) => {
+                            if (!event) return { bgColor: '#d4edbb', textColor: '#374151' };
+                            const eventStr = String(event).trim();
 
-                            return (
-                              <div key={pidx} style={{ marginBottom: '2px' }}>
+                            const colorMap = {
+                              '三多': { bgColor: '#d4edbb', textColor: '#374151' },
+                              '上午(外)': { bgColor: '#c6dbe1', textColor: '#374151' },
+                              '下午(外)': { bgColor: '#ffcfc8', textColor: '#374151' },
+                              '特休': { bgColor: '#ca3750', textColor: '#ffffff' },
+                              '排休': { bgColor: '#ffe59f', textColor: '#374151' },
+                              '巡檢': { bgColor: '#c0e1f6', textColor: '#374151' },
+                              '上午(巡)': { bgColor: '#5b3286', textColor: '#ffffff' },
+                              '下午(巡)': { bgColor: '#5b3286', textColor: '#ffffff' },
+                              '國定假日': { bgColor: '#d81b91', textColor: '#ffffff' },
+                              '彈性假': { bgColor: '#a7adb6', textColor: '#374151' },
+                              '病假': { bgColor: '#7d9ac4', textColor: '#374151' },
+                              '事假': { bgColor: '#473822', textColor: '#ffffff' },
+                              '駐點': { bgColor: '#e28d38', textColor: '#374151' },
+                              '上午(特)': { bgColor: '#b10202', textColor: '#ffffff' },
+                              '下午(特)': { bgColor: '#b10202', textColor: '#ffffff' },
+                            };
+
+                            return colorMap[eventStr] || { bgColor: '#d4edbb', textColor: '#374151' };
+                          };
+
+                          const hasSchedules = person.schedules.length > 0;
+                          const statusLabel = hasSchedules ? person.schedules[0]?.event : (person.bandSchedule || '三多');
+                          const statusColor = getEventColor(statusLabel);
+
+                          return (
+                            <div key={pidx}>
+                              {/* 人員名稱 + 狀態標籤 */}
+                              {shouldShowPerson && person.person && (
                                 <div
                                   style={{
                                     display: 'flex',
                                     gap: '6px',
                                     alignItems: 'center',
-                                    marginBottom: '3px',
+                                    marginBottom: '4px',
                                     padding: '4px 6px',
-                                    backgroundColor: '#f3f4f6',
+                                    backgroundColor: '#f9fafb',
                                     borderRadius: '4px',
-                                    minHeight: '24px',
                                   }}
                                 >
-                                  <span
-                                    style={{
-                                      fontWeight: '600',
-                                      color: '#1f2937',
-                                      fontSize: '12px',
-                                      minWidth: '50px',
-                                      display: shouldShowPerson ? 'block' : 'none',
-                                    }}
-                                  >
+                                  <span style={{ fontWeight: '600', color: '#1f2937', fontSize: '12px' }}>
                                     {personMap[person.person] || person.person}
                                   </span>
                                   {statusLabel && (
@@ -703,42 +669,71 @@ export default function ReportGenerator() {
                                         borderRadius: '3px',
                                         fontSize: '10px',
                                         fontWeight: '600',
-                                        whiteSpace: 'nowrap',
                                       }}
                                     >
                                       {statusLabel}
                                     </span>
                                   )}
                                 </div>
-                                {hasSchedules && (
-                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', paddingLeft: '6px' }}>
-                                    {person.schedules.map((schedule, sidx) => (
-                                      <div
-                                        key={sidx}
-                                        style={{
-                                          padding: '3px 6px',
-                                          backgroundColor: '#f9fafb',
-                                          borderRadius: '3px',
-                                          color: '#374151',
-                                          fontSize: '10px',
-                                          lineHeight: '1.3',
-                                          borderLeft: '2px solid #e5e7eb',
-                                        }}
-                                      >
-                                        {schedule.region && schedule.location ? (
-                                          `${schedule.region} ${schedule.location}`
-                                        ) : schedule.location ? (
-                                          schedule.location
-                                        ) : (
-                                          schedule.event
-                                        )}
-                                      </div>
-                                    ))}
+                              )}
+
+                              {/* 該人員的行程或班表狀態 */}
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {hasSchedules ? (
+                                  person.schedules.map((schedule, sidx) => (
+                                    <div
+                                      key={sidx}
+                                      style={{
+                                        padding: '4px 6px',
+                                        backgroundColor: 'white',
+                                        borderRadius: '4px',
+                                        color: '#374151',
+                                        fontSize: '11px',
+                                        lineHeight: '1.4',
+                                      }}
+                                    >
+                                      {schedule.region && schedule.location ? (
+                                        <div>{schedule.region} {schedule.location} {schedule.event}</div>
+                                      ) : schedule.location ? (
+                                        <div>{schedule.location} {schedule.event}</div>
+                                      ) : (
+                                        <div>{schedule.event}</div>
+                                      )}
+                                    </div>
+                                  ))
+                                ) : person.bandSchedule ? (
+                                  <div
+                                    style={{
+                                      padding: '4px 6px',
+                                      backgroundColor: 'white',
+                                      borderRadius: '4px',
+                                      color: '#374151',
+                                      fontSize: '11px',
+                                      lineHeight: '1.4',
+                                      fontStyle: 'italic',
+                                    }}
+                                  >
+                                    {person.bandSchedule}
+                                  </div>
+                                ) : (
+                                  <div
+                                    style={{
+                                      padding: '4px 6px',
+                                      backgroundColor: 'white',
+                                      borderRadius: '4px',
+                                      color: '#2563eb',
+                                      fontSize: '11px',
+                                      lineHeight: '1.4',
+                                      fontWeight: '600',
+                                    }}
+                                  >
+                                    三多
                                   </div>
                                 )}
                               </div>
-                            );
-                          })}
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   );
@@ -747,50 +742,19 @@ export default function ReportGenerator() {
             </div>
           </ReportCard>
 
-          {/* 3. 當年度（2026）年度統計 */}
-          <ReportCard title="當年度（2026）年度統計">
-            <div style={{ padding: '15px', overflowX: 'auto' }}>
-              {data.annualStats?.data && data.annualStats.data.length > 0 ? (
-                <table
-                  style={{
-                    width: '100%',
-                    borderCollapse: 'collapse',
-                    fontSize: '14px',
-                  }}
-                >
-                  <thead>
-                    <tr
-                      style={{
-                        backgroundColor: '#f3f4f6',
-                        borderBottom: '2px solid #d1d5db',
-                      }}
-                    >
-                      <th style={{ padding: '10px', textAlign: 'left', fontWeight: 'bold', color: '#1f2937' }}>
-                        月份
-                      </th>
-                      <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', color: '#1f2937' }}>
-                        Iris
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.annualStats.data.map((item, idx) => (
-                      <tr key={idx} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                        <td style={{ padding: '10px', color: '#374151', fontWeight: '500' }}>
-                          {item.name}
-                        </td>
-                        <td style={{ padding: '10px', textAlign: 'center', color: '#374151' }}>
-                          {item.values && item.values.length > 0 ? item.values[0] : '－'}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <div style={{ padding: '20px', textAlign: 'center', color: '#9ca3af' }}>
-                  尚未帶入資料
-                </div>
-              )}
+          {/* 3. 年度統計 */}
+          <ReportCard title="年度統計">
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                gap: '15px',
+                padding: '15px',
+              }}
+            >
+              <div style={{ padding: '20px', textAlign: 'center', color: '#9ca3af' }}>
+                尚未帶入資料
+              </div>
             </div>
           </ReportCard>
 
@@ -898,12 +862,12 @@ export default function ReportGenerator() {
           {/* 6. 本週報修明細 */}
           <ReportCard title="本週報修明細">
             <div style={{ padding: '15px', overflowX: 'auto' }}>
-              {Array.isArray(data.repairDetails?.data) && data.repairDetails.data.length > 0 ? (
+              {Array.isArray(data.repairs) && data.repairs.length > 0 ? (
                 <table
                   style={{
                     width: '100%',
                     borderCollapse: 'collapse',
-                    fontSize: '13px',
+                    fontSize: '14px',
                   }}
                 >
                   <thead>
@@ -913,30 +877,40 @@ export default function ReportGenerator() {
                         borderBottom: '2px solid #d1d5db',
                       }}
                     >
-                      {data.repairDetails.headers?.slice(0, 13).map((header, idx) => (
-                        <th
-                          key={idx}
-                          style={{
-                            padding: '10px 8px',
-                            textAlign: 'left',
-                            fontWeight: 'bold',
-                            color: '#1f2937',
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {header}
-                        </th>
-                      ))}
+                      <th style={{ padding: '10px', textAlign: 'left', fontWeight: 'bold', color: '#1f2937' }}>
+                        日期
+                      </th>
+                      <th style={{ padding: '10px', textAlign: 'left', fontWeight: 'bold', color: '#1f2937' }}>
+                        類別
+                      </th>
+                      <th style={{ padding: '10px', textAlign: 'left', fontWeight: 'bold', color: '#1f2937' }}>
+                        狀態
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {data.repairDetails.data.map((item, idx) => (
+                    {repairsArray.slice(0, 7).map((item, idx) => (
                       <tr key={idx} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                        {data.repairDetails.headers?.slice(0, 13).map((header, hidx) => (
-                          <td key={hidx} style={{ padding: '10px 8px', color: '#374151', fontSize: '12px' }}>
-                            {item[header] || '－'}
-                          </td>
-                        ))}
+                        <td style={{ padding: '10px', color: '#374151' }}>
+                          {item?.date || '待定'}
+                        </td>
+                        <td style={{ padding: '10px', color: '#374151' }}>
+                          {item?.category || item?.type || '其他'}
+                        </td>
+                        <td style={{ padding: '10px' }}>
+                          <span
+                            style={{
+                              padding: '4px 10px',
+                              backgroundColor: '#dcfce7',
+                              color: '#166534',
+                              borderRadius: '4px',
+                              fontSize: '12px',
+                              fontWeight: '500',
+                            }}
+                          >
+                            {item?.status || '待處理'}
+                          </span>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
