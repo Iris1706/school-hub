@@ -103,7 +103,8 @@ export default function ReportGenerator() {
             const response = await fetch(endpoint.url);
             if (response.ok) {
               const json = await response.json();
-              newData[endpoint.key] = json || [];
+              // 處理兩種 API 格式：{ data: [...] } 或直接 [...]
+              newData[endpoint.key] = json?.data || json || [];
             }
           } catch (err) {
             console.warn(`無法獲取 ${endpoint.url}:`, err.message);
