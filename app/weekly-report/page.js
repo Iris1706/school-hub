@@ -3,6 +3,18 @@
 import { useState, useEffect } from 'react';
 
 export default function ReportGenerator() {
+  // 人員代碼映射表
+  const personMap = {
+    'P': 'Pawn',
+    'E': 'Esther',
+    'I': 'Iris',
+    'H': 'Hongkun',
+    'M': 'May',
+    'Z': 'Zephyr',
+    'A': 'Andy',
+    'J': 'Jenna',
+  };
+
   const [dateMode, setDateMode] = useState('week');
   const [weekOffset, setWeekOffset] = useState(0);
   const [monthOffset, setMonthOffset] = useState(0);
@@ -450,21 +462,6 @@ export default function ReportGenerator() {
         </div>
       )}
 
-      {/* 載入指示 */}
-      {loading && (
-        <div
-          style={{
-            padding: '40px',
-            textAlign: 'center',
-            backgroundColor: 'white',
-            borderRadius: '8px',
-            color: '#6b7280',
-            fontSize: '14px',
-          }}
-        >
-          ⏳ 正在載入報表數據...
-        </div>
-      )}
 
       {/* 預覽區域 */}
       {!loading && (
@@ -614,7 +611,7 @@ export default function ReportGenerator() {
                                 <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
                                   {shouldShowPerson && schedule.person && (
                                     <span style={{ fontWeight: '600', color: '#1f2937' }}>
-                                      {schedule.person}
+                                      {personMap[schedule.person] || schedule.person}
                                     </span>
                                   )}
                                   {schedule.event && (
