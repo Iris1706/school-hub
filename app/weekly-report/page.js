@@ -24,6 +24,7 @@ export default function ReportGenerator() {
     inspect: [],
     repairs: [],
     schedule: [],
+    attendance: [],
     todos: [],
     weeklyStatus: [],
   });
@@ -85,6 +86,7 @@ export default function ReportGenerator() {
           { key: 'inspect', url: '/api/inspect' },
           { key: 'repairs', url: '/api/repairs' },
           { key: 'schedule', url: '/api/daily-schedule' },
+          { key: 'attendance', url: '/api/schedule' },
           { key: 'todos', url: '/api/todos' },
           { key: 'weeklyStatus', url: '/api/weekly-status' },
         ];
@@ -93,6 +95,7 @@ export default function ReportGenerator() {
           inspect: [],
           repairs: [],
           schedule: [],
+          attendance: [],
           todos: [],
           weeklyStatus: [],
         };
