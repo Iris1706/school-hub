@@ -111,8 +111,13 @@ export async function GET(request) {
       row.forEach((status, colIdx) => {
         if (!status || String(status).trim() === "") return;
 
-        const dateStr = dateRow[colIdx]?.trim() || "";
-        if (!dateStr) return;
+        const dateNum = dateRow[colIdx]?.trim() || "";
+        if (!dateNum) return;
+
+        // 轉換日期為 yyyy/m/d 格式
+        const dateNum_int = parseInt(dateNum);
+        if (isNaN(dateNum_int)) return;
+        const dateStr = `${year}/${month}/${dateNum_int}`;
 
         bandSchedules.push({
           person: personCode,
