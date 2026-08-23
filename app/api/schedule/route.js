@@ -19,14 +19,14 @@ export async function GET(request) {
     }
 
     const sheetName = `${year}/${month}`;
-
     console.log(`讀取班表資料：${sheetName}`);
 
-    let bandScheduleRes;
+    // 1. 讀取日期行（C5:AG5）
+    let dateRowRes;
     try {
-      bandScheduleRes = await sheets.spreadsheets.values.get({
+      dateRowRes = await sheets.spreadsheets.values.get({
         spreadsheetId: SCHEDULE_SHEET_ID,
-        range: `'${sheetName}'!A3:AG14`,
+        range: `'${sheetName}'!C5:AG5`,
       });
     } catch (error) {
       if (error.message && error.message.includes("Unable to parse range")) {
@@ -36,32 +36,46 @@ export async function GET(request) {
       throw error;
     }
 
-    const rows = bandScheduleRes.data.values || [];
-    if (rows.length === 0) {
-      console.warn(`未找到班表資料：${sheetName}`);
+    const dateRow = dateRowRes.data.values?.[0] || [];
+    if (dateRow.length === 0) {
+      console.warn(`未找到日期資料：${sheetName}`);
       return Response.json({ data: [] });
     }
 
-    let dateRowRes;
+    // 2. 讀取員工編號（A6:A13）
+    let personCodeRes;
     try {
-      dateRowRes = await sheets.spreadsheets.values.get({
+      personCodeRes = await sheets.spreadsheets.values.get({
         spreadsheetId: SCHEDULE_SHEET_ID,
-        range: `'${sheetName}'!A2:AG2`,
+        range: `'${sheetName}'!A6:A13`,
       });
     } catch (error) {
-      dateRowRes = { data: { values: [] } };
+      personCodeRes = { data: { values: [] } };
     }
 
-    const dateRow = dateRowRes.data.values?.[0] || [];
+    const personCodes = personCodeRes.data.values?.map(row => String(row[0] || "").trim()).filter(p => p) || [];
 
+    // 3. 讀取班表狀態（C6:AG13）
+    let bandScheduleRes;
+    try {
+      bandScheduleRes = await sheets.spreadsheets.values.get({
+        spreadsheetId: SCHEDULE_SHEET_ID,
+        range: `'${sheetName}'!C6:AG13`,
+      });
+    } catch (error) {
+      bandScheduleRes = { data: { values: [] } };
+    }
+
+    const scheduleRows = bandScheduleRes.data.values || [];
+
+    // 4. 組合班表資料
     const bandSchedules = [];
 
-    rows.forEach((row, rowIdx) => {
-      const personCode = String(row[0] || "").trim();
+    scheduleRows.forEach((row, rowIdx) => {
+      const personCode = personCodes[rowIdx];
       if (!personCode) return;
 
       row.forEach((status, colIdx) => {
-        if (colIdx === 0) return;
         if (!status || String(status).trim() === "") return;
 
         const dateStr = dateRow[colIdx]?.trim() || "";
@@ -84,9 +98,6 @@ export async function GET(request) {
 
   } catch (error) {
     console.error("讀取班表失敗：", error);
-    if (error.message && error.message.includes("Unable to parse range")) {
-      return Response.json({ data: [] });
-    }
     return Response.json(
       { error: "讀取班表失敗：" + error.message },
       { status: 500 }
