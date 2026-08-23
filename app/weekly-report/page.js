@@ -108,6 +108,11 @@ export default function ReportGenerator() {
               const json = await response.json();
               // 處理兩種 API 格式：{ data: [...] } 或直接 [...]
               newData[endpoint.key] = json?.data || json || [];
+
+              // 調試日志
+              if (endpoint.key === 'attendance') {
+                console.log(`班表數據 (${endpoint.key}):`, newData[endpoint.key]);
+              }
             }
           } catch (err) {
             console.warn(`無法獲取 ${endpoint.url}:`, err.message);
@@ -115,6 +120,7 @@ export default function ReportGenerator() {
         }
 
         setData(newData);
+        console.log('最終數據:', newData);
       } catch (err) {
         setError('獲取數據失敗：' + err.message);
         console.error(err);
@@ -282,20 +288,27 @@ export default function ReportGenerator() {
       });
     });
 
-    // 2. 填入班表狀態（先填所有人，再覆蓋有行程的人）
+    // 2. 填入班表狀態
     attendance.forEach((att) => {
       const person = String(att?.person || '').trim();
       const attDate = String(att?.date || '').trim();
 
       if (person && attDate === dateStr && peopleData[person]) {
         const status = String(att?.status || '').trim();
-        // 無論是否有行程，先設定班表狀態
         if (status) {
           peopleData[person].bandSchedule = status;
+          // 調試：打印成功匹配的數據
+          if (dateStr === '2026/8/23') {
+            console.log(`✓ 匹配班表: ${person} - ${dateStr} - ${status}`);
+          }
         }
-        // 如果有特定行程，則班表狀態會被忽略（在 statusLabel 邏輯中）
       }
     });
+
+    // 調試：顯示該日期的所有數據
+    if (dateStr === '2026/8/23') {
+      console.log(`日期 ${dateStr} 的班表數據:`, Object.values(peopleData).filter(p => p.bandSchedule));
+    }
 
     return Object.values(peopleData);
   };
