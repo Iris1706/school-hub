@@ -282,19 +282,18 @@ export default function ReportGenerator() {
       });
     });
 
-    // 2. 填入班表狀態（作為備用）
+    // 2. 填入班表狀態（先填所有人，再覆蓋有行程的人）
     attendance.forEach((att) => {
       const person = String(att?.person || '').trim();
       const attDate = String(att?.date || '').trim();
 
-      if (person && peopleData[person]) {
-        // 精確比對日期格式
-        if (attDate === dateStr && peopleData[person].schedules.length === 0) {
-          const status = String(att?.status || '').trim();
-          if (status) {
-            peopleData[person].bandSchedule = status;
-          }
+      if (person && attDate === dateStr && peopleData[person]) {
+        const status = String(att?.status || '').trim();
+        // 無論是否有行程，先設定班表狀態
+        if (status) {
+          peopleData[person].bandSchedule = status;
         }
+        // 如果有特定行程，則班表狀態會被忽略（在 statusLabel 邏輯中）
       }
     });
 
