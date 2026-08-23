@@ -502,9 +502,10 @@ export default function ReportGenerator() {
                   const displayMonth = startDate.getMonth() + 1; // 1-12
                   const shouldShowPerson = displayMonth < 9;
 
-                  // 直接掃描資料找當週日期（使用字符串比對）
+                  // 直接掃描資料找當週日期（使用字符串比對），並處理多人情況
                   const daySchedules = Array.isArray(data.schedule)
-                    ? data.schedule.filter((s) => {
+                    ? data.schedule
+                      .filter((s) => {
                         try {
                           // 直接比對日期字符串（去除空格）
                           const apiDate = String(s?.date || '').trim();
@@ -515,6 +516,21 @@ export default function ReportGenerator() {
                         } catch {
                           return false;
                         }
+                      })
+                      .flatMap((s) => {
+                        // 處理多人情況（例如 "E/Z" 分解為兩個行程）
+                        const persons = String(s?.person || '')
+                          .split('/')
+                          .map((p) => p.trim())
+                          .filter((p) => p);
+
+                        // 為每個人創建一個行程項目
+                        return persons.length > 0
+                          ? persons.map((person) => ({
+                              ...s,
+                              person,
+                            }))
+                          : [s];
                       })
                     : [];
 
