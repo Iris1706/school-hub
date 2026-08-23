@@ -242,6 +242,62 @@ export default function ReportGenerator() {
 
   const scheduleByDay = getScheduleByDay();
 
+  // 獲取當天所有人員的班表數據（包括特定行程和班表狀態）
+  const getAllPeopleForDay = (dateStr) => {
+    const allPeople = ['P', 'E', 'I', 'H', 'M', 'Z', 'A', 'J'];
+    const attendance = Array.isArray(data.attendance) ? data.attendance : [];
+    const schedule = Array.isArray(data.schedule) ? data.schedule : [];
+
+    const peopleData = {};
+
+    // 初始化所有人員
+    allPeople.forEach((person) => {
+      peopleData[person] = {
+        person,
+        schedules: [],
+        bandSchedule: null,
+      };
+    });
+
+    // 1. 填入特定行程
+    const daySchedules = schedule.filter((s) => {
+      try {
+        const apiDate = String(s?.date || '').trim();
+        return apiDate === dateStr;
+      } catch {
+        return false;
+      }
+    });
+
+    daySchedules.forEach((schedule) => {
+      const persons = String(schedule?.person || '')
+        .split('/')
+        .map((p) => p.trim())
+        .filter((p) => p);
+
+      persons.forEach((person) => {
+        if (peopleData[person]) {
+          peopleData[person].schedules.push(schedule);
+        }
+      });
+    });
+
+    // 2. 填入班表狀態（作為備用）
+    attendance.forEach((att) => {
+      const person = String(att?.person || '').trim();
+      const attDate = String(att?.date || '').trim();
+
+      if (person && attDate === dateStr && peopleData[person]) {
+        if (peopleData[person].schedules.length === 0) {
+          // 只有在沒有特定行程時才使用班表狀態
+          peopleData[person].bandSchedule = att.status || att.event || '三多';
+        }
+      }
+    });
+
+    return Object.values(peopleData);
+  };
+
   return (
     <div style={{ padding: '20px', backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
       {/* 頂部控制欄 - 匯出功能 + 日期範圍 */}
@@ -506,40 +562,8 @@ export default function ReportGenerator() {
                   const displayMonth = startDate.getMonth() + 1; // 1-12
                   const shouldShowPerson = displayMonth < 9;
 
-                  // 篩選當週日期的行程（保留原始格式）
-                  const daySchedulesRaw = Array.isArray(data.schedule)
-                    ? data.schedule.filter((s) => {
-                        try {
-                          const apiDate = String(s?.date || '').trim();
-                          const cardDate = String(dayData.dateStr).trim();
-                          return apiDate === cardDate;
-                        } catch {
-                          return false;
-                        }
-                      })
-                    : [];
-
-                  // 按人員分組
-                  const schedulesByPerson = {};
-                  daySchedulesRaw.forEach((schedule) => {
-                    const persons = String(schedule?.person || '')
-                      .split('/')
-                      .map((p) => p.trim())
-                      .filter((p) => p);
-
-                    persons.forEach((person) => {
-                      if (!schedulesByPerson[person]) {
-                        schedulesByPerson[person] = [];
-                      }
-                      schedulesByPerson[person].push(schedule);
-                    });
-                  });
-
-                  // 轉換為陣列格式
-                  const daySchedules = Object.entries(schedulesByPerson).map(([person, schedules]) => ({
-                    person,
-                    schedules,
-                  }));
+                  // 獲取當天所有人員的數據（包括班表狀態）
+                  const dayPeople = getAllPeopleForDay(dayData.dateStr);
 
                   return (
                     <div
@@ -586,76 +610,77 @@ export default function ReportGenerator() {
 
                       {/* 行程列表 */}
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '7px', flex: 1 }}>
-                        {daySchedules.length > 0 ? (
-                          daySchedules.map((group, gidx) => {
-                            // 取得該人員的第一個行程的事件顏色
-                            const getEventColor = (event) => {
-                              if (!event) return { bgColor: '#d4edbb', textColor: '#374151' };
-                              const eventStr = String(event).trim();
+                        {dayPeople.map((person, pidx) => {
+                          // 取得顏色
+                          const getEventColor = (event) => {
+                            if (!event) return { bgColor: '#d4edbb', textColor: '#374151' };
+                            const eventStr = String(event).trim();
 
-                              const colorMap = {
-                                '三多': { bgColor: '#d4edbb', textColor: '#374151' },
-                                '上午(外)': { bgColor: '#c6dbe1', textColor: '#374151' },
-                                '下午(外)': { bgColor: '#ffcfc8', textColor: '#374151' },
-                                '特休': { bgColor: '#ca3750', textColor: '#ffffff' },
-                                '排休': { bgColor: '#ffe59f', textColor: '#374151' },
-                                '巡檢': { bgColor: '#c0e1f6', textColor: '#374151' },
-                                '上午(巡)': { bgColor: '#5b3286', textColor: '#ffffff' },
-                                '下午(巡)': { bgColor: '#5b3286', textColor: '#ffffff' },
-                                '國定假日': { bgColor: '#d81b91', textColor: '#ffffff' },
-                                '彈性假': { bgColor: '#a7adb6', textColor: '#374151' },
-                                '病假': { bgColor: '#7d9ac4', textColor: '#374151' },
-                                '事假': { bgColor: '#473822', textColor: '#ffffff' },
-                                '駐點': { bgColor: '#e28d38', textColor: '#374151' },
-                                '上午(特)': { bgColor: '#b10202', textColor: '#ffffff' },
-                                '下午(特)': { bgColor: '#b10202', textColor: '#ffffff' },
-                              };
-
-                              return colorMap[eventStr] || { bgColor: '#d4edbb', textColor: '#374151' };
+                            const colorMap = {
+                              '三多': { bgColor: '#d4edbb', textColor: '#374151' },
+                              '上午(外)': { bgColor: '#c6dbe1', textColor: '#374151' },
+                              '下午(外)': { bgColor: '#ffcfc8', textColor: '#374151' },
+                              '特休': { bgColor: '#ca3750', textColor: '#ffffff' },
+                              '排休': { bgColor: '#ffe59f', textColor: '#374151' },
+                              '巡檢': { bgColor: '#c0e1f6', textColor: '#374151' },
+                              '上午(巡)': { bgColor: '#5b3286', textColor: '#ffffff' },
+                              '下午(巡)': { bgColor: '#5b3286', textColor: '#ffffff' },
+                              '國定假日': { bgColor: '#d81b91', textColor: '#ffffff' },
+                              '彈性假': { bgColor: '#a7adb6', textColor: '#374151' },
+                              '病假': { bgColor: '#7d9ac4', textColor: '#374151' },
+                              '事假': { bgColor: '#473822', textColor: '#ffffff' },
+                              '駐點': { bgColor: '#e28d38', textColor: '#374151' },
+                              '上午(特)': { bgColor: '#b10202', textColor: '#ffffff' },
+                              '下午(特)': { bgColor: '#b10202', textColor: '#ffffff' },
                             };
 
-                            const firstSchedule = group.schedules[0];
-                            const eventColor = getEventColor(firstSchedule?.event);
+                            return colorMap[eventStr] || { bgColor: '#d4edbb', textColor: '#374151' };
+                          };
 
-                            return (
-                              <div key={gidx}>
-                                {/* 人員名稱 + 第一個行程的事件標籤 */}
-                                {shouldShowPerson && group.person && (
-                                  <div
-                                    style={{
-                                      display: 'flex',
-                                      gap: '6px',
-                                      alignItems: 'center',
-                                      marginBottom: '4px',
-                                      padding: '4px 6px',
-                                      backgroundColor: '#f9fafb',
-                                      borderRadius: '4px',
-                                    }}
-                                  >
-                                    <span style={{ fontWeight: '600', color: '#1f2937', fontSize: '12px' }}>
-                                      {personMap[group.person] || group.person}
+                          const hasSchedules = person.schedules.length > 0;
+                          const statusLabel = hasSchedules ? person.schedules[0]?.event : (person.bandSchedule || '三多');
+                          const statusColor = getEventColor(statusLabel);
+
+                          return (
+                            <div key={pidx}>
+                              {/* 人員名稱 + 狀態標籤 */}
+                              {shouldShowPerson && person.person && (
+                                <div
+                                  style={{
+                                    display: 'flex',
+                                    gap: '6px',
+                                    alignItems: 'center',
+                                    marginBottom: '4px',
+                                    padding: '4px 6px',
+                                    backgroundColor: '#f9fafb',
+                                    borderRadius: '4px',
+                                  }}
+                                >
+                                  <span style={{ fontWeight: '600', color: '#1f2937', fontSize: '12px' }}>
+                                    {personMap[person.person] || person.person}
+                                  </span>
+                                  {statusLabel && (
+                                    <span
+                                      style={{
+                                        display: 'inline-block',
+                                        backgroundColor: statusColor.bgColor,
+                                        color: statusColor.textColor,
+                                        padding: '2px 6px',
+                                        borderRadius: '3px',
+                                        fontSize: '10px',
+                                        fontWeight: '600',
+                                      }}
+                                    >
+                                      {statusLabel}
                                     </span>
-                                    {firstSchedule?.event && (
-                                      <span
-                                        style={{
-                                          display: 'inline-block',
-                                          backgroundColor: eventColor.bgColor,
-                                          color: eventColor.textColor,
-                                          padding: '2px 6px',
-                                          borderRadius: '3px',
-                                          fontSize: '10px',
-                                          fontWeight: '600',
-                                        }}
-                                      >
-                                        {firstSchedule.event}
-                                      </span>
-                                    )}
-                                  </div>
-                                )}
+                                  )}
+                                </div>
+                              )}
 
-                                {/* 該人員的所有行程 */}
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                  {group.schedules.map((schedule, sidx) => (
+                              {/* 該人員的行程或班表狀態 */}
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {hasSchedules ? (
+                                  person.schedules.map((schedule, sidx) => (
                                     <div
                                       key={sidx}
                                       style={{
@@ -675,30 +700,40 @@ export default function ReportGenerator() {
                                         <div>{schedule.event}</div>
                                       )}
                                     </div>
-                                  ))}
-                                </div>
+                                  ))
+                                ) : person.bandSchedule ? (
+                                  <div
+                                    style={{
+                                      padding: '4px 6px',
+                                      backgroundColor: 'white',
+                                      borderRadius: '4px',
+                                      color: '#374151',
+                                      fontSize: '11px',
+                                      lineHeight: '1.4',
+                                      fontStyle: 'italic',
+                                    }}
+                                  >
+                                    {person.bandSchedule}
+                                  </div>
+                                ) : (
+                                  <div
+                                    style={{
+                                      padding: '4px 6px',
+                                      backgroundColor: 'white',
+                                      borderRadius: '4px',
+                                      color: '#2563eb',
+                                      fontSize: '11px',
+                                      lineHeight: '1.4',
+                                      fontWeight: '600',
+                                    }}
+                                  >
+                                    三多
+                                  </div>
+                                )}
                               </div>
-                            );
-                          })
-                        ) : (
-                          <div
-                            style={{
-                              padding: '6px 8px',
-                              backgroundColor: 'white',
-                              borderRadius: '6px',
-                              color: '#2563eb',
-                              fontSize: '13px',
-                              fontWeight: '600',
-                              textAlign: 'center',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              flex: 1,
-                            }}
-                          >
-                            三多
-                          </div>
-                        )}
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   );
