@@ -503,37 +503,40 @@ export default function ReportGenerator() {
                   const displayMonth = startDate.getMonth() + 1; // 1-12
                   const shouldShowPerson = displayMonth < 9;
 
-                  // 直接掃描資料找當週日期（使用字符串比對），並處理多人情況
-                  const daySchedules = Array.isArray(data.schedule)
-                    ? data.schedule
-                      .filter((s) => {
+                  // 篩選當週日期的行程（保留原始格式）
+                  const daySchedulesRaw = Array.isArray(data.schedule)
+                    ? data.schedule.filter((s) => {
                         try {
-                          // 直接比對日期字符串（去除空格）
                           const apiDate = String(s?.date || '').trim();
                           const cardDate = String(dayData.dateStr).trim();
-
-                          // 精確比對
                           return apiDate === cardDate;
                         } catch {
                           return false;
                         }
                       })
-                      .flatMap((s) => {
-                        // 處理多人情況（例如 "E/Z" 分解為兩個行程）
-                        const persons = String(s?.person || '')
-                          .split('/')
-                          .map((p) => p.trim())
-                          .filter((p) => p);
-
-                        // 為每個人創建一個行程項目
-                        return persons.length > 0
-                          ? persons.map((person) => ({
-                              ...s,
-                              person,
-                            }))
-                          : [s];
-                      })
                     : [];
+
+                  // 按人員分組
+                  const schedulesByPerson = {};
+                  daySchedulesRaw.forEach((schedule) => {
+                    const persons = String(schedule?.person || '')
+                      .split('/')
+                      .map((p) => p.trim())
+                      .filter((p) => p);
+
+                    persons.forEach((person) => {
+                      if (!schedulesByPerson[person]) {
+                        schedulesByPerson[person] = [];
+                      }
+                      schedulesByPerson[person].push(schedule);
+                    });
+                  });
+
+                  // 轉換為陣列格式
+                  const daySchedules = Object.entries(schedulesByPerson).map(([person, schedules]) => ({
+                    person,
+                    schedules,
+                  }));
 
                   return (
                     <div
@@ -581,13 +584,12 @@ export default function ReportGenerator() {
                       {/* 行程列表 */}
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '7px', flex: 1 }}>
                         {daySchedules.length > 0 ? (
-                          daySchedules.map((schedule, sidx) => {
-                            // 根據事件欄位決定標籤顏色
+                          daySchedules.map((group, gidx) => {
+                            // 取得該人員的第一個行程的事件顏色
                             const getEventColor = (event) => {
                               if (!event) return { bgColor: '#d4edbb', textColor: '#374151' };
                               const eventStr = String(event).trim();
 
-                              // 完整的顏色映射表
                               const colorMap = {
                                 '三多': { bgColor: '#d4edbb', textColor: '#374151' },
                                 '上午(外)': { bgColor: '#c6dbe1', textColor: '#374151' },
@@ -609,53 +611,68 @@ export default function ReportGenerator() {
                               return colorMap[eventStr] || { bgColor: '#d4edbb', textColor: '#374151' };
                             };
 
-                            const eventColor = getEventColor(schedule.event);
+                            const firstSchedule = group.schedules[0];
+                            const eventColor = getEventColor(firstSchedule?.event);
 
                             return (
-                              <div
-                                key={sidx}
-                                style={{
-                                  padding: '6px 8px',
-                                  backgroundColor: 'white',
-                                  borderRadius: '6px',
-                                  color: '#374151',
-                                  fontSize: '11px',
-                                  fontWeight: '500',
-                                  lineHeight: '1.4',
-                                }}
-                              >
-                                {/* 人員名稱和事件標籤 */}
-                                <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
-                                  {shouldShowPerson && schedule.person && (
-                                    <span style={{ fontWeight: '600', color: '#1f2937' }}>
-                                      {personMap[schedule.person] || schedule.person}
+                              <div key={gidx}>
+                                {/* 人員名稱 + 第一個行程的事件標籤 */}
+                                {shouldShowPerson && group.person && (
+                                  <div
+                                    style={{
+                                      display: 'flex',
+                                      gap: '6px',
+                                      alignItems: 'center',
+                                      marginBottom: '4px',
+                                      padding: '4px 6px',
+                                      backgroundColor: '#f9fafb',
+                                      borderRadius: '4px',
+                                    }}
+                                  >
+                                    <span style={{ fontWeight: '600', color: '#1f2937', fontSize: '12px' }}>
+                                      {personMap[group.person] || group.person}
                                     </span>
-                                  )}
-                                  {schedule.event && (
-                                    <span
+                                    {firstSchedule?.event && (
+                                      <span
+                                        style={{
+                                          display: 'inline-block',
+                                          backgroundColor: eventColor.bgColor,
+                                          color: eventColor.textColor,
+                                          padding: '2px 6px',
+                                          borderRadius: '3px',
+                                          fontSize: '10px',
+                                          fontWeight: '600',
+                                        }}
+                                      >
+                                        {firstSchedule.event}
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+
+                                {/* 該人員的所有行程 */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                  {group.schedules.map((schedule, sidx) => (
+                                    <div
+                                      key={sidx}
                                       style={{
-                                        display: 'inline-block',
-                                        backgroundColor: eventColor.bgColor,
-                                        color: eventColor.textColor,
-                                        padding: '2px 6px',
-                                        borderRadius: '3px',
-                                        fontSize: '10px',
-                                        fontWeight: '600',
+                                        padding: '4px 6px',
+                                        backgroundColor: 'white',
+                                        borderRadius: '4px',
+                                        color: '#374151',
+                                        fontSize: '11px',
+                                        lineHeight: '1.4',
                                       }}
                                     >
-                                      {schedule.event}
-                                    </span>
-                                  )}
-                                </div>
-                                {/* 行程詳情：區域 地點 事件 */}
-                                <div>
-                                  {schedule.region && schedule.location ? (
-                                    <div>{schedule.region} {schedule.location} {schedule.event}</div>
-                                  ) : schedule.location ? (
-                                    <div>{schedule.location} {schedule.event}</div>
-                                  ) : (
-                                    <div>{schedule.event}</div>
-                                  )}
+                                      {schedule.region && schedule.location ? (
+                                        <div>{schedule.region} {schedule.location} {schedule.event}</div>
+                                      ) : schedule.location ? (
+                                        <div>{schedule.location} {schedule.event}</div>
+                                      ) : (
+                                        <div>{schedule.event}</div>
+                                      )}
+                                    </div>
+                                  ))}
                                 </div>
                               </div>
                             );
