@@ -599,7 +599,6 @@ export default function ReportGenerator() {
                                 style={{
                                   padding: '6px 8px',
                                   backgroundColor: 'white',
-                                  border: '2px solid #2563eb',
                                   borderRadius: '6px',
                                   color: '#374151',
                                   fontSize: '11px',
@@ -642,7 +641,6 @@ export default function ReportGenerator() {
                             style={{
                               padding: '6px 8px',
                               backgroundColor: 'white',
-                              border: '2px solid #2563eb',
                               borderRadius: '6px',
                               color: '#2563eb',
                               fontSize: '13px',
