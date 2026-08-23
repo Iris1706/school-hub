@@ -287,10 +287,13 @@ export default function ReportGenerator() {
       const person = String(att?.person || '').trim();
       const attDate = String(att?.date || '').trim();
 
-      if (person && attDate === dateStr && peopleData[person]) {
-        if (peopleData[person].schedules.length === 0) {
-          // 只有在沒有特定行程時才使用班表狀態
-          peopleData[person].bandSchedule = att.status || att.event || '三多';
+      if (person && peopleData[person]) {
+        // 精確比對日期格式
+        if (attDate === dateStr && peopleData[person].schedules.length === 0) {
+          const status = String(att?.status || '').trim();
+          if (status) {
+            peopleData[person].bandSchedule = status;
+          }
         }
       }
     });
