@@ -504,31 +504,6 @@ export default function ReportGenerator() {
         )}
       </div>
 
-      {/* 統計卡片區域 */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(5, 1fr)',
-          gap: '15px',
-          marginBottom: '30px',
-        }}
-      >
-        {/* 本週報修 */}
-        <StatCard title="本週報修" value="－" />
-
-        {/* 生生巡檢 */}
-        <StatCard title="生生巡檢" value={`${shengshengInspect}/${shengshengTotal}`} />
-
-        {/* THSD 巡檢 */}
-        <StatCard title="THSD 巡檢" value={`${thsdInspect}/${thsdTotal}`} />
-
-        {/* SA 維修處理中 */}
-        <StatCard title="SA 維修處理中" value={saRepairsProcessing} />
-
-        {/* 夾異物（本週） */}
-        <StatCard title="夾異物（本週）" value={data.foreignObjects?.count || 0} />
-      </div>
-
       {/* 錯誤提示 */}
       {error && (
         <div
@@ -553,6 +528,32 @@ export default function ReportGenerator() {
           {/* 1. 本週重點 */}
           <ReportCard title="本週重點">
             <div style={{ padding: '15px' }}>
+              {/* 統計卡片區域 */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(5, 1fr)',
+                  gap: '15px',
+                  marginBottom: '20px',
+                }}
+              >
+                {/* 本週報修 */}
+                <StatCard title="本週報修" value="－" />
+
+                {/* 生生巡檢 */}
+                <StatCard title="生生巡檢" value={`${shengshengInspect}/${shengshengTotal}`} />
+
+                {/* THSD 巡檢 */}
+                <StatCard title="THSD 巡檢" value={`${thsdInspect}/${thsdTotal}`} />
+
+                {/* SA 維修處理中 */}
+                <StatCard title="SA 維修處理中" value={saRepairsProcessing} />
+
+                {/* 夾異物（本週） */}
+                <StatCard title="夾異物（本週）" value={data.foreignObjects?.count || 0} />
+              </div>
+
+              {/* 文字輸入框 */}
               <textarea
                 value={weeklyHighlights}
                 onChange={(e) => setWeeklyHighlights(e.target.value)}
