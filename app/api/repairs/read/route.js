@@ -26,7 +26,7 @@ export async function GET(request) {
     if (type === 'completed') {
       const response = await sheets.spreadsheets.values.get({
         spreadsheetId: process.env.Repair_SHEET_ID,
-        range: `${sheetName}!A3:H`,
+        range: `'${sheetName}'!A3:H`,
       });
 
       const data = response.data.values || [];
@@ -37,7 +37,7 @@ export async function GET(request) {
     } else if (type === 'inProgress') {
       const response = await sheets.spreadsheets.values.get({
         spreadsheetId: process.env.Repair_SHEET_ID,
-        range: `${sheetName}!J3:S`,
+        range: `'${sheetName}'!J3:S`,
       });
 
       const data = response.data.values || [];
