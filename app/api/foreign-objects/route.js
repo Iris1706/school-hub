@@ -30,6 +30,8 @@ export async function GET(request) {
     const FOREIGN_SHEET_ID = process.env.FOREIGN_SHEET_ID;
     const SHEET_NAME = "南區";
 
+    console.log('FOREIGN_SHEET_ID:', FOREIGN_SHEET_ID);
+
     if (!FOREIGN_SHEET_ID) {
       return NextResponse.json(
         { error: "缺少環境變數 FOREIGN_SHEET_ID", count: 0 },
@@ -38,25 +40,60 @@ export async function GET(request) {
     }
 
     const sheets = getSheetsClient();
+    console.log(`正在讀取 sheet: ${SHEET_NAME}`);
+
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId: FOREIGN_SHEET_ID,
       range: `'${SHEET_NAME}'!A:Z`,
     });
 
     const rows = res.data.values || [];
+    console.log(`讀到 ${rows.length} 行數據`);
+
     const headers = rows[0] || [];
+    console.log('表頭:', headers);
 
     // 找到日期欄位
     const dateColumnIndex = headers.findIndex(
       (h) => h === "日期" || h === "date" || h.includes("日期")
     );
 
+    console.log('日期欄位索引:', dateColumnIndex);
+
     if (dateColumnIndex === -1) {
-      console.warn("找不到日期欄位");
+      console.warn("找不到日期欄位，使用第一列作為日期");
+      // 如果找不到，使用第一列
+      const dateIndex = 0;
+
+      // 計算本週日期
+      const today = new Date();
+      const weekStart = new Date(today);
+      const day = weekStart.getDay();
+      const diff = weekStart.getDate() - day + (day === 0 ? -6 : 1);
+      weekStart.setDate(diff);
+
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekEnd.getDate() + 6);
+
+      let weekCount = 0;
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row[dateIndex]) continue;
+
+        try {
+          const itemDate = new Date(row[dateIndex]);
+          if (itemDate >= weekStart && itemDate <= weekEnd) {
+            weekCount++;
+          }
+        } catch (e) {
+          // 日期解析失敗，跳過
+        }
+      }
+
       return NextResponse.json({
-        count: 0,
-        weekStart: new Date().toLocaleDateString('zh-TW'),
-        weekEnd: new Date().toLocaleDateString('zh-TW'),
+        count: weekCount,
+        weekStart: weekStart.toLocaleDateString('zh-TW'),
+        weekEnd: weekEnd.toLocaleDateString('zh-TW'),
       });
     }
 
