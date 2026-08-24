@@ -244,7 +244,15 @@ export default function ReportGenerator() {
   // 總計 = 所有有 THSD 數據的行數
   const thsdTotal = thsdDataRows.length || 1;
 
-  const saRepairsProcessing = repairsArray.filter((r) => r?.status === '處理中' || r?.status === '進行中').length;
+  // SA 維修處理中（與硬體管理頁籤邏輯一致）
+  // 計算「一期生生平板維修」和「二期生生平板維修」處理中的筆數
+  const saRepairsProcessing = repairsArray.filter((r) => {
+    const category = r?.category || '';
+    const status = r?.status || '';
+    const isTabletRepair = category === '一期生生平板維修' || category === '二期生生平板維修';
+    const isProcessing = status === '處理中' || status === '進行中';
+    return isTabletRepair && isProcessing;
+  }).length;
 
   // 計算南區維修數據
   const getRepairStats = () => {
