@@ -131,7 +131,7 @@ export default function ReportGenerator() {
 
         // 獲取一期和二期平板維修處理中的筆數
         try {
-          const period1Url = `/api/repairs/read?sheetName=${encodeURIComponent('一期生生平板維修')}&type=inProgress`;
+          const period1Url = `/api/repairs/read?sheetName=${encodeURIComponent('Pawn')}&type=inProgress`;
           const period2Url = `/api/repairs/read?sheetName=${encodeURIComponent('二期生生平板維修')}&type=inProgress`;
 
           console.log('一期 URL:', period1Url);
