@@ -131,8 +131,14 @@ export default function ReportGenerator() {
 
         // 獲取一期和二期平板維修處理中的筆數
         try {
-          const period1Response = await fetch('/api/repairs/read?sheetName=一期生生平板維修&type=inProgress');
-          const period2Response = await fetch('/api/repairs/read?sheetName=二期生生平板維修&type=inProgress');
+          const period1Url = `/api/repairs/read?sheetName=${encodeURIComponent('一期生生平板維修')}&type=inProgress`;
+          const period2Url = `/api/repairs/read?sheetName=${encodeURIComponent('二期生生平板維修')}&type=inProgress`;
+
+          console.log('一期 URL:', period1Url);
+          console.log('二期 URL:', period2Url);
+
+          const period1Response = await fetch(period1Url);
+          const period2Response = await fetch(period2Url);
 
           let tabletRepairsInProgress = 0;
 
@@ -141,7 +147,9 @@ export default function ReportGenerator() {
             console.log('一期 API 返回:', period1Data);
             const period1Count = (period1Data?.data || []).length;
             tabletRepairsInProgress += period1Count;
-            console.log(`一期生生平板維修處理中: ${period1Count}`);
+            console.log(`一期生生平板維修處理中: ${period1Count} 筆`);
+          } else {
+            console.error(`一期 API 失敗，狀態: ${period1Response.status}`, await period1Response.text());
           }
 
           if (period2Response.ok) {
@@ -149,13 +157,16 @@ export default function ReportGenerator() {
             console.log('二期 API 返回:', period2Data);
             const period2Count = (period2Data?.data || []).length;
             tabletRepairsInProgress += period2Count;
-            console.log(`二期生生平板維修處理中: ${period2Count}`);
+            console.log(`二期生生平板維修處理中: ${period2Count} 筆`);
+          } else {
+            console.error(`二期 API 失敗，狀態: ${period2Response.status}`, await period2Response.text());
           }
 
           newData.tabletRepairsInProgress = tabletRepairsInProgress;
-          console.log(`總處理中筆數: ${tabletRepairsInProgress}`);
+          console.log(`【總處理中筆數】: ${tabletRepairsInProgress}`);
         } catch (err) {
           console.warn(`無法獲取平板維修處理中數據:`, err.message);
+          console.error(err);
         }
 
         setData(newData);
