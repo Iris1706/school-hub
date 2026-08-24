@@ -30,6 +30,7 @@ export default function ReportGenerator() {
     foreignObjects: { count: 0 },
     annualStats: { data: [], total: 0 },
     repairDetails: { headers: [], data: [], count: 0 },
+    tabletRepairsInProgress: 0,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -87,7 +88,6 @@ export default function ReportGenerator() {
       try {
         const endpoints = [
           { key: 'inspect', url: '/api/inspect' },
-          { key: 'repairs', url: '/api/repairs' },
           { key: 'schedule', url: '/api/daily-schedule' },
           { key: 'attendance', url: '/api/schedule' },
           { key: 'todos', url: '/api/todos' },
@@ -107,6 +107,7 @@ export default function ReportGenerator() {
           foreignObjects: { count: 0 },
           annualStats: { data: [], total: 0 },
           repairDetails: { headers: [], data: [], count: 0 },
+          tabletRepairsInProgress: 0,
         };
 
         // 嘗試獲取每個 API，失敗時使用空陣列
@@ -126,6 +127,33 @@ export default function ReportGenerator() {
           } catch (err) {
             console.warn(`無法獲取 ${endpoint.url}:`, err.message);
           }
+        }
+
+        // 獲取一期和二期平板維修處理中的筆數
+        try {
+          const period1Response = await fetch('/api/repairs/read?sheetName=一期生生平板維修&type=inProgress');
+          const period2Response = await fetch('/api/repairs/read?sheetName=二期生生平板維修&type=inProgress');
+
+          let tabletRepairsInProgress = 0;
+
+          if (period1Response.ok) {
+            const period1Data = await period1Response.json();
+            const period1Count = (period1Data?.data || []).length;
+            tabletRepairsInProgress += period1Count;
+            console.log(`一期生生平板維修處理中: ${period1Count}`);
+          }
+
+          if (period2Response.ok) {
+            const period2Data = await period2Response.json();
+            const period2Count = (period2Data?.data || []).length;
+            tabletRepairsInProgress += period2Count;
+            console.log(`二期生生平板維修處理中: ${period2Count}`);
+          }
+
+          newData.tabletRepairsInProgress = tabletRepairsInProgress;
+          console.log(`總處理中筆數: ${tabletRepairsInProgress}`);
+        } catch (err) {
+          console.warn(`無法獲取平板維修處理中數據:`, err.message);
         }
 
         setData(newData);
@@ -245,14 +273,8 @@ export default function ReportGenerator() {
   const thsdTotal = thsdDataRows.length || 1;
 
   // SA 維修處理中（與硬體管理頁籤邏輯一致）
-  // 計算「一期生生平板維修」和「二期生生平板維修」處理中的筆數
-  const saRepairsProcessing = repairsArray.filter((r) => {
-    const category = r?.category || '';
-    const status = r?.status || '';
-    const isTabletRepair = category === '一期生生平板維修' || category === '二期生生平板維修';
-    const isProcessing = status === '處理中' || status === '進行中';
-    return isTabletRepair && isProcessing;
-  }).length;
+  // 顯示一期生生平板維修及二期生生平板維修總共處理中的筆數
+  const saRepairsProcessing = data.tabletRepairsInProgress || 0;
 
   // 計算南區維修數據
   const getRepairStats = () => {
