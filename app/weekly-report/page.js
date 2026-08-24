@@ -123,6 +123,10 @@ export default function ReportGenerator() {
               if (endpoint.key === 'attendance') {
                 console.log(`班表數據 (${endpoint.key}):`, newData[endpoint.key]);
               }
+              if (endpoint.key === 'foreignObjects') {
+                console.log(`夾異物 API 返回:`, json);
+                console.log(`夾異物數據:`, newData[endpoint.key]);
+              }
             }
           } catch (err) {
             console.warn(`無法獲取 ${endpoint.url}:`, err.message);
