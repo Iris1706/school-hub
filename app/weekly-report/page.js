@@ -138,6 +138,7 @@ export default function ReportGenerator() {
 
           if (period1Response.ok) {
             const period1Data = await period1Response.json();
+            console.log('一期 API 返回:', period1Data);
             const period1Count = (period1Data?.data || []).length;
             tabletRepairsInProgress += period1Count;
             console.log(`一期生生平板維修處理中: ${period1Count}`);
@@ -145,6 +146,7 @@ export default function ReportGenerator() {
 
           if (period2Response.ok) {
             const period2Data = await period2Response.json();
+            console.log('二期 API 返回:', period2Data);
             const period2Count = (period2Data?.data || []).length;
             tabletRepairsInProgress += period2Count;
             console.log(`二期生生平板維修處理中: ${period2Count}`);
