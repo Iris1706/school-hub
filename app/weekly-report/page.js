@@ -229,8 +229,20 @@ export default function ReportGenerator() {
 
   const shengshengTotal = inspectArray.length || 1;
 
-  const thsdInspect = inspectArray.filter((i) => i?.type === 'THSD' || i?.category === 'THSD' || i?.name?.includes('THSD')).length;
-  const thsdTotal = thsdInspect || 1;
+  // THSD 巡檢統計（與 inspect 頁籤邏輯一致）
+  // 只計算有 THSD 數據的行
+  const thsdDataRows = inspectArray.filter((d) => {
+    const hasThsdData =
+      getFieldValue(d, "THSD學校") ||
+      getFieldValue(d, "載具數量") ||
+      getFieldValue(d, "是否完成");
+    return hasThsdData;
+  });
+
+  // 完成數 = THSD 數據中「是否完成」勾選的數量
+  const thsdInspect = thsdDataRows.filter((d) => isChecked(getFieldValue(d, "是否完成"))).length;
+  // 總計 = 所有有 THSD 數據的行數
+  const thsdTotal = thsdDataRows.length || 1;
 
   const saRepairsProcessing = repairsArray.filter((r) => r?.status === '處理中' || r?.status === '進行中').length;
 
