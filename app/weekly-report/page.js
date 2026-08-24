@@ -192,16 +192,38 @@ export default function ReportGenerator() {
   const inspectArray = Array.isArray(data.inspect) ? data.inspect : [];
   const repairsArray = Array.isArray(data.repairs) ? data.repairs : [];
 
-  // 生生用平板：完成數（巡檢單上傳 AND 巡檢單email給老師都勾選）
+  // 檢查是否打勾（與 inspect 頁籤邏輯一致）
   const isChecked = (value) => {
     if (!value) return false;
-    const val = String(value).trim();
-    return val === '✓' || val === '✔' || val === '是' || val === 'true' || val === '1';
+    const str = String(value).toLowerCase().trim();
+    return str === "true" || str === "✓" || str === "☑" || str === "✔";
   };
 
+  // 取得欄位值（與 inspect 頁籤邏輯一致，容錯處理）
+  const getFieldValue = (obj, fieldName) => {
+    if (!obj) return "";
+
+    // 首先嘗試直接匹配
+    if (obj[fieldName] !== undefined) {
+      return obj[fieldName] || "";
+    }
+
+    // 如果直接匹配失敗，尋找相似的欄位名稱（去除空格和換行符）
+    const normalizedFieldName = fieldName.replace(/\s+/g, "").toLowerCase();
+    for (const key in obj) {
+      const normalizedKey = key.replace(/\s+/g, "").toLowerCase();
+      if (normalizedKey === normalizedFieldName) {
+        return obj[key] || "";
+      }
+    }
+
+    return "";
+  };
+
+  // 生生用平板統計（與 inspect 頁籤邏輯一致）
   const shengshengInspect = inspectArray.filter((i) => {
-    const uploadCheck = i?.['巡檢單上傳'] || i?.uploadCheck || '';
-    const emailCheck = i?.['巡檢單email給老師'] || i?.emailCheck || '';
+    const uploadCheck = getFieldValue(i, "巡檢單上傳");
+    const emailCheck = getFieldValue(i, "巡檢單email給老師");
     return isChecked(uploadCheck) && isChecked(emailCheck);
   }).length;
 
