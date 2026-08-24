@@ -192,8 +192,20 @@ export default function ReportGenerator() {
   const inspectArray = Array.isArray(data.inspect) ? data.inspect : [];
   const repairsArray = Array.isArray(data.repairs) ? data.repairs : [];
 
-  const shengshengInspect = inspectArray.filter((i) => i?.type === '生生' || i?.category === '生生用平板' || i?.name?.includes('生生')).length;
-  const shengshengTotal = shengshengInspect || 1;
+  // 生生用平板：完成數（巡檢單上傳 AND 巡檢單email給老師都勾選）
+  const isChecked = (value) => {
+    if (!value) return false;
+    const val = String(value).trim();
+    return val === '✓' || val === '✔' || val === '是' || val === 'true' || val === '1';
+  };
+
+  const shengshengInspect = inspectArray.filter((i) => {
+    const uploadCheck = i?.['巡檢單上傳'] || i?.uploadCheck || '';
+    const emailCheck = i?.['巡檢單email給老師'] || i?.emailCheck || '';
+    return isChecked(uploadCheck) && isChecked(emailCheck);
+  }).length;
+
+  const shengshengTotal = inspectArray.length || 1;
 
   const thsdInspect = inspectArray.filter((i) => i?.type === 'THSD' || i?.category === 'THSD' || i?.name?.includes('THSD')).length;
   const thsdTotal = thsdInspect || 1;
