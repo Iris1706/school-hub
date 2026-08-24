@@ -109,19 +109,42 @@ export async function GET(request) {
 
     // 篩選本週數據
     let weekCount = 0;
+    console.log(`週期範圍: ${weekStart.toLocaleDateString('zh-TW')} ~ ${weekEnd.toLocaleDateString('zh-TW')}`);
+
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
       if (!row[dateColumnIndex]) continue;
 
       try {
-        const itemDate = new Date(row[dateColumnIndex]);
+        const dateStr = String(row[dateColumnIndex]).trim();
+        console.log(`第 ${i} 行日期字符串: "${dateStr}"`);
+
+        // 解析格式 "2026/08/23" 或 "2026/8/23"
+        let itemDate;
+        if (dateStr.includes('/')) {
+          const parts = dateStr.split('/');
+          if (parts.length === 3) {
+            const year = parseInt(parts[0]);
+            const month = parseInt(parts[1]) - 1; // JavaScript 月份從 0 開始
+            const day = parseInt(parts[2]);
+            itemDate = new Date(year, month, day);
+          }
+        } else {
+          itemDate = new Date(dateStr);
+        }
+
+        console.log(`解析後的日期: ${itemDate.toLocaleDateString('zh-TW')}`);
+
         if (itemDate >= weekStart && itemDate <= weekEnd) {
           weekCount++;
+          console.log(`✓ 匹配當週`);
         }
       } catch (e) {
-        // 日期解析失敗，跳過
+        console.error(`第 ${i} 行日期解析失敗:`, e.message);
       }
     }
+
+    console.log(`最終計數: ${weekCount}`);
 
     return NextResponse.json({
       count: weekCount,
