@@ -28,7 +28,10 @@ export default function CompletedTable({ sheetName }) {
       const rawData = result.data || [];
 
       // 過濾掉空行（第一個欄位為空）
-      const filteredData = rawData.filter(row => row[0] && row[0].trim());
+      // rawData 格式：{ sheetRow, values: [...] }
+      const filteredData = rawData.filter(row =>
+        row && row.values && Array.isArray(row.values) && row.values[0] && row.values[0].trim()
+      );
 
       setData(filteredData);
       setError(null);
