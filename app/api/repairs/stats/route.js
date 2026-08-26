@@ -55,6 +55,8 @@ export async function GET(request) {
     let thisWeekCompleted = 0;
     let totalDaysForMonth = 0;
     let monthCompletedCount = 0;
+    let totalDaysForWeek = 0;
+    let weekCompletedCount = 0;
 
     const schoolStats = {};
     const categoryStats = {};
@@ -87,6 +89,9 @@ export async function GET(request) {
         // weekStart 是本週一的午夜，weekEnd 是本週日的午夜
         if (completedDateNormalized >= weekStart && completedDateNormalized <= weekEnd) {
           thisWeekCompleted++;
+          weekCompletedCount++;
+          const daysToRepairWeek = Math.ceil((completedDate - createdDate) / (1000 * 60 * 60 * 24));
+          totalDaysForWeek += daysToRepairWeek;
         }
 
         const school = row[2];
@@ -121,6 +126,9 @@ export async function GET(request) {
     const averageRepairDays =
       monthCompletedCount > 0 ? Math.round(totalDaysForMonth / monthCompletedCount) : 0;
 
+    const averageRepairDaysWeek =
+      weekCompletedCount > 0 ? Math.round(totalDaysForWeek / weekCompletedCount) : 0;
+
     const topSchools = Object.entries(schoolStats)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5);
@@ -139,6 +147,7 @@ export async function GET(request) {
         thisMonthCompleted,
         thisWeekCompleted,
         averageRepairDays,
+        averageRepairDaysWeek,
         completedCount,
         inProgressCount,
         topSchools: topSchools.map(([name, count]) => ({ name, count })),
