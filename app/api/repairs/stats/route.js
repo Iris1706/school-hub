@@ -38,8 +38,12 @@ export async function GET(request) {
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
+
+    // 計算本週開始日期（週一）
     const weekStart = new Date(now);
-    weekStart.setDate(now.getDate() - now.getDay());
+    const day = weekStart.getDay();
+    const diff = weekStart.getDate() - day + (day === 0 ? -6 : 1); // 調整為週一開始
+    weekStart.setDate(diff);
 
     let thisMonthCompleted = 0;
     let thisWeekCompleted = 0;
@@ -50,11 +54,15 @@ export async function GET(request) {
     const categoryStats = {};
 
     completedData.forEach((row) => {
-      if (!row[0] || !row[7]) return;
+      // 過濾掉空行（檢查第一個和第七個欄位）
+      if (!row || !row[0] || (typeof row[0] === 'string' && !row[0].trim()) || !row[7]) return;
 
       try {
         const createdDate = new Date(row[0]);
         const completedDate = new Date(row[7]);
+
+        // 驗證日期是否有效
+        if (isNaN(createdDate.getTime()) || isNaN(completedDate.getTime())) return;
 
         if (createdDate.getMonth() === currentMonth && createdDate.getFullYear() === currentYear) {
           thisMonthCompleted++;
@@ -64,32 +72,36 @@ export async function GET(request) {
           totalDaysForMonth += daysToRepair;
         }
 
+        // 檢查是否在本週內（包含週一到今天）
         if (createdDate >= weekStart && createdDate <= now) {
           thisWeekCompleted++;
         }
 
         const school = row[2];
-        if (school) {
+        if (school && (typeof school !== 'string' || school.trim())) {
           schoolStats[school] = (schoolStats[school] || 0) + 1;
         }
 
         const category = row[3];
-        if (category) {
+        if (category && (typeof category !== 'string' || category.trim())) {
           categoryStats[category] = (categoryStats[category] || 0) + 1;
         }
       } catch (e) {
-        // 日期解析失敗
+        // 日期解析失敗，跳過此行
       }
     });
 
     inProgressData.forEach((row) => {
+      // 過濾掉空行
+      if (!row || !row[0] || (typeof row[0] === 'string' && !row[0].trim())) return;
+
       const school = row[2];
-      if (school) {
+      if (school && (typeof school !== 'string' || school.trim())) {
         schoolStats[school] = (schoolStats[school] || 0) + 1;
       }
 
       const category = row[3];
-      if (category) {
+      if (category && (typeof category !== 'string' || category.trim())) {
         categoryStats[category] = (categoryStats[category] || 0) + 1;
       }
     });
@@ -105,14 +117,18 @@ export async function GET(request) {
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5);
 
+    // 計算非空行的數量
+    const completedCount = completedData.filter(row => row && row[0] && (typeof row[0] !== 'string' || row[0].trim())).length;
+    const inProgressCount = inProgressData.filter(row => row && row[0] && (typeof row[0] !== 'string' || row[0].trim())).length;
+
     return Response.json({
       success: true,
       stats: {
         thisMonthCompleted,
         thisWeekCompleted,
         averageRepairDays,
-        completedCount: completedData.length,
-        inProgressCount: inProgressData.length,
+        completedCount,
+        inProgressCount,
         topSchools: topSchools.map(([name, count]) => ({ name, count })),
         topCategories: topCategories.map(([name, count]) => ({ name, count })),
       },
