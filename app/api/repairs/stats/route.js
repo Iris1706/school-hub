@@ -57,6 +57,8 @@ export async function GET(request) {
     let monthCompletedCount = 0;
     let totalDaysForWeek = 0;
     let weekCompletedCount = 0;
+    let totalDaysForAll = 0;
+    let allCompletedCount = 0;
 
     const schoolStats = {};
     const categoryStats = {};
@@ -78,6 +80,10 @@ export async function GET(request) {
 
         // 計算維修天數（建單日也要算，所以 +1）
         const daysToRepair = Math.ceil((completedDate - createdDate) / (1000 * 60 * 60 * 24)) + 1;
+
+        // 計算所有完修的平均
+        allCompletedCount++;
+        totalDaysForAll += daysToRepair;
 
         // 根據完成日期計算本月完修
         if (completedDateNormalized.getMonth() === currentMonth && completedDateNormalized.getFullYear() === currentYear) {
@@ -129,6 +135,9 @@ export async function GET(request) {
     const averageRepairDaysWeek =
       weekCompletedCount > 0 ? Math.round(totalDaysForWeek / weekCompletedCount) : 0;
 
+    const averageRepairDaysAll =
+      allCompletedCount > 0 ? Math.round(totalDaysForAll / allCompletedCount) : 0;
+
     const topSchools = Object.entries(schoolStats)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5);
@@ -148,6 +157,7 @@ export async function GET(request) {
         thisWeekCompleted,
         averageRepairDays,
         averageRepairDaysWeek,
+        averageRepairDaysAll,
         completedCount,
         inProgressCount,
         topSchools: topSchools.map(([name, count]) => ({ name, count })),
