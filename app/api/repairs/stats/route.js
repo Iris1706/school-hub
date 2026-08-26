@@ -64,7 +64,8 @@ export async function GET(request) {
         // 驗證日期是否有效
         if (isNaN(createdDate.getTime()) || isNaN(completedDate.getTime())) return;
 
-        if (createdDate.getMonth() === currentMonth && createdDate.getFullYear() === currentYear) {
+        // 根據完成日期計算本月完修
+        if (completedDate.getMonth() === currentMonth && completedDate.getFullYear() === currentYear) {
           thisMonthCompleted++;
           monthCompletedCount++;
 
@@ -72,8 +73,8 @@ export async function GET(request) {
           totalDaysForMonth += daysToRepair;
         }
 
-        // 檢查是否在本週內（包含週一到今天）
-        if (createdDate >= weekStart && createdDate <= now) {
+        // 根據完成日期檢查是否在本週內（包含週一到今天）
+        if (completedDate >= weekStart && completedDate <= now) {
           thisWeekCompleted++;
         }
 
