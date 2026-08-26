@@ -49,7 +49,7 @@ export default function CompletedTable({ sheetName }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sheetName,
-          rowIndex,
+          rowIndex: rowIndex + 3,
           type: 'completed',
         }),
         cache: 'no-store',

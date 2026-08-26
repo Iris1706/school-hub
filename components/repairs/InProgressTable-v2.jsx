@@ -62,7 +62,7 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sheetName,
-          rowIndex,
+          rowIndex: rowIndex + 3,
           type: 'inProgress',
         }),
         cache: 'no-store',
