@@ -15,6 +15,26 @@ function getSheetsClient() {
   return google.sheets({ version: 'v4', auth });
 }
 
+function getWorkDays(startDate, endDate) {
+  let workDays = 0;
+  const current = new Date(startDate);
+  current.setHours(0, 0, 0, 0);
+
+  const end = new Date(endDate);
+  end.setHours(0, 0, 0, 0);
+
+  while (current <= end) {
+    const dayOfWeek = current.getDay();
+    // 1-5 是週一到週五（工作天）
+    if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+      workDays++;
+    }
+    current.setDate(current.getDate() + 1);
+  }
+
+  return workDays;
+}
+
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -78,8 +98,8 @@ export async function GET(request) {
         const completedDateNormalized = new Date(completedDate);
         completedDateNormalized.setHours(0, 0, 0, 0);
 
-        // 計算維修天數（建單日也要算，所以 +1）
-        const daysToRepair = Math.ceil((completedDate - createdDate) / (1000 * 60 * 60 * 24)) + 1;
+        // 計算工作天數（只算週一～週五）
+        const daysToRepair = getWorkDays(createdDate, completedDate);
 
         // 只計算正數天數（完成日期 >= 建單日期）
         if (daysToRepair > 0) {
