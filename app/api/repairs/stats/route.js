@@ -39,11 +39,16 @@ export async function GET(request) {
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
 
-    // 計算本週開始日期（週一）
+    // 計算本週開始日期（週一），設定為當天午夜
     const weekStart = new Date(now);
     const day = weekStart.getDay();
     const diff = weekStart.getDate() - day + (day === 0 ? -6 : 1); // 調整為週一開始
     weekStart.setDate(diff);
+    weekStart.setHours(0, 0, 0, 0);
+
+    // 當天的結束時間（用於比較）
+    const endOfToday = new Date(now);
+    endOfToday.setHours(23, 59, 59, 999);
 
     let thisMonthCompleted = 0;
     let thisWeekCompleted = 0;
@@ -64,8 +69,12 @@ export async function GET(request) {
         // 驗證日期是否有效
         if (isNaN(createdDate.getTime()) || isNaN(completedDate.getTime())) return;
 
+        // 標準化 completedDate 為當天的午夜，便於比較
+        const completedDateNormalized = new Date(completedDate);
+        completedDateNormalized.setHours(0, 0, 0, 0);
+
         // 根據完成日期計算本月完修
-        if (completedDate.getMonth() === currentMonth && completedDate.getFullYear() === currentYear) {
+        if (completedDateNormalized.getMonth() === currentMonth && completedDateNormalized.getFullYear() === currentYear) {
           thisMonthCompleted++;
           monthCompletedCount++;
 
@@ -74,7 +83,8 @@ export async function GET(request) {
         }
 
         // 根據完成日期檢查是否在本週內（包含週一到今天）
-        if (completedDate >= weekStart && completedDate <= now) {
+        // weekStart 是本週一的午夜，completedDateNormalized 是完成日期的午夜
+        if (completedDateNormalized >= weekStart && completedDateNormalized <= endOfToday) {
           thisWeekCompleted++;
         }
 
