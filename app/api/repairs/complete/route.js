@@ -27,8 +27,10 @@ export async function POST(request) {
     }
 
     const sheets = getSheetsClient();
+    const googleSheetRowIndex = rowIndex + 3; // 轉換為實際行號
 
-    const inProgressRange = `${sheetName}!J${rowIndex}:S${rowIndex}`;
+    // 讀取「處理中」的資料
+    const inProgressRange = `${sheetName}!J${googleSheetRowIndex}:S${googleSheetRowIndex}`;
     const inProgressResponse = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.Repair_SHEET_ID,
       range: inProgressRange,
@@ -39,6 +41,7 @@ export async function POST(request) {
       throw new Error('找不到該筆資料');
     }
 
+    // 準備完修後的資料
     const completedRow = [
       inProgressRow[0] || '',
       inProgressRow[1] || '',
@@ -50,6 +53,7 @@ export async function POST(request) {
       completeData.completionDate,
     ];
 
+    // 找到「已完修」的下一個空行
     const completedDataResponse = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.Repair_SHEET_ID,
       range: `${sheetName}!A3:A`,
@@ -64,6 +68,7 @@ export async function POST(request) {
       }
     }
 
+    // 新增資料到「已完修」
     await sheets.spreadsheets.values.update({
       spreadsheetId: process.env.Repair_SHEET_ID,
       range: `${sheetName}!A${nextEmptyRow}:H${nextEmptyRow}`,
@@ -73,11 +78,55 @@ export async function POST(request) {
       },
     });
 
-    await sheets.spreadsheets.values.clear({
+    // 實現「資料往上遞補」：將「處理中」該行以下的所有資料往上移一行
+    const inProgressAllResponse = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.Repair_SHEET_ID,
-      range: inProgressRange,
+      range: `${sheetName}!J3:S`,
     });
 
+    const allInProgressRows = inProgressAllResponse.data.values || [];
+    const currentRowIndexInArray = googleSheetRowIndex - 3; // 轉換為陣列索引
+
+    if (currentRowIndexInArray < allInProgressRows.length) {
+      // 將該行以下的所有資料往上移一行
+      const rowsToMove = allInProgressRows.slice(currentRowIndexInArray + 1);
+
+      // 更新從當前行開始的資料（將下面的資料往上移）
+      const updates = [];
+      for (let i = 0; i < rowsToMove.length; i++) {
+        const targetRow = googleSheetRowIndex + i;
+        updates.push({
+          range: `${sheetName}!J${targetRow}:S${targetRow}`,
+          values: [rowsToMove[i]],
+        });
+      }
+
+      // 清除最後一行
+      const lastRowToClean = googleSheetRowIndex + rowsToMove.length;
+      updates.push({
+        range: `${sheetName}!J${lastRowToClean}:S${lastRowToClean}`,
+        values: [Array(10).fill('')], // 清除10個欄位（J到S）
+      });
+
+      // 批量執行更新
+      if (updates.length > 0) {
+        await sheets.spreadsheets.values.batchUpdate({
+          spreadsheetId: process.env.Repair_SHEET_ID,
+          resource: {
+            data: updates,
+            valueInputOption: 'RAW',
+          },
+        });
+      }
+    } else {
+      // 如果該行是最後一行或下面沒有資料，直接清除該行
+      await sheets.spreadsheets.values.clear({
+        spreadsheetId: process.env.Repair_SHEET_ID,
+        range: inProgressRange,
+      });
+    }
+
+    // 記錄操作日誌
     const logsSheetName = sheetName === 'Pawn' ? '操作日誌1' : '操作日誌2';
     const timestamp = new Date().toLocaleString('zh-TW', {
       timeZone: 'Asia/Taipei',

@@ -27,21 +27,97 @@ export async function POST(request) {
     }
 
     const sheets = getSheetsClient();
-
     const googleSheetRowIndex = rowIndex + 3;
 
     if (type === 'completed') {
-      await sheets.spreadsheets.values.clear({
+      // 「已完修」資料往上遞補
+      const completedAllResponse = await sheets.spreadsheets.values.get({
         spreadsheetId: process.env.Repair_SHEET_ID,
-        range: `${sheetName}!A${googleSheetRowIndex}:H${googleSheetRowIndex}`,
+        range: `${sheetName}!A3:H`,
       });
+
+      const allCompletedRows = completedAllResponse.data.values || [];
+      const currentRowIndexInArray = googleSheetRowIndex - 3;
+
+      if (currentRowIndexInArray < allCompletedRows.length) {
+        const rowsToMove = allCompletedRows.slice(currentRowIndexInArray + 1);
+
+        const updates = [];
+        for (let i = 0; i < rowsToMove.length; i++) {
+          const targetRow = googleSheetRowIndex + i;
+          updates.push({
+            range: `${sheetName}!A${targetRow}:H${targetRow}`,
+            values: [rowsToMove[i]],
+          });
+        }
+
+        const lastRowToClean = googleSheetRowIndex + rowsToMove.length;
+        updates.push({
+          range: `${sheetName}!A${lastRowToClean}:H${lastRowToClean}`,
+          values: [Array(8).fill('')],
+        });
+
+        if (updates.length > 0) {
+          await sheets.spreadsheets.values.batchUpdate({
+            spreadsheetId: process.env.Repair_SHEET_ID,
+            resource: {
+              data: updates,
+              valueInputOption: 'RAW',
+            },
+          });
+        }
+      } else {
+        await sheets.spreadsheets.values.clear({
+          spreadsheetId: process.env.Repair_SHEET_ID,
+          range: `${sheetName}!A${googleSheetRowIndex}:H${googleSheetRowIndex}`,
+        });
+      }
     } else if (type === 'inProgress') {
-      await sheets.spreadsheets.values.clear({
+      // 「處理中」資料往上遞補
+      const inProgressAllResponse = await sheets.spreadsheets.values.get({
         spreadsheetId: process.env.Repair_SHEET_ID,
-        range: `${sheetName}!J${googleSheetRowIndex}:S${googleSheetRowIndex}`,
+        range: `${sheetName}!J3:S`,
       });
+
+      const allInProgressRows = inProgressAllResponse.data.values || [];
+      const currentRowIndexInArray = googleSheetRowIndex - 3;
+
+      if (currentRowIndexInArray < allInProgressRows.length) {
+        const rowsToMove = allInProgressRows.slice(currentRowIndexInArray + 1);
+
+        const updates = [];
+        for (let i = 0; i < rowsToMove.length; i++) {
+          const targetRow = googleSheetRowIndex + i;
+          updates.push({
+            range: `${sheetName}!J${targetRow}:S${targetRow}`,
+            values: [rowsToMove[i]],
+          });
+        }
+
+        const lastRowToClean = googleSheetRowIndex + rowsToMove.length;
+        updates.push({
+          range: `${sheetName}!J${lastRowToClean}:S${lastRowToClean}`,
+          values: [Array(10).fill('')],
+        });
+
+        if (updates.length > 0) {
+          await sheets.spreadsheets.values.batchUpdate({
+            spreadsheetId: process.env.Repair_SHEET_ID,
+            resource: {
+              data: updates,
+              valueInputOption: 'RAW',
+            },
+          });
+        }
+      } else {
+        await sheets.spreadsheets.values.clear({
+          spreadsheetId: process.env.Repair_SHEET_ID,
+          range: `${sheetName}!J${googleSheetRowIndex}:S${googleSheetRowIndex}`,
+        });
+      }
     }
 
+    // 記錄操作日誌
     const logsSheetName = sheetName === 'Pawn' ? '操作日誌1' : '操作日誌2';
     const timestamp = new Date().toLocaleString('zh-TW', {
       timeZone: 'Asia/Taipei',
@@ -72,7 +148,7 @@ export async function POST(request) {
             '刪除',
             `行 ${googleSheetRowIndex}`,
             type === 'completed' ? '已完修' : '處理中',
-            '資料已清空',
+            '資料已刪除並往上遞補',
           ],
         ],
       },

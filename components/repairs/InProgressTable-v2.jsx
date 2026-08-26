@@ -25,12 +25,16 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
       }
 
       const result = await response.json();
-      const loadedData = result.data || [];
-      setData(loadedData);
+      const rawData = result.data || [];
+
+      // 過濾掉空行（第一個欄位為空）
+      const filteredData = rawData.filter(row => row[0] && row[0].trim());
+
+      setData(filteredData);
       setError(null);
       // 通知父元件資料已載入
       if (onDataLoaded) {
-        onDataLoaded(loadedData.length);
+        onDataLoaded(filteredData.length);
       }
     } catch (err) {
       setError(err.message);
