@@ -61,10 +61,9 @@ export default function DashboardPage() {
         const res = await fetch("/api/todos");
         const json = await res.json();
         if (json.data) {
-          // 過濾出尚未完成的待辦事項（狀態不是「已完成」）
+          // 過濾出尚未完成的待辦事項（完成欄位不是 'true'）
           const filtered = json.data.filter((todo) => {
-            const status = (todo.狀態 || "").trim().toLowerCase();
-            return status !== "已完成" && status !== "completed";
+            return !todo.完成 || todo.完成 !== 'true';
           });
           setTodos(filtered);
         }
