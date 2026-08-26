@@ -99,16 +99,7 @@ export async function GET(request) {
         completedDateNormalized.setHours(0, 0, 0, 0);
 
         // 計算日曆天數（建單日也要算，所以 +1）
-        const calendarDays = Math.ceil((completedDate - createdDate) / (1000 * 60 * 60 * 24)) + 1;
-
-        // 計算該範圍內的實際工作天（只算週一～週五）
-        const actualWorkDays = getWorkDays(createdDate, completedDate);
-
-        // 工作天佔比
-        const workDayRatio = actualWorkDays / calendarDays;
-
-        // 調整後的維修天數（四捨五入）
-        const daysToRepair = Math.round(calendarDays * workDayRatio);
+        const daysToRepair = Math.ceil((completedDate - createdDate) / (1000 * 60 * 60 * 24)) + 1;
 
         // 只計算正數天數（完成日期 >= 建單日期）
         if (daysToRepair > 0) {
