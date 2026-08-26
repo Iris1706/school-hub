@@ -128,7 +128,7 @@ export default function RepairDashboard({ sheetName }) {
             ⏱️ 平均維修天數
           </div>
           <div style={{ fontSize: '36px', fontWeight: '700', marginBottom: '4px' }}>
-            {(stats.averageRepairDays || 0) + 1}
+            {stats.averageRepairDays || 0}
           </div>
           <div style={{ fontSize: '12px', opacity: 0.8 }}>天</div>
         </div>

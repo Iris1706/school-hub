@@ -76,12 +76,13 @@ export async function GET(request) {
         const completedDateNormalized = new Date(completedDate);
         completedDateNormalized.setHours(0, 0, 0, 0);
 
+        // 計算維修天數（建單日也要算，所以 +1）
+        const daysToRepair = Math.ceil((completedDate - createdDate) / (1000 * 60 * 60 * 24)) + 1;
+
         // 根據完成日期計算本月完修
         if (completedDateNormalized.getMonth() === currentMonth && completedDateNormalized.getFullYear() === currentYear) {
           thisMonthCompleted++;
           monthCompletedCount++;
-
-          const daysToRepair = Math.ceil((completedDate - createdDate) / (1000 * 60 * 60 * 24));
           totalDaysForMonth += daysToRepair;
         }
 
@@ -90,8 +91,7 @@ export async function GET(request) {
         if (completedDateNormalized >= weekStart && completedDateNormalized <= weekEnd) {
           thisWeekCompleted++;
           weekCompletedCount++;
-          const daysToRepairWeek = Math.ceil((completedDate - createdDate) / (1000 * 60 * 60 * 24));
-          totalDaysForWeek += daysToRepairWeek;
+          totalDaysForWeek += daysToRepair;
         }
 
         const school = row[2];
