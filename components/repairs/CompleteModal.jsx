@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, CheckCircle } from 'lucide-react';
 
 export default function CompleteModal({ isOpen, rowData, rowIndex, sheetName, onClose, onSuccess }) {
@@ -11,6 +11,39 @@ export default function CompleteModal({ isOpen, rowData, rowIndex, sheetName, on
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [latestRowData, setLatestRowData] = useState(rowData);
+  const [isFetchingLatestData, setIsFetchingLatestData] = useState(false);
+
+  // 當 modal 打開時，重新從 Google Sheet 讀取最新資料
+  useEffect(() => {
+    if (isOpen && rowIndex !== null && sheetName) {
+      fetchLatestData();
+    }
+  }, [isOpen, rowIndex, sheetName]);
+
+  const fetchLatestData = async () => {
+    try {
+      setIsFetchingLatestData(true);
+      const response = await fetch(
+        `/api/repairs/read?sheetName=${encodeURIComponent(sheetName)}&type=inProgress`,
+        { cache: 'no-store' }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        const allData = result.data || [];
+        // 根據 rowIndex 獲取該筆資料
+        if (allData[rowIndex]) {
+          setLatestRowData(allData[rowIndex]);
+        }
+      }
+    } catch (err) {
+      console.error('讀取最新資料錯誤:', err);
+      // 如果讀取失敗，保持使用原始資料
+    } finally {
+      setIsFetchingLatestData(false);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -143,7 +176,7 @@ export default function CompleteModal({ isOpen, rowData, rowIndex, sheetName, on
         </div>
 
         {/* Original Data Preview */}
-        {rowData && (
+        {latestRowData && (
           <div
             style={{
               background: 'linear-gradient(135deg, rgba(107, 114, 128, 0.05) 0%, rgba(107, 114, 128, 0.02) 100%)',
@@ -151,10 +184,14 @@ export default function CompleteModal({ isOpen, rowData, rowIndex, sheetName, on
               borderRadius: '8px',
               marginBottom: '24px',
               borderLeft: '4px solid #9ca3af',
+              position: 'relative',
             }}
           >
-            <div style={{ fontSize: '12px', fontWeight: '600', color: '#6b7280', marginBottom: '12px', textTransform: 'uppercase' }}>
+            <div style={{ fontSize: '12px', fontWeight: '600', color: '#6b7280', marginBottom: '12px', textTransform: 'uppercase', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               原始資料
+              {isFetchingLatestData && (
+                <span style={{ fontSize: '11px', fontWeight: '400', color: '#3b82f6' }}>同步中...</span>
+              )}
             </div>
             <div
               style={{
@@ -166,19 +203,19 @@ export default function CompleteModal({ isOpen, rowData, rowIndex, sheetName, on
             >
               <div>
                 <div style={{ color: '#6b7280', marginBottom: '4px' }}>學校</div>
-                <div style={{ fontWeight: '500' }}>{rowData[2] || '-'}</div>
+                <div style={{ fontWeight: '500' }}>{latestRowData[2] || '-'}</div>
               </div>
               <div>
                 <div style={{ color: '#6b7280', marginBottom: '4px' }}>問題分類</div>
-                <div style={{ fontWeight: '500' }}>{rowData[3] || '-'}</div>
+                <div style={{ fontWeight: '500' }}>{latestRowData[3] || '-'}</div>
               </div>
               <div>
                 <div style={{ color: '#6b7280', marginBottom: '4px' }}>原序號</div>
-                <div style={{ fontWeight: '500', fontFamily: 'monospace' }}>{rowData[4] || '-'}</div>
+                <div style={{ fontWeight: '500', fontFamily: 'monospace' }}>{latestRowData[4] || '-'}</div>
               </div>
               <div>
                 <div style={{ color: '#6b7280', marginBottom: '4px' }}>維修序號</div>
-                <div style={{ fontWeight: '500', fontFamily: 'monospace' }}>{rowData[5] || '-'}</div>
+                <div style={{ fontWeight: '500', fontFamily: 'monospace' }}>{latestRowData[5] || '-'}</div>
               </div>
             </div>
           </div>
