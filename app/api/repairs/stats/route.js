@@ -81,9 +81,11 @@ export async function GET(request) {
         // 計算維修天數（建單日也要算，所以 +1）
         const daysToRepair = Math.ceil((completedDate - createdDate) / (1000 * 60 * 60 * 24)) + 1;
 
-        // 計算所有完修的平均
-        allCompletedCount++;
-        totalDaysForAll += daysToRepair;
+        // 只計算正數天數（完成日期 >= 建單日期）
+        if (daysToRepair > 0) {
+          allCompletedCount++;
+          totalDaysForAll += daysToRepair;
+        }
 
         // 根據完成日期計算本月完修
         if (completedDateNormalized.getMonth() === currentMonth && completedDateNormalized.getFullYear() === currentYear) {
