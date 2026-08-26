@@ -137,8 +137,10 @@ input:focus {
     padding: 12px 0;
     display: flex;
     gap: 0;
-    flex-wrap: wrap;
-    overflow-y: visible;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
     z-index: 100;
   }
 
@@ -149,12 +151,13 @@ input:focus {
   .sidebar-link {
     padding: 8px 12px;
     font-size: 12px;
-    flex: 1;
-    min-width: 100px;
+    flex: 0 0 auto;
+    min-width: 80px;
     text-align: center;
     border-left: none;
     border-bottom: 3px solid transparent;
     margin: 0;
+    white-space: nowrap;
   }
 
   .sidebar-link.active {
