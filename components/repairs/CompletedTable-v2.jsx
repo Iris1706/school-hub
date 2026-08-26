@@ -40,7 +40,7 @@ export default function CompletedTable({ sheetName }) {
     }
   };
 
-  const handleDelete = async (rowIndex) => {
+  const handleDelete = async (rowItem) => {
     if (!confirm('確定要刪除此筆資料嗎？')) return;
 
     try {
@@ -49,7 +49,7 @@ export default function CompletedTable({ sheetName }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sheetName,
-          rowIndex: rowIndex + 3,
+          rowIndex: rowItem.sheetRow,
           type: 'completed',
         }),
         cache: 'no-store',
@@ -60,7 +60,7 @@ export default function CompletedTable({ sheetName }) {
         throw new Error(errorData.error || '刪除失敗');
       }
 
-      setData(data.filter((_, idx) => idx !== rowIndex));
+      setData(data.filter((item) => item.sheetRow !== rowItem.sheetRow));
     } catch (err) {
       alert(`刪除失敗: ${err.message}`);
       console.error('刪除錯誤:', err);
@@ -81,8 +81,8 @@ export default function CompletedTable({ sheetName }) {
 
   // Sort by completion date (newest first)
   const sortedData = [...data].sort((a, b) => {
-    const dateA = a[7] ? new Date(a[7]) : new Date(0);
-    const dateB = b[7] ? new Date(b[7]) : new Date(0);
+    const dateA = a.values[7] ? new Date(a.values[7]) : new Date(0);
+    const dateB = b.values[7] ? new Date(b.values[7]) : new Date(0);
     return dateB - dateA;
   });
 
@@ -116,24 +116,24 @@ export default function CompletedTable({ sheetName }) {
         </tr>
       </thead>
       <tbody>
-        {sortedData.map((row, index) => (
+        {sortedData.map((row) => (
           <tr
-            key={index}
+            key={row.sheetRow}
             style={{
               borderBottom: '1px solid #e5e7eb',
             }}
           >
-            <td style={{ padding: '12px 8px', fontSize: '11px', width: '9%', lineHeight: '1.4' }}>{row[0] || '-'}</td>
-            <td style={{ padding: '12px 8px', fontSize: '11px', fontFamily: 'monospace', width: '9%', lineHeight: '1.4' }}>{row[1] || '-'}</td>
-            <td style={{ padding: '12px 8px', fontSize: '11px', width: '14%', lineHeight: '1.4' }}>{row[2] || '-'}</td>
-            <td style={{ padding: '12px 8px', fontSize: '11px', width: '12%', lineHeight: '1.4' }}>{row[3] || '-'}</td>
-            <td style={{ padding: '12px 8px', fontSize: '11px', fontFamily: 'monospace', width: '10%', lineHeight: '1.4' }}>{row[4] || '-'}</td>
-            <td style={{ padding: '12px 8px', fontSize: '11px', fontFamily: 'monospace', width: '10%', lineHeight: '1.4' }}>{row[5] || '-'}</td>
-            <td style={{ padding: '12px 8px', fontSize: '11px', width: '10%', lineHeight: '1.4' }}>{row[6] || '-'}</td>
-            <td style={{ padding: '12px 8px', fontSize: '11px', width: '11%', lineHeight: '1.4' }}>{row[7] || '-'}</td>
+            <td style={{ padding: '12px 8px', fontSize: '11px', width: '9%', lineHeight: '1.4' }}>{row.values[0] || '-'}</td>
+            <td style={{ padding: '12px 8px', fontSize: '11px', fontFamily: 'monospace', width: '9%', lineHeight: '1.4' }}>{row.values[1] || '-'}</td>
+            <td style={{ padding: '12px 8px', fontSize: '11px', width: '14%', lineHeight: '1.4' }}>{row.values[2] || '-'}</td>
+            <td style={{ padding: '12px 8px', fontSize: '11px', width: '12%', lineHeight: '1.4' }}>{row.values[3] || '-'}</td>
+            <td style={{ padding: '12px 8px', fontSize: '11px', fontFamily: 'monospace', width: '10%', lineHeight: '1.4' }}>{row.values[4] || '-'}</td>
+            <td style={{ padding: '12px 8px', fontSize: '11px', fontFamily: 'monospace', width: '10%', lineHeight: '1.4' }}>{row.values[5] || '-'}</td>
+            <td style={{ padding: '12px 8px', fontSize: '11px', width: '10%', lineHeight: '1.4' }}>{row.values[6] || '-'}</td>
+            <td style={{ padding: '12px 8px', fontSize: '11px', width: '11%', lineHeight: '1.4' }}>{row.values[7] || '-'}</td>
             <td style={{ padding: '12px 8px', textAlign: 'center', width: '15%' }}>
               <button
-                onClick={() => handleDelete(index)}
+                onClick={() => handleDelete(row)}
                 style={{
                   background: '#ef4444',
                   color: 'white',

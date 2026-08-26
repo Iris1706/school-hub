@@ -29,7 +29,12 @@ export async function GET(request) {
         range: `'${sheetName}'!A3:H`,
       });
 
-      const data = response.data.values || [];
+      const rawData = response.data.values || [];
+      // 為每筆資料附加其在 Google Sheet 中的實際行號
+      const data = rawData.map((row, index) => ({
+        sheetRow: 3 + index,
+        values: row,
+      }));
       return Response.json({
         success: true,
         data: data,
@@ -40,7 +45,12 @@ export async function GET(request) {
         range: `'${sheetName}'!J3:S`,
       });
 
-      const data = response.data.values || [];
+      const rawData = response.data.values || [];
+      // 為每筆資料附加其在 Google Sheet 中的實際行號
+      const data = rawData.map((row, index) => ({
+        sheetRow: 3 + index,
+        values: row,
+      }));
       return Response.json({
         success: true,
         data: data,

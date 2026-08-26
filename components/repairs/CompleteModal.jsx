@@ -11,7 +11,7 @@ export default function CompleteModal({ isOpen, rowData, rowIndex, sheetName, on
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [latestRowData, setLatestRowData] = useState(rowData);
+  const [latestRowData, setLatestRowData] = useState({ values: rowData || [] });
   const [isFetchingLatestData, setIsFetchingLatestData] = useState(false);
 
   // 當 modal 打開時，重新從 Google Sheet 讀取最新資料
@@ -32,9 +32,10 @@ export default function CompleteModal({ isOpen, rowData, rowIndex, sheetName, on
       if (response.ok) {
         const result = await response.json();
         const allData = result.data || [];
-        // 根據 rowIndex 獲取該筆資料
-        if (allData[rowIndex]) {
-          setLatestRowData(allData[rowIndex]);
+        // 根據 sheetRow 獲取該筆資料
+        const matchedRow = allData.find(row => row.sheetRow === rowIndex);
+        if (matchedRow) {
+          setLatestRowData(matchedRow);
         }
       }
     } catch (err) {
@@ -80,7 +81,7 @@ export default function CompleteModal({ isOpen, rowData, rowIndex, sheetName, on
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sheetName,
-          rowIndex: rowIndex + 3, // 轉換為實際行號（API返回的是0-based，實際行號從3開始）
+          rowIndex, // rowIndex 已經是 Google Sheet 行號
           completeData: {
             newSerialNumber: formData.newSerialNumber,
             status: formData.status,
@@ -203,19 +204,19 @@ export default function CompleteModal({ isOpen, rowData, rowIndex, sheetName, on
             >
               <div>
                 <div style={{ color: '#6b7280', marginBottom: '4px' }}>學校</div>
-                <div style={{ fontWeight: '500' }}>{latestRowData[2] || '-'}</div>
+                <div style={{ fontWeight: '500' }}>{latestRowData.values?.[2] || '-'}</div>
               </div>
               <div>
                 <div style={{ color: '#6b7280', marginBottom: '4px' }}>問題分類</div>
-                <div style={{ fontWeight: '500' }}>{latestRowData[3] || '-'}</div>
+                <div style={{ fontWeight: '500' }}>{latestRowData.values?.[3] || '-'}</div>
               </div>
               <div>
                 <div style={{ color: '#6b7280', marginBottom: '4px' }}>原序號</div>
-                <div style={{ fontWeight: '500', fontFamily: 'monospace' }}>{latestRowData[4] || '-'}</div>
+                <div style={{ fontWeight: '500', fontFamily: 'monospace' }}>{latestRowData.values?.[4] || '-'}</div>
               </div>
               <div>
                 <div style={{ color: '#6b7280', marginBottom: '4px' }}>維修序號</div>
-                <div style={{ fontWeight: '500', fontFamily: 'monospace' }}>{latestRowData[5] || '-'}</div>
+                <div style={{ fontWeight: '500', fontFamily: 'monospace' }}>{latestRowData.values?.[5] || '-'}</div>
               </div>
             </div>
           </div>

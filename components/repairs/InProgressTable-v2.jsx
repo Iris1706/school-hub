@@ -28,7 +28,7 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
       const rawData = result.data || [];
 
       // 過濾掉空行（第一個欄位為空）
-      const filteredData = rawData.filter(row => row[0] && row[0].trim());
+      const filteredData = rawData.filter(row => row.values && row.values[0] && row.values[0].trim());
 
       setData(filteredData);
       setError(null);
@@ -53,7 +53,7 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
     return dateStr;
   };
 
-  const handleDelete = async (rowIndex) => {
+  const handleDelete = async (rowItem) => {
     if (!confirm('確定要刪除此筆資料嗎？')) return;
 
     try {
@@ -62,7 +62,7 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sheetName,
-          rowIndex: rowIndex + 3,
+          rowIndex: rowItem.sheetRow,
           type: 'inProgress',
         }),
         cache: 'no-store',
@@ -73,7 +73,7 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
         throw new Error(errorData.error || '刪除失敗');
       }
 
-      setData(data.filter((_, idx) => idx !== rowIndex));
+      setData(data.filter((item) => item.sheetRow !== rowItem.sheetRow));
     } catch (err) {
       alert(`刪除失敗: ${err.message}`);
       console.error('刪除錯誤:', err);
@@ -122,23 +122,23 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
           </tr>
         </thead>
         <tbody>
-          {data.map((row, index) => (
+          {data.map((row) => (
             <tr
-              key={index}
+              key={row.sheetRow}
               style={{
                 borderBottom: '1px solid #e5e7eb',
               }}
             >
-              <td style={{ padding: '12px 8px', fontSize: '11px', width: '9%', lineHeight: '1.4' }}>{formatDate(row[0])}</td>
-              <td style={{ padding: '12px 8px', fontSize: '11px', fontFamily: 'monospace', width: '9%', lineHeight: '1.4' }}>{row[1] || '-'}</td>
-              <td style={{ padding: '12px 8px', fontSize: '11px', width: '16%', lineHeight: '1.4' }}>{row[2] || '-'}</td>
-              <td style={{ padding: '12px 8px', fontSize: '11px', width: '14%', lineHeight: '1.4' }}>{row[3] || '-'}</td>
-              <td style={{ padding: '12px 8px', fontSize: '11px', fontFamily: 'monospace', width: '11%', lineHeight: '1.4' }}>{row[4] || '-'}</td>
-              <td style={{ padding: '12px 8px', fontSize: '11px', width: '11%', lineHeight: '1.4' }}>{row[5] || '-'}</td>
+              <td style={{ padding: '12px 8px', fontSize: '11px', width: '9%', lineHeight: '1.4' }}>{formatDate(row.values[0])}</td>
+              <td style={{ padding: '12px 8px', fontSize: '11px', fontFamily: 'monospace', width: '9%', lineHeight: '1.4' }}>{row.values[1] || '-'}</td>
+              <td style={{ padding: '12px 8px', fontSize: '11px', width: '16%', lineHeight: '1.4' }}>{row.values[2] || '-'}</td>
+              <td style={{ padding: '12px 8px', fontSize: '11px', width: '14%', lineHeight: '1.4' }}>{row.values[3] || '-'}</td>
+              <td style={{ padding: '12px 8px', fontSize: '11px', fontFamily: 'monospace', width: '11%', lineHeight: '1.4' }}>{row.values[4] || '-'}</td>
+              <td style={{ padding: '12px 8px', fontSize: '11px', width: '11%', lineHeight: '1.4' }}>{row.values[5] || '-'}</td>
               <td style={{ padding: '12px 8px', textAlign: 'center', width: '30%' }}>
                 <div style={{ display: 'flex', gap: '3px', justifyContent: 'center', flexWrap: 'nowrap' }}>
                   <button
-                    onClick={() => onShowEditModal(index, row)}
+                    onClick={() => onShowEditModal(row.sheetRow, row.values)}
                     style={{
                       background: '#3b82f6',
                       color: 'white',
@@ -168,7 +168,7 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
                   </button>
 
                   <button
-                    onClick={() => onShowCompleteModal(index, row)}
+                    onClick={() => onShowCompleteModal(row.sheetRow, row.values)}
                     style={{
                       background: '#10b981',
                       color: 'white',
@@ -198,7 +198,7 @@ export default function InProgressTable({ sheetName, onShowCompleteModal, onShow
                   </button>
 
                   <button
-                    onClick={() => handleDelete(index)}
+                    onClick={() => handleDelete(row)}
                     style={{
                       background: '#ef4444',
                       color: 'white',
