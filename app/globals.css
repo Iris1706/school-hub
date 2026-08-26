@@ -167,7 +167,8 @@ input:focus {
 
   .main {
     padding: 16px;
-    overflow-x: hidden;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     margin-left: 0;
     margin-bottom: 70px;
     min-height: calc(100vh - 70px);
