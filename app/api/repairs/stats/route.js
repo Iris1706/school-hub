@@ -98,8 +98,8 @@ export async function GET(request) {
         const completedDateNormalized = new Date(completedDate);
         completedDateNormalized.setHours(0, 0, 0, 0);
 
-        // 計算工作天數（只算週一～週五）
-        const daysToRepair = getWorkDays(createdDate, completedDate);
+        // 計算工作天數（只算週一～週五，建單日也算）
+        const daysToRepair = getWorkDays(createdDate, completedDate) + 1;
 
         // 只計算正數天數（完成日期 >= 建單日期）
         if (daysToRepair > 0) {
