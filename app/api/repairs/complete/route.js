@@ -27,10 +27,9 @@ export async function POST(request) {
     }
 
     const sheets = getSheetsClient();
-    const googleSheetRowIndex = rowIndex + 3; // 轉換為實際行號
 
-    // 讀取「處理中」的資料
-    const inProgressRange = `${sheetName}!J${googleSheetRowIndex}:S${googleSheetRowIndex}`;
+    // 讀取「處理中」的資料（rowIndex 已由前端轉換為 Google Sheet 行號）
+    const inProgressRange = `${sheetName}!J${rowIndex}:S${rowIndex}`;
     const inProgressResponse = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.Repair_SHEET_ID,
       range: inProgressRange,
@@ -85,7 +84,7 @@ export async function POST(request) {
     });
 
     const allInProgressRows = inProgressAllResponse.data.values || [];
-    const currentRowIndexInArray = googleSheetRowIndex - 3; // 轉換為陣列索引
+    const currentRowIndexInArray = rowIndex - 3; // 轉換為陣列索引
 
     if (currentRowIndexInArray < allInProgressRows.length) {
       // 將該行以下的所有資料往上移一行
@@ -94,7 +93,7 @@ export async function POST(request) {
       // 更新從當前行開始的資料（將下面的資料往上移）
       const updates = [];
       for (let i = 0; i < rowsToMove.length; i++) {
-        const targetRow = googleSheetRowIndex + i;
+        const targetRow = rowIndex + i;
         updates.push({
           range: `${sheetName}!J${targetRow}:S${targetRow}`,
           values: [rowsToMove[i]],
@@ -102,7 +101,7 @@ export async function POST(request) {
       }
 
       // 清除最後一行
-      const lastRowToClean = googleSheetRowIndex + rowsToMove.length;
+      const lastRowToClean = rowIndex + rowsToMove.length;
       updates.push({
         range: `${sheetName}!J${lastRowToClean}:S${lastRowToClean}`,
         values: [Array(10).fill('')], // 清除10個欄位（J到S）

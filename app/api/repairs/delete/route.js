@@ -27,7 +27,6 @@ export async function POST(request) {
     }
 
     const sheets = getSheetsClient();
-    const googleSheetRowIndex = rowIndex + 3;
 
     if (type === 'completed') {
       // 「已完修」資料往上遞補
@@ -37,21 +36,21 @@ export async function POST(request) {
       });
 
       const allCompletedRows = completedAllResponse.data.values || [];
-      const currentRowIndexInArray = googleSheetRowIndex - 3;
+      const currentRowIndexInArray = rowIndex - 3;
 
       if (currentRowIndexInArray < allCompletedRows.length) {
         const rowsToMove = allCompletedRows.slice(currentRowIndexInArray + 1);
 
         const updates = [];
         for (let i = 0; i < rowsToMove.length; i++) {
-          const targetRow = googleSheetRowIndex + i;
+          const targetRow = rowIndex + i;
           updates.push({
             range: `${sheetName}!A${targetRow}:H${targetRow}`,
             values: [rowsToMove[i]],
           });
         }
 
-        const lastRowToClean = googleSheetRowIndex + rowsToMove.length;
+        const lastRowToClean = rowIndex + rowsToMove.length;
         updates.push({
           range: `${sheetName}!A${lastRowToClean}:H${lastRowToClean}`,
           values: [Array(8).fill('')],
@@ -69,7 +68,7 @@ export async function POST(request) {
       } else {
         await sheets.spreadsheets.values.clear({
           spreadsheetId: process.env.Repair_SHEET_ID,
-          range: `${sheetName}!A${googleSheetRowIndex}:H${googleSheetRowIndex}`,
+          range: `${sheetName}!A${rowIndex}:H${rowIndex}`,
         });
       }
     } else if (type === 'inProgress') {
@@ -80,21 +79,21 @@ export async function POST(request) {
       });
 
       const allInProgressRows = inProgressAllResponse.data.values || [];
-      const currentRowIndexInArray = googleSheetRowIndex - 3;
+      const currentRowIndexInArray = rowIndex - 3;
 
       if (currentRowIndexInArray < allInProgressRows.length) {
         const rowsToMove = allInProgressRows.slice(currentRowIndexInArray + 1);
 
         const updates = [];
         for (let i = 0; i < rowsToMove.length; i++) {
-          const targetRow = googleSheetRowIndex + i;
+          const targetRow = rowIndex + i;
           updates.push({
             range: `${sheetName}!J${targetRow}:S${targetRow}`,
             values: [rowsToMove[i]],
           });
         }
 
-        const lastRowToClean = googleSheetRowIndex + rowsToMove.length;
+        const lastRowToClean = rowIndex + rowsToMove.length;
         updates.push({
           range: `${sheetName}!J${lastRowToClean}:S${lastRowToClean}`,
           values: [Array(10).fill('')],
@@ -112,7 +111,7 @@ export async function POST(request) {
       } else {
         await sheets.spreadsheets.values.clear({
           spreadsheetId: process.env.Repair_SHEET_ID,
-          range: `${sheetName}!J${googleSheetRowIndex}:S${googleSheetRowIndex}`,
+          range: `${sheetName}!J${rowIndex}:S${rowIndex}`,
         });
       }
     }
@@ -146,7 +145,7 @@ export async function POST(request) {
           [
             timestamp,
             '刪除',
-            `行 ${googleSheetRowIndex}`,
+            `行 ${rowIndex}`,
             type === 'completed' ? '已完修' : '處理中',
             '資料已刪除並往上遞補',
           ],
