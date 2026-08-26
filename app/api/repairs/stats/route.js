@@ -177,8 +177,8 @@ export async function GET(request) {
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5);
 
-    // 計算非空行的數量
-    const completedCount = completedData.filter(row => row && row[0] && (typeof row[0] !== 'string' || row[0].trim())).length;
+    // 計算非空行的數量（completedCount 需檢查完成日期）
+    const completedCount = completedData.filter(row => row && row[0] && (typeof row[0] !== 'string' || row[0].trim()) && row[7]).length;
     const inProgressCount = inProgressData.filter(row => row && row[0] && (typeof row[0] !== 'string' || row[0].trim())).length;
 
     return Response.json({
