@@ -60,9 +60,10 @@ export async function POST(request) {
 
     let nextEmptyRow = 3;
     const completedValues = completedDataResponse.data.values || [];
-    for (let i = 0; i < completedValues.length; i++) {
-      if (!completedValues[i] || !completedValues[i][0]) {
-        nextEmptyRow = 3 + i;
+    // 從後往前找最後一個有資料的行
+    for (let i = completedValues.length - 1; i >= 0; i--) {
+      if (completedValues[i] && completedValues[i][0]) {
+        nextEmptyRow = 3 + i + 1; // 最後一個有資料的行的下一行
         break;
       }
     }
@@ -138,9 +139,10 @@ export async function POST(request) {
 
     let logNextRow = 3;
     const logsValues = logsDataResponse.data.values || [];
-    for (let i = 0; i < logsValues.length; i++) {
-      if (!logsValues[i] || !logsValues[i][0]) {
-        logNextRow = 3 + i;
+    // 從後往前找最後一個有資料的行
+    for (let i = logsValues.length - 1; i >= 0; i--) {
+      if (logsValues[i] && logsValues[i][0]) {
+        logNextRow = 3 + i + 1; // 最後一個有資料的行的下一行
         break;
       }
     }
