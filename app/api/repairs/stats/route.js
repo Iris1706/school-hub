@@ -46,9 +46,10 @@ export async function GET(request) {
     weekStart.setDate(diff);
     weekStart.setHours(0, 0, 0, 0);
 
-    // 當天的結束時間（用於比較）
-    const endOfToday = new Date(now);
-    endOfToday.setHours(23, 59, 59, 999);
+    // 計算本週結束日期（週日）
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekEnd.getDate() + 6); // 週一加 6 天 = 週日
+    weekEnd.setHours(23, 59, 59, 999);
 
     let thisMonthCompleted = 0;
     let thisWeekCompleted = 0;
@@ -82,9 +83,9 @@ export async function GET(request) {
           totalDaysForMonth += daysToRepair;
         }
 
-        // 根據完成日期檢查是否在本週內（包含週一到今天）
-        // weekStart 是本週一的午夜，completedDateNormalized 是完成日期的午夜
-        if (completedDateNormalized >= weekStart && completedDateNormalized <= endOfToday) {
+        // 根據完成日期檢查是否在本週內（週一到週日）
+        // weekStart 是本週一的午夜，weekEnd 是本週日的午夜
+        if (completedDateNormalized >= weekStart && completedDateNormalized <= weekEnd) {
           thisWeekCompleted++;
         }
 
