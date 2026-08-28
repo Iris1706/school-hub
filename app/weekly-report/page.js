@@ -478,6 +478,19 @@ export default function ReportGenerator() {
     const employees = Array.isArray(weeklyStatus) ? weeklyStatus : (weeklyStatus?.data || weeklyStatus?.employees || []);
     const dates = weeklyStatus?.dates || [];
 
+    // 僅在第一次時打印調試信息（避免重複）
+    if (targetDay === 24) {
+      console.log(`🔍 weeklyStatus 結構診斷:`);
+      console.log(`  - weeklyStatus 本身:`, weeklyStatus);
+      console.log(`  - weeklyStatus 類型:`, typeof weeklyStatus);
+      console.log(`  - weeklyStatus 的 key:`, Object.keys(weeklyStatus));
+      console.log(`  - employees 長度:`, employees.length);
+      console.log(`  - dates 陣列:`, dates);
+      if (employees.length > 0) {
+        console.log(`  - 第一個 employee:`, JSON.stringify(employees[0], null, 2));
+      }
+    }
+
     if (employees.length > 0 && dates.length > 0) {
       // 在 dates 陣列中找到目標日期的索引
       const dateIndex = dates.indexOf(targetDay);
@@ -499,6 +512,12 @@ export default function ReportGenerator() {
             }
           }
         });
+      } else {
+        console.log(`⚠️ [${dateStr}] 日期 ${targetDay} 不在 dates 陣列中`);
+      }
+    } else {
+      if (targetDay === 24) {
+        console.log(`❌ weeklyStatus 數據不完整: employees=${employees.length}, dates=${dates.length}`);
       }
     }
 
