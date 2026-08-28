@@ -34,6 +34,7 @@ export default function ReportGenerator() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [apiDebug, setApiDebug] = useState(null);
 
   // 計算週期日期
   const getDateRange = () => {
@@ -172,10 +173,26 @@ export default function ReportGenerator() {
 
               // 特別處理 weeklyStatus - 返回格式 { data: [...], dates: [...] }
               if (endpoint.key === 'weeklyStatus') {
+                console.log('📊 weeklyStatus API 完整回應:', json);
+                console.log('json.data:', json?.data);
+                console.log('json.dates:', json?.dates);
+                console.log('json 的所有 keys:', Object.keys(json || {}));
+
+                // 保存調試信息供頁面顯示
+                setApiDebug({
+                  endpoint: endpoint.url,
+                  rawJson: json,
+                  dataLength: json?.data?.length || 0,
+                  datesLength: json?.dates?.length || 0,
+                  dates: json?.dates,
+                  firstEmployee: json?.data?.[0],
+                });
+
                 newData[endpoint.key] = {
                   employees: json?.data || [],
                   dates: json?.dates || [],
                 };
+                console.log('提取後的 newData[weeklyStatus]:', newData[endpoint.key]);
               } else {
                 newData[endpoint.key] = Array.isArray(extractedData) ? extractedData : [];
               }
@@ -733,6 +750,34 @@ export default function ReportGenerator() {
           }}
         >
           ⚠️ {error}
+        </div>
+      )}
+
+      {/* API 調試信息 */}
+      {apiDebug && (
+        <div
+          style={{
+            padding: '15px',
+            backgroundColor: '#e0e7ff',
+            borderLeft: '4px solid #6366f1',
+            marginBottom: '20px',
+            borderRadius: '6px',
+            color: '#1e1b4b',
+            fontSize: '11px',
+            fontFamily: 'monospace',
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
+            maxHeight: '500px',
+            overflowY: 'auto',
+          }}
+        >
+          <strong>📡 weeklyStatus API 診斷信息：</strong>
+          {`\n\nAPI 端點: ${apiDebug.endpoint}\n`}
+          {`data 長度: ${apiDebug.dataLength}\n`}
+          {`dates 長度: ${apiDebug.datesLength}\n`}
+          {`dates 內容: ${JSON.stringify(apiDebug.dates)}\n\n`}
+          {`第一個員工:\n${JSON.stringify(apiDebug.firstEmployee, null, 2)}\n\n`}
+          {`完整 JSON:\n${JSON.stringify(apiDebug.rawJson, null, 2)}`}
         </div>
       )}
 
