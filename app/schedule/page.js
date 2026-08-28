@@ -269,23 +269,25 @@ export default function SchedulePage() {
 
                     const getTextColor = () => {
                       if (!status) return "var(--text-primary)";
-                      if (status.includes("三多")) return "white";
-                      if (status.includes("外出")) return "white";
-                      if (status.includes("上午(外)")) return "white";
-                      if (status.includes("下午(外)")) return "white";
+                      // 深色背景 → 白色文字
+                      if (status.includes("國定假日")) return "white";
                       if (status.includes("特休")) return "white";
-                      if (status.includes("排休")) return "white";
-                      if (status.includes("巡檢")) return "white";
-                      if (status.includes("上午(巡)")) return "white";
-                      if (status.includes("下午(巡)")) return "white";
                       if (status.includes("上午(特)")) return "white";
                       if (status.includes("下午(特)")) return "white";
-                      if (status.includes("國定假日")) return "white";
-                      if (status.includes("彈性假")) return "white";
-                      if (status.includes("病假")) return "white";
-                      if (status.includes("事假")) return "white";
-                      if (status.includes("駐點")) return "white";
+                      if (status.includes("上午(巡)")) return "white";
+                      if (status.includes("下午(巡)")) return "white";
                       if (status.includes("颱風假")) return "white";
+                      // 淺色背景 → 黑色文字
+                      if (status.includes("三多")) return "black";
+                      if (status.includes("外出")) return "black";
+                      if (status.includes("上午(外)")) return "black";
+                      if (status.includes("下午(外)")) return "black";
+                      if (status.includes("排休")) return "black";
+                      if (status.includes("病假")) return "black";
+                      if (status.includes("事假")) return "black";
+                      if (status.includes("駐點")) return "black";
+                      if (status.includes("彈性假")) return "black";
+                      if (status.includes("巡檢")) return "black";
                       return "var(--text-primary)";
                     };
 
