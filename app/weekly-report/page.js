@@ -167,6 +167,22 @@ export default function ReportGenerator() {
 
               newData[endpoint.key] = Array.isArray(extractedData) ? extractedData : [];
 
+              // 特別調試 weeklyStatus API
+              if (endpoint.key === 'weeklyStatus') {
+                console.log(`======== weeklyStatus API 完整信息 ========`);
+                console.log(`原始響應文本（前300字符）:`, responseText.substring(0, 300));
+                console.log(`解析後的 json:`, json);
+                console.log(`json 型態:`, typeof json);
+                console.log(`json 是陣列?:`, Array.isArray(json));
+                console.log(`json 長度:`, json?.length || 'N/A');
+                console.log(`json.data:`, json?.data);
+                console.log(`json.employees:`, json?.employees);
+                console.log(`json.dates:`, json?.dates);
+                console.log(`newData[weeklyStatus]:`, newData[endpoint.key]);
+                console.log(`newData[weeklyStatus] 長度:`, newData[endpoint.key]?.length || 'N/A');
+                console.log(`=====================================`);
+              }
+
               // 調試日志
               if (endpoint.key === 'attendance') {
                 console.log(`======== 班表數據（attendance）完整信息 ========`);
