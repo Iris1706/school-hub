@@ -121,7 +121,20 @@ export default function ReportGenerator() {
 
               // 調試日志
               if (endpoint.key === 'attendance') {
-                console.log(`班表數據 (${endpoint.key}):`, newData[endpoint.key]);
+                console.log(`======== 班表數據完整信息 ========`);
+                console.log(`raw json:`, json);
+                console.log(`newData[attendance]:`, newData[endpoint.key]);
+                console.log(`數據類型:`, Array.isArray(newData[endpoint.key]) ? '陣列' : typeof newData[endpoint.key]);
+                console.log(`數據長度:`, Array.isArray(newData[endpoint.key]) ? newData[endpoint.key].length : '非陣列');
+                if (Array.isArray(newData[endpoint.key]) && newData[endpoint.key].length > 0) {
+                  console.log(`第一筆數據:`, newData[endpoint.key][0]);
+                  const irisRecords = newData[endpoint.key].filter(a => String(a?.person || '').trim() === 'I');
+                  console.log(`Iris 記錄數:`, irisRecords.length);
+                  if (irisRecords.length > 0) {
+                    console.log(`Iris 的第一筆:`, irisRecords[0]);
+                  }
+                }
+                console.log(`================================`);
               }
               if (endpoint.key === 'foreignObjects') {
                 console.log(`夾異物 API 返回:`, json);
@@ -350,6 +363,39 @@ export default function ReportGenerator() {
 
   const scheduleByDay = getScheduleByDay();
 
+  // 日期匹配函數：將字符串日期轉換為可比較的格式
+  const normalizeDateString = (dateStr) => {
+    try {
+      // 移除空格
+      const trimmed = String(dateStr).trim();
+
+      // 嘗試多種日期格式
+      let date = null;
+
+      // 格式1: yyyy/m/d 或 yyyy/mm/dd
+      if (/^\d{4}\/\d{1,2}\/\d{1,2}$/.test(trimmed)) {
+        const parts = trimmed.split('/');
+        date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+      }
+      // 格式2: yyyy-m-d 或 yyyy-mm-dd
+      else if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(trimmed)) {
+        const parts = trimmed.split('-');
+        date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+      }
+      // 格式3: ISO 格式或其他標準格式
+      else {
+        date = new Date(trimmed);
+      }
+
+      if (date && !isNaN(date.getTime())) {
+        return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
+      }
+    } catch (e) {
+      console.warn(`日期格式轉換失敗: ${dateStr}`, e);
+    }
+    return trimmed;
+  };
+
   // 獲取當天所有人員的班表數據（包括特定行程和班表狀態）
   const getAllPeopleForDay = (dateStr) => {
     const allPeople = ['P', 'E', 'I', 'H', 'M', 'Z', 'A', 'J'];
@@ -390,39 +436,38 @@ export default function ReportGenerator() {
       });
     });
 
-    // 2. 填入班表狀態（嘗試多種日期格式匹配）
-    attendance.forEach((att) => {
+    // 2. 填入班表狀態（智能日期匹配）
+    if (attendance.length === 0) {
+      console.warn(`⚠️ 沒有 attendance 數據！請檢查 /api/schedule API`);
+    }
+
+    // 標準化目標日期
+    const normalizedTarget = normalizeDateString(dateStr);
+
+    attendance.forEach((att, idx) => {
       const person = String(att?.person || '').trim();
       const attDate = String(att?.date || '').trim();
+      const status = String(att?.status || '').trim();
 
-      // 嘗試匹配日期（支持多種格式）
-      let isDateMatch = false;
+      // 標準化 attendance 的日期
+      const normalizedAttDate = normalizeDateString(attDate);
+      const isDateMatch = normalizedAttDate === normalizedTarget;
 
-      if (attDate === dateStr) {
-        isDateMatch = true;
-      } else {
-        // 嘗試轉換日期格式進行匹配
-        try {
-          const attDateObj = new Date(attDate);
-          const attDateFormatted = `${attDateObj.getFullYear()}/${attDateObj.getMonth() + 1}/${attDateObj.getDate()}`;
-          if (attDateFormatted === dateStr) {
-            isDateMatch = true;
-          }
-        } catch (e) {
-          // 忽略格式轉換錯誤
-        }
+      // 只在前幾筆或 Iris 時打印
+      if (idx < 2 || person === 'I') {
+        console.log(`Attendance[${person}]: 原始日期="${attDate}" → 標準化="${normalizedAttDate}", 目標="${normalizedTarget}", 匹配=${isDateMatch}, 狀態="${status}"`);
       }
 
       if (person && isDateMatch && peopleData[person]) {
-        const status = String(att?.status || '').trim();
         if (status) {
           peopleData[person].bandSchedule = status;
-          console.log(`✓ 匹配班表: ${person} - ${dateStr} - ${status}`);
+          console.log(`✅ 班表匹配成功: ${person} [${normalizedTarget}] = ${status}`);
         }
       }
     });
 
-    console.log(`日期 ${dateStr} 的班表數據:`, Object.values(peopleData).filter(p => p.bandSchedule || p.schedules.length > 0));
+    const irisData = Object.values(peopleData).find(p => p.person === 'I');
+    console.log(`[${dateStr}] Iris 班表: bandSchedule="${irisData?.bandSchedule}", 有行程=${(irisData?.schedules?.length || 0) > 0}`);
 
     return Object.values(peopleData);
   };
