@@ -6,8 +6,9 @@ import {
   columnLetter,
 } from "../../../lib/googleSheets";
 
-// 新欄位映射
+// Google Sheets 實際欄位映射（A:J）
 const FIELD_NAMES = [
+  "優先級",
   "日期",
   "學校",
   "事件",
@@ -16,51 +17,58 @@ const FIELD_NAMES = [
   "郵件",
   "進度",
   "備註",
-  "優先級",
+  "完成",
 ];
 
 // GET: 獲取所有待辦事項（無上限）
 export async function GET() {
   try {
     const sheets = getSheetsClient();
-    // 移除行數限制，讀取整個表格
+    // 讀取整個表格
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: `'${TODO_TAB}'!A:J`,
+      range: `'${TODO_TAB}'!A:Z`,
     });
     const rows = res.data.values || [];
     const headers = rows[0] || [];
 
-    // 建立欄位索引映射
+    console.log("Google Sheets 表頭:", headers);
+
+    // 建立表頭 → 欄位索引的映射
     const headerIndex = {};
-    FIELD_NAMES.forEach((field) => {
-      headerIndex[field] = headers.indexOf(field);
+    headers.forEach((headerName, idx) => {
+      headerIndex[headerName] = idx;
     });
+    console.log("表頭映射:", headerIndex);
 
-    // 解析資料行（過濾掉空行）
-    const data = rows.slice(1)
-      .filter(row => row && row.some(cell => cell?.trim()))
-      .map((row, idx) => {
-        // 相容舊資料：如果找不到新的進度欄位，檢查是否有舊的完成欄位
-        let progress = row[headerIndex.進度] || "";
-        // 如果進度欄位為空，檢查第10列是否有舊的完成狀態
-        if (!progress && row[9] === 'true') {
-          progress = '完成';
-        }
+    // 解析資料行（過濾掉空行，保留正確的行號）
+    const data = rows.slice(1).map((row, originalIdx) => {
+      // 檢查是否為空行
+      if (!row || !row.some(cell => cell?.trim())) {
+        return null;
+      }
 
-        return {
-          __row: idx + 2,
-          日期: row[headerIndex.日期] || "",
-          學校: row[headerIndex.學校] || "",
-          事件: row[headerIndex.事件] || "",
-          聯絡人: row[headerIndex.聯絡人] || "",
-          電話: row[headerIndex.電話] || "",
-          郵件: row[headerIndex.郵件] || "",
-          進度: progress,
-          備註: row[headerIndex.備註] || "",
-          優先級: row[headerIndex.優先級] || "",
-        };
-      });
+      const rowNumber = originalIdx + 2; // 原始行號（Google Sheets 中的列號）
+
+      const item = {
+        __row: rowNumber,
+        優先級: row[headerIndex.優先級] || "",
+        日期: row[headerIndex.日期] || "",
+        學校: row[headerIndex.學校] || "",
+        事件: row[headerIndex.事件] || "",
+        聯絡人: row[headerIndex.聯絡人] || "",
+        電話: row[headerIndex.電話] || "",
+        郵件: row[headerIndex.郵件] || "",
+        進度: row[headerIndex.進度] || "",
+        備註: row[headerIndex.備註] || "",
+        完成: row[headerIndex.完成] || "",
+      };
+
+      console.log(`第 ${rowNumber} 列 - 優先級:"${item.優先級}", 日期:"${item.日期}", 事件:"${item.事件}"...`);
+      return item;
+    }).filter(item => item !== null);
+
+    console.log("解析後的第一筆資料:", data[0]);
 
     return NextResponse.json({ headers, data });
   } catch (err) {
@@ -75,23 +83,36 @@ export async function POST(req) {
     const body = await req.json();
     const sheets = getSheetsClient();
 
-    // 構建新行資料
-    const newRow = [
-      body.日期 || "",
-      body.學校 || "",
-      body.事件 || "",
-      body.聯絡人 || "",
-      body.電話 || "",
-      body.郵件 || "",
-      body.進度 || "",
-      body.備註 || "",
-      body.優先級 || "",
-    ];
+    // 先讀取表頭以確定欄位順序
+    const headersRes = await sheets.spreadsheets.values.get({
+      spreadsheetId: SPREADSHEET_ID,
+      range: `'${TODO_TAB}'!1:1`,
+    });
+    const headers = headersRes.data.values?.[0] || [];
 
-    // 使用 append 方法自動新增到最後（推薦方法）
+    // 構建新行資料（按照 Google Sheets 的欄位順序）
+    const newRow = headers.map(headerName => {
+      switch (headerName) {
+        case "優先級": return body.優先級 || "";
+        case "日期": return body.日期 || "";
+        case "學校": return body.學校 || "";
+        case "事件": return body.事件 || "";
+        case "聯絡人": return body.聯絡人 || "";
+        case "電話": return body.電話 || "";
+        case "郵件": return body.郵件 || "";
+        case "進度": return body.進度 || "";
+        case "備註": return body.備註 || "";
+        case "完成": return body.完成 || "";
+        default: return "";
+      }
+    });
+
+    console.log("新增資料:", newRow);
+
+    // 使用 append 方法自動新增到最後
     await sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
-      range: `'${TODO_TAB}'!A:J`,
+      range: `'${TODO_TAB}'!A:Z`,
       valueInputOption: "RAW",
       requestBody: {
         values: [newRow],
@@ -127,25 +148,41 @@ export async function PUT(req) {
 
     console.log(`更新第 ${__row} 列，資料:`, data);
 
-    // 構建更新資料
-    const updateRow = [
-      data.日期 || "",
-      data.學校 || "",
-      data.事件 || "",
-      data.聯絡人 || "",
-      data.電話 || "",
-      data.郵件 || "",
-      data.進度 || "",
-      data.備註 || "",
-      data.優先級 || "",
-    ];
+    // 先讀取表頭以確定欄位順序
+    const headersRes = await sheets.spreadsheets.values.get({
+      spreadsheetId: SPREADSHEET_ID,
+      range: `'${TODO_TAB}'!1:1`,
+    });
+    const headers = headersRes.data.values?.[0] || [];
+
+    // 構建更新資料（按照 Google Sheets 的欄位順序）
+    const updateRow = headers.map(headerName => {
+      switch (headerName) {
+        case "優先級": return data.優先級 || "";
+        case "日期": return data.日期 || "";
+        case "學校": return data.學校 || "";
+        case "事件": return data.事件 || "";
+        case "聯絡人": return data.聯絡人 || "";
+        case "電話": return data.電話 || "";
+        case "郵件": return data.郵件 || "";
+        case "進度": return data.進度 || "";
+        case "備註": return data.備註 || "";
+        case "完成": return data.完成 || "";
+        default: return "";
+      }
+    });
 
     console.log("要寫入的行資料:", updateRow);
+
+    // 計算範圍（A到最後一個有表頭的欄位）
+    const lastColumn = String.fromCharCode(64 + headers.length); // A=65, B=66, ...
+    const range = `'${TODO_TAB}'!A${__row}:${lastColumn}${__row}`;
+    console.log("更新範圍:", range);
 
     // 更新行
     const updateResult = await sheets.spreadsheets.values.update({
       spreadsheetId: SPREADSHEET_ID,
-      range: `'${TODO_TAB}'!A${__row}:I${__row}`,
+      range: range,
       valueInputOption: "RAW",
       requestBody: {
         values: [updateRow],
@@ -179,13 +216,23 @@ export async function DELETE(req) {
       );
     }
 
-    // 刪除行（實際上是清空該行）
+    // 先讀取表頭以確定欄位個數
+    const headersRes = await sheets.spreadsheets.values.get({
+      spreadsheetId: SPREADSHEET_ID,
+      range: `'${TODO_TAB}'!1:1`,
+    });
+    const headers = headersRes.data.values?.[0] || [];
+
+    // 刪除行（實際上是清空該行的所有欄位）
+    const lastColumn = String.fromCharCode(64 + headers.length);
+    const range = `'${TODO_TAB}'!A${__row}:${lastColumn}${__row}`;
+
     await sheets.spreadsheets.values.update({
       spreadsheetId: SPREADSHEET_ID,
-      range: `'${TODO_TAB}'!A${__row}:I${__row}`,
+      range: range,
       valueInputOption: "RAW",
       requestBody: {
-        values: [Array(9).fill("")],
+        values: [Array(headers.length).fill("")],
       },
     });
 

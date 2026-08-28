@@ -201,6 +201,37 @@ export default function TodoPage() {
     }
   };
 
+  // 更新優先級
+  const handleChangePriority = async (todo, newPriority) => {
+    try {
+      console.log('更新優先級:', { todo, newPriority });
+      const updatedTodo = {
+        ...todo,
+        優先級: newPriority,
+      };
+
+      console.log('發送更新:', updatedTodo);
+      const res = await fetch('/api/todos', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedTodo),
+      });
+
+      console.log('API 回應狀態:', res.status);
+      const responseData = await res.json();
+      console.log('API 回應內容:', responseData);
+
+      if (!res.ok) throw new Error(responseData.error || '更新失敗');
+
+      console.log('開始重新載入資料...');
+      await fetchTodos();
+      console.log('資料已重新載入');
+    } catch (err) {
+      console.error('錯誤詳情:', err);
+      alert('錯誤: ' + err.message);
+    }
+  };
+
   // 分組和排序
   const pendingTodos = todos
     .filter((t) => t.進度 !== '完成')
@@ -247,19 +278,17 @@ export default function TodoPage() {
       borderBottom: '1px solid var(--border, #e1e3e8)',
     }}>
       <td style={{ padding: '12px 8px' }}>
-        <span
-          style={{
-            fontSize: '12px',
-            fontWeight: '600',
-            padding: '4px 8px',
-            borderRadius: '4px',
-            whiteSpace: 'nowrap',
-            display: 'inline-block',
-            ...getPriorityStyle(todo.優先級 || '一般'),
+        <select
+          value={todo.優先級 || '一般'}
+          onChange={(e) => {
+            console.log('優先級選擇改變:', e.target.value);
+            handleChangePriority(todo, e.target.value);
           }}
         >
-          {todo.優先級 || '一般'}
-        </span>
+          <option value="急">急</option>
+          <option value="不急">不急</option>
+          <option value="一般">一般</option>
+        </select>
       </td>
       <td style={{ padding: '12px 8px', fontSize: '13px' }}>{formatDate(todo.日期)}</td>
       <td style={{ padding: '12px 8px', fontSize: '13px' }}>{todo.學校}</td>
