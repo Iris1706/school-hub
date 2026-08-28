@@ -263,14 +263,29 @@ export default function SchedulePage() {
                       if (status.includes("病假")) return "#7e9ac4";
                       if (status.includes("事假")) return "#e6e6e6";
                       if (status.includes("駐點")) return "#e28d38";
+                      if (status.includes("颱風假")) return "#215a6c";
                       return "#7a7a7a"; // 深灰色 - 預設
                     };
 
                     const getTextColor = () => {
                       if (!status) return "var(--text-primary)";
-                      if (status.includes("上午(巡)") || status.includes("下午(巡)")) return "white";
-                      if (status.includes("上午(特)") || status.includes("下午(特)")) return "white";
-                      if (status.includes("事假")) return "black";
+                      if (status.includes("三多")) return "#a8d170";
+                      if (status.includes("外出")) return "#d4a0e6";
+                      if (status.includes("上午(外)")) return "#8fb3d6";
+                      if (status.includes("下午(外)")) return "#ff8d7d";
+                      if (status.includes("特休")) return "#8a1a2c";
+                      if (status.includes("排休")) return "#ffcb6b";
+                      if (status.includes("巡檢")) return "#7fbae8";
+                      if (status.includes("上午(巡)")) return "#3d1a62";
+                      if (status.includes("下午(巡)")) return "#3d1a62";
+                      if (status.includes("上午(特)")) return "#700101";
+                      if (status.includes("下午(特)")) return "#700101";
+                      if (status.includes("國定假日")) return "#a01a6e";
+                      if (status.includes("彈性假")) return "#6d7680";
+                      if (status.includes("病假")) return "#4a5a8a";
+                      if (status.includes("事假")) return "#a9a9a9";
+                      if (status.includes("駐點")) return "#b05a1a";
+                      if (status.includes("颱風假")) return "#0f3a48";
                       return "var(--text-primary)";
                     };
 
