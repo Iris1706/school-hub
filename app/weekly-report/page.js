@@ -905,7 +905,7 @@ export default function ReportGenerator() {
                                 '國定假日': { bgColor: '#d81b91', textColor: '#ffffff' },
                                 '彈性假': { bgColor: '#a7adb6', textColor: '#ffffff' },
                                 '病假': { bgColor: '#7e9ac4', textColor: '#ffffff' },
-                                '事假': { bgColor: '#e6e6e6', textColor: '#ffffff' },
+                                '事假': { bgColor: '#b9b3b3', textColor: '#ffffff' },
                                 '駐點': { bgColor: '#e28d38', textColor: '#ffffff' },
                                 '上午(特)': { bgColor: '#b10202', textColor: '#ffffff' },
                                 '下午(特)': { bgColor: '#b10202', textColor: '#ffffff' },
