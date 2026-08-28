@@ -515,13 +515,22 @@ export default function ReportGenerator() {
         employees.forEach((emp) => {
           if (!emp) return;
 
-          const empId = String(emp?.employeeId || emp?.person || '').trim().toUpperCase();
+          // 根據員工名稱從 personMap 找到對應的單字母代碼
+          const employeeName = String(emp?.employeeName || '').trim();
+          let personCode = null;
+          for (const [code, name] of Object.entries(personMap)) {
+            if (employeeName.includes(name)) {
+              personCode = code;
+              break;
+            }
+          }
+
           const dailyStatus = emp?.dailyStatus;
 
-          if (dailyStatus && Array.isArray(dailyStatus) && dateIndex < dailyStatus.length) {
+          if (personCode && dailyStatus && Array.isArray(dailyStatus) && dateIndex < dailyStatus.length) {
             const status = String(dailyStatus[dateIndex] || '').trim();
-            if (status && peopleData[empId]) {
-              peopleData[empId].bandSchedule = status;
+            if (status && peopleData[personCode]) {
+              peopleData[personCode].bandSchedule = status;
             }
           }
         });
