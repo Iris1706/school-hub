@@ -86,12 +86,17 @@ export default function ReportGenerator() {
       setLoading(true);
       setError('');
       try {
+        // 計算年月參數
+        const { startDate } = getDateRange();
+        const year = startDate.getFullYear();
+        const month = startDate.getMonth() + 1;
+
         const endpoints = [
           { key: 'inspect', url: '/api/inspect' },
           { key: 'schedule', url: '/api/daily-schedule' },
           { key: 'attendance', url: '/api/schedule' },
           { key: 'todos', url: '/api/todos' },
-          { key: 'weeklyStatus', url: '/api/weekly-status' },
+          { key: 'weeklyStatus', url: `/api/weekly-status?year=${year}&month=${month}` },
           { key: 'foreignObjects', url: '/api/foreign-objects' },
           { key: 'annualStats', url: '/api/annual-stats' },
           { key: 'repairDetails', url: '/api/repair-details' },
@@ -165,22 +170,25 @@ export default function ReportGenerator() {
                 extractedData = [];
               }
 
-              newData[endpoint.key] = Array.isArray(extractedData) ? extractedData : [];
-
-              // 特別調試 weeklyStatus API
+              // 特別處理 weeklyStatus - 返回格式是 { data: [...], dates: [...] }
               if (endpoint.key === 'weeklyStatus') {
+                if (json?.data && json?.dates) {
+                  newData[endpoint.key] = {
+                    data: json.data,
+                    dates: json.dates,
+                  };
+                } else if (Array.isArray(json)) {
+                  newData[endpoint.key] = json;
+                } else {
+                  newData[endpoint.key] = [];
+                }
                 console.log(`======== weeklyStatus API 完整信息 ========`);
-                console.log(`原始響應文本（前300字符）:`, responseText.substring(0, 300));
-                console.log(`解析後的 json:`, json);
-                console.log(`json 型態:`, typeof json);
-                console.log(`json 是陣列?:`, Array.isArray(json));
-                console.log(`json 長度:`, json?.length || 'N/A');
-                console.log(`json.data:`, json?.data);
-                console.log(`json.employees:`, json?.employees);
+                console.log(`json.data 長度:`, json?.data?.length || 0);
                 console.log(`json.dates:`, json?.dates);
-                console.log(`newData[weeklyStatus]:`, newData[endpoint.key]);
-                console.log(`newData[weeklyStatus] 長度:`, newData[endpoint.key]?.length || 'N/A');
+                console.log(`提取後 newData[weeklyStatus]:`, newData[endpoint.key]);
                 console.log(`=====================================`);
+              } else {
+                newData[endpoint.key] = Array.isArray(extractedData) ? extractedData : [];
               }
 
               // 調試日志
@@ -500,17 +508,17 @@ export default function ReportGenerator() {
     let dates = [];
     let dateIndex = -1;
 
-    // 嘗試從不同的結構中提取 employees 和 dates
-    if (Array.isArray(weeklyStatus) && weeklyStatus.length > 0) {
-      // 情況 1: weeklyStatus 直接是員工陣列
+    // 處理 weeklyStatus 結構
+    if (weeklyStatus?.data && Array.isArray(weeklyStatus.data) && Array.isArray(weeklyStatus.dates)) {
+      // 正確格式：{ data: [...], dates: [...] }
+      employees = weeklyStatus.data;
+      dates = weeklyStatus.dates;
+    } else if (Array.isArray(weeklyStatus) && weeklyStatus.length > 0) {
+      // 備用：weeklyStatus 直接是員工陣列
       employees = weeklyStatus;
     } else if (weeklyStatus?.employees && Array.isArray(weeklyStatus.employees)) {
-      // 情況 2: weeklyStatus.employees 存在
+      // 備用：weeklyStatus.employees 存在
       employees = weeklyStatus.employees;
-      dates = weeklyStatus.dates || [];
-    } else if (weeklyStatus?.data && Array.isArray(weeklyStatus.data)) {
-      // 情況 3: weeklyStatus.data 存在
-      employees = weeklyStatus.data;
       dates = weeklyStatus.dates || [];
     }
 
@@ -518,17 +526,17 @@ export default function ReportGenerator() {
     if (targetDay === 24 && dateStr.includes('2026/8') && !diagData) {
       const diagInfo = {
         weeklyStatusType: typeof weeklyStatus,
-        isArray: Array.isArray(weeklyStatus),
-        length: Array.isArray(weeklyStatus) ? weeklyStatus.length : Object.keys(weeklyStatus).length,
-        employeesLength: weeklyStatus?.employees?.length || 0,
+        hasData: !!weeklyStatus?.data,
+        hasDates: !!weeklyStatus?.dates,
+        dataLength: weeklyStatus?.data?.length || 0,
+        datesLength: weeklyStatus?.dates?.length || 0,
         datesArray: weeklyStatus?.dates,
         extractedEmployeesLength: employees.length,
         extractedDatesLength: dates.length,
-        firstEmployee: employees[0] ? JSON.stringify(employees[0]) : 'N/A',
         allEmployees: employees.map(emp => ({
           id: emp?.employeeId || emp?.person,
           dailyStatusLength: emp?.dailyStatus?.length || 0,
-          dailyStatus: emp?.dailyStatus
+          dailyStatusSample: emp?.dailyStatus?.slice(0, 5)
         }))
       };
       setDiagData(diagInfo);
