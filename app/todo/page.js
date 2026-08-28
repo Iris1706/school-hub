@@ -254,21 +254,41 @@ export default function TodoPage() {
   // 優先級樣式
   const getPriorityStyle = (priority) => {
     const styles = {
-      '急': { backgroundColor: '#dc2626', color: 'white' },
-      '不急': { backgroundColor: '#f59e0b', color: 'white' },
-      '一般': { backgroundColor: '#6b7280', color: 'white' },
+      '急': { backgroundColor: '#b10202', color: 'white' },
+      '不急': { backgroundColor: '#e6cff2', color: 'black' },
+      '一般': { backgroundColor: '#d4edbc', color: 'black' },
     };
-    return styles[priority] || { backgroundColor: '#d1d5db', color: 'white' };
+    return styles[priority] || { backgroundColor: '#d4edbc', color: 'black' };
+  };
+
+  // 優先級 Select 樣式
+  const getPrioritySelectStyle = (priority) => {
+    const styles = {
+      '急': { backgroundColor: '#b10202', color: 'white', border: 'none' },
+      '不急': { backgroundColor: '#e6cff2', color: 'black', border: 'none' },
+      '一般': { backgroundColor: '#d4edbc', color: 'black', border: 'none' },
+    };
+    return styles[priority] || { backgroundColor: '#d4edbc', color: 'black', border: 'none' };
   };
 
   // 進度樣式
   const getProgressStyle = (progress) => {
     const styles = {
-      '待處理': { backgroundColor: '#93c5fd', color: '#1e3a8a' },
-      '已處理待追蹤': { backgroundColor: '#a5b4fc', color: '#3730a3' },
-      '完成': { backgroundColor: '#86efac', color: '#165e31' },
+      '待處理': { backgroundColor: '#b10202', color: 'white' },
+      '已處理待追蹤': { backgroundColor: '#ffe5a0', color: 'black' },
+      '完成': { backgroundColor: '#bfe1f6', color: 'black' },
     };
-    return styles[progress] || { backgroundColor: '#e5e7eb', color: '#374151' };
+    return styles[progress] || { backgroundColor: '#bfe1f6', color: 'black' };
+  };
+
+  // 進度 Select 樣式
+  const getProgressSelectStyle = (progress) => {
+    const styles = {
+      '待處理': { backgroundColor: '#b10202', color: 'white', border: 'none' },
+      '已處理待追蹤': { backgroundColor: '#ffe5a0', color: 'black', border: 'none' },
+      '完成': { backgroundColor: '#bfe1f6', color: 'black', border: 'none' },
+    };
+    return styles[progress] || { backgroundColor: '#bfe1f6', color: 'black', border: 'none' };
   };
 
   // 表格行組件
@@ -284,6 +304,7 @@ export default function TodoPage() {
             console.log('優先級選擇改變:', e.target.value);
             handleChangePriority(todo, e.target.value);
           }}
+          style={{ padding: '4px 8px', borderRadius: '4px', fontSize: '13px', ...getPrioritySelectStyle(todo.優先級 || '一般') }}
         >
           <option value="急">急</option>
           <option value="不急">不急</option>
@@ -313,6 +334,7 @@ export default function TodoPage() {
             console.log('選擇改變:', e.target.value);
             handleChangeProgress(todo, e.target.value);
           }}
+          style={{ padding: '4px 8px', borderRadius: '4px', fontSize: '13px', ...getProgressSelectStyle(todo.進度 || '待處理') }}
         >
           <option value="待處理">待處理</option>
           <option value="已處理待追蹤">已處理待追蹤</option>
@@ -460,7 +482,7 @@ export default function TodoPage() {
             <select
               value={formData.進度}
               onChange={(e) => setFormData({ ...formData, 進度: e.target.value })}
-              style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
+              style={{ padding: '8px 10px', fontSize: '13px', borderRadius: '8px', ...getProgressSelectStyle(formData.進度) }}
             >
               {PROGRESS_OPTIONS.map((opt) => (
                 <option key={opt} value={opt}>{opt}</option>
@@ -484,7 +506,7 @@ export default function TodoPage() {
             <select
               value={formData.優先級}
               onChange={(e) => setFormData({ ...formData, 優先級: e.target.value })}
-              style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
+              style={{ padding: '8px 10px', fontSize: '13px', borderRadius: '8px', ...getPrioritySelectStyle(formData.優先級) }}
             >
               {PRIORITY_OPTIONS.map((opt) => (
                 <option key={opt} value={opt}>{opt}</option>
@@ -748,7 +770,7 @@ export default function TodoPage() {
                 <select
                   value={editFormData.進度}
                   onChange={(e) => setEditFormData({ ...editFormData, 進度: e.target.value })}
-                  style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
+                  style={{ padding: '8px 10px', fontSize: '13px', borderRadius: '8px', ...getProgressSelectStyle(editFormData.進度) }}
                 >
                   {PROGRESS_OPTIONS.map((opt) => (
                     <option key={opt} value={opt}>{opt}</option>
@@ -761,7 +783,7 @@ export default function TodoPage() {
                 <select
                   value={editFormData.優先級}
                   onChange={(e) => setEditFormData({ ...editFormData, 優先級: e.target.value })}
-                  style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
+                  style={{ padding: '8px 10px', fontSize: '13px', borderRadius: '8px', ...getPrioritySelectStyle(editFormData.優先級) }}
                 >
                   {PRIORITY_OPTIONS.map((opt) => (
                     <option key={opt} value={opt}>{opt}</option>
