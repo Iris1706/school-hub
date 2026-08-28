@@ -757,29 +757,29 @@ export default function ReportGenerator() {
 
                             return (
                               <div style={{ marginBottom: '2px' }}>
-                                {bandSchedule && (
-                                  <div
+                                <div
+                                  style={{
+                                    display: 'flex',
+                                    gap: '6px',
+                                    alignItems: 'center',
+                                    marginBottom: '3px',
+                                    padding: '4px 6px',
+                                    backgroundColor: '#f3f4f6',
+                                    borderRadius: '4px',
+                                    minHeight: '24px',
+                                  }}
+                                >
+                                  <span
                                     style={{
-                                      display: 'flex',
-                                      gap: '6px',
-                                      alignItems: 'center',
-                                      marginBottom: '3px',
-                                      padding: '4px 6px',
-                                      backgroundColor: '#f3f4f6',
-                                      borderRadius: '4px',
-                                      minHeight: '24px',
+                                      fontWeight: '600',
+                                      color: '#1f2937',
+                                      fontSize: '12px',
+                                      minWidth: '50px',
                                     }}
                                   >
-                                    <span
-                                      style={{
-                                        fontWeight: '600',
-                                        color: '#1f2937',
-                                        fontSize: '12px',
-                                        minWidth: '50px',
-                                      }}
-                                    >
-                                      iris
-                                    </span>
+                                    iris
+                                  </span>
+                                  {bandSchedule && (
                                     <span
                                       style={{
                                         display: 'inline-block',
@@ -794,8 +794,8 @@ export default function ReportGenerator() {
                                     >
                                       {bandSchedule}
                                     </span>
-                                  </div>
-                                )}
+                                  )}
+                                </div>
                                 {hasSchedules && (
                                   <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', paddingLeft: '6px' }}>
                                     {irisPerson.schedules.map((schedule, sidx) => (
