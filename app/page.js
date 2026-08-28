@@ -66,7 +66,14 @@ export default function DashboardPage() {
             const progress = (todo.進度 || "").trim();
             return progress !== "完成";
           });
-          setTodos(filtered);
+          // 按優先級排序：急 > 一般 > 不急
+          const sorted = filtered.sort((a, b) => {
+            const priorityOrder = { '急': 1, '一般': 2, '不急': 3 };
+            const orderA = priorityOrder[a.優先級] || 999;
+            const orderB = priorityOrder[b.優先級] || 999;
+            return orderA - orderB;
+          });
+          setTodos(sorted);
         }
       } catch (err) {
         console.error("讀取待辦事項失敗：", err);
