@@ -223,11 +223,11 @@ export default function TodoPage() {
   // 進度樣式
   const getProgressStyle = (progress) => {
     const styles = {
-      '待處理': { backgroundColor: '#3b82f6', color: 'white' },
-      '已處理待追蹤': { backgroundColor: '#8b5cf6', color: 'white' },
-      '完成': { backgroundColor: '#10b981', color: 'white' },
+      '待處理': { backgroundColor: '#93c5fd', color: '#1e3a8a' },
+      '已處理待追蹤': { backgroundColor: '#a5b4fc', color: '#3730a3' },
+      '完成': { backgroundColor: '#86efac', color: '#165e31' },
     };
-    return styles[progress] || { backgroundColor: '#d1d5db', color: 'white' };
+    return styles[progress] || { backgroundColor: '#e5e7eb', color: '#374151' };
   };
 
   // 表格行組件
@@ -237,20 +237,19 @@ export default function TodoPage() {
       borderBottom: '1px solid var(--border, #e1e3e8)',
     }}>
       <td style={{ padding: '12px 8px' }}>
-        {todo.優先級 && (
-          <span
-            style={{
-              fontSize: '12px',
-              fontWeight: '600',
-              padding: '4px 8px',
-              borderRadius: '4px',
-              whiteSpace: 'nowrap',
-              ...getPriorityStyle(todo.優先級),
-            }}
-          >
-            {todo.優先級}
-          </span>
-        )}
+        <span
+          style={{
+            fontSize: '12px',
+            fontWeight: '600',
+            padding: '4px 8px',
+            borderRadius: '4px',
+            whiteSpace: 'nowrap',
+            display: 'inline-block',
+            ...getPriorityStyle(todo.優先級 || '一般'),
+          }}
+        >
+          {todo.優先級 || '一般'}
+        </span>
       </td>
       <td style={{ padding: '12px 8px', fontSize: '13px' }}>{formatDate(todo.日期)}</td>
       <td style={{ padding: '12px 8px', fontSize: '13px' }}>{todo.學校}</td>
@@ -270,20 +269,25 @@ export default function TodoPage() {
       </td>
       <td style={{ padding: '12px 8px' }}>
         <select
-          value={todo.進度 || ''}
-          onChange={(e) => handleChangeProgress(todo, e.target.value)}
+          value={todo.進度 || '待處理'}
+          onChange={(e) => {
+            handleChangeProgress(todo, e.target.value);
+          }}
           style={{
             fontSize: '12px',
             fontWeight: '600',
-            padding: '4px 8px',
+            padding: '6px 8px',
             borderRadius: '4px',
-            border: 'none',
+            border: '1px solid #e5e7eb',
             cursor: 'pointer',
+            backgroundColor: 'white',
             ...getProgressStyle(todo.進度),
           }}
         >
           {PROGRESS_OPTIONS.map((opt) => (
-            <option key={opt} value={opt}>{opt}</option>
+            <option key={opt} value={opt} style={{ backgroundColor: 'white', color: 'black' }}>
+              {opt}
+            </option>
           ))}
         </select>
       </td>
