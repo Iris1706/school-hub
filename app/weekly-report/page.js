@@ -390,27 +390,39 @@ export default function ReportGenerator() {
       });
     });
 
-    // 2. 填入班表狀態
+    // 2. 填入班表狀態（嘗試多種日期格式匹配）
     attendance.forEach((att) => {
       const person = String(att?.person || '').trim();
       const attDate = String(att?.date || '').trim();
 
-      if (person && attDate === dateStr && peopleData[person]) {
+      // 嘗試匹配日期（支持多種格式）
+      let isDateMatch = false;
+
+      if (attDate === dateStr) {
+        isDateMatch = true;
+      } else {
+        // 嘗試轉換日期格式進行匹配
+        try {
+          const attDateObj = new Date(attDate);
+          const attDateFormatted = `${attDateObj.getFullYear()}/${attDateObj.getMonth() + 1}/${attDateObj.getDate()}`;
+          if (attDateFormatted === dateStr) {
+            isDateMatch = true;
+          }
+        } catch (e) {
+          // 忽略格式轉換錯誤
+        }
+      }
+
+      if (person && isDateMatch && peopleData[person]) {
         const status = String(att?.status || '').trim();
         if (status) {
           peopleData[person].bandSchedule = status;
-          // 調試：打印成功匹配的數據
-          if (dateStr === '2026/8/23') {
-            console.log(`✓ 匹配班表: ${person} - ${dateStr} - ${status}`);
-          }
+          console.log(`✓ 匹配班表: ${person} - ${dateStr} - ${status}`);
         }
       }
     });
 
-    // 調試：顯示該日期的所有數據
-    if (dateStr === '2026/8/23') {
-      console.log(`日期 ${dateStr} 的班表數據:`, Object.values(peopleData).filter(p => p.bandSchedule));
-    }
+    console.log(`日期 ${dateStr} 的班表數據:`, Object.values(peopleData).filter(p => p.bandSchedule || p.schedules.length > 0));
 
     return Object.values(peopleData);
   };
