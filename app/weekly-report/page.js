@@ -120,14 +120,40 @@ export default function ReportGenerator() {
 
             if (response.ok) {
               const json = await response.json();
-              // 處理兩種 API 格式：{ data: [...] } 或直接 [...]
-              newData[endpoint.key] = json?.data || json || [];
+
+              // 特別調試 attendance API
+              if (endpoint.key === 'attendance') {
+                console.log(`======== /api/schedule 原始響應 ========`);
+                console.log(`json 本身:`, json);
+                console.log(`json 的類型:`, typeof json);
+                console.log(`JSON.stringify(json):`, JSON.stringify(json).substring(0, 500));
+                console.log(`json?.data:`, json?.data);
+                console.log(`json?.attendance:`, json?.attendance);
+                console.log(`json?.records:`, json?.records);
+                console.log(`是否為陣列:`, Array.isArray(json));
+                console.log(`================================`);
+              }
+
+              // 處理多種 API 格式
+              let extractedData;
+              if (json?.data) {
+                extractedData = json.data;
+              } else if (json?.attendance) {
+                extractedData = json.attendance;
+              } else if (json?.records) {
+                extractedData = json.records;
+              } else if (Array.isArray(json)) {
+                extractedData = json;
+              } else {
+                extractedData = [];
+              }
+
+              newData[endpoint.key] = Array.isArray(extractedData) ? extractedData : [];
 
               // 調試日志
               if (endpoint.key === 'attendance') {
                 console.log(`======== 班表數據（attendance）完整信息 ========`);
                 console.log(`✓ API 返回成功`);
-                console.log(`原始 json:`, json);
                 console.log(`提取後的 newData[attendance]:`, newData[endpoint.key]);
                 console.log(`是否為陣列:`, Array.isArray(newData[endpoint.key]));
                 console.log(`陣列長度:`, Array.isArray(newData[endpoint.key]) ? newData[endpoint.key].length : 'N/A');
