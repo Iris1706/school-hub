@@ -924,8 +924,8 @@ export default function ReportGenerator() {
                               const eventStr = String(event).trim();
                               const colorMap = {
                                 '三多': { bgColor: '#d4edbb', textColor: '#374151' },
-                                '上午(外)': { bgColor: '#c6dbe1', textColor: '#374151' },
-                                '下午(外)': { bgColor: '#ffcfc8', textColor: '#374151' },
+                                '上午(外)': { bgColor: '#e6cff3', textColor: '#374151' },
+                                '下午(外)': { bgColor: '#e6cff3', textColor: '#374151' },
                                 '特休': { bgColor: '#ca3750', textColor: '#ffffff' },
                                 '排休': { bgColor: '#ffe59f', textColor: '#374151' },
                                 '巡檢': { bgColor: '#c0e1f6', textColor: '#374151' },
