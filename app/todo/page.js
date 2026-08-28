@@ -235,7 +235,7 @@ export default function TodoPage() {
   // 分組和排序
   // 排序函數 - 按優先級排序
   const sortByPriority = (a, b) => {
-    const priorityOrder = { '急': 1, '不急': 2, '一般': 3 };
+    const priorityOrder = { '急': 1, '一般': 2, '不急': 3 };
     const orderA = priorityOrder[a.優先級] || 999;
     const orderB = priorityOrder[b.優先級] || 999;
     return orderA - orderB;
