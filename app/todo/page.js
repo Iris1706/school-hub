@@ -269,20 +269,23 @@ export default function TodoPage() {
         {todo.郵件 && <div style={{ fontSize: '12px', color: 'var(--text-secondary, #666)' }}>{todo.郵件}</div>}
       </td>
       <td style={{ padding: '12px 8px' }}>
-        {todo.進度 && (
-          <span
-            style={{
-              fontSize: '12px',
-              fontWeight: '600',
-              padding: '4px 8px',
-              borderRadius: '4px',
-              whiteSpace: 'nowrap',
-              ...getProgressStyle(todo.進度),
-            }}
-          >
-            {todo.進度}
-          </span>
-        )}
+        <select
+          value={todo.進度 || ''}
+          onChange={(e) => handleChangeProgress(todo, e.target.value)}
+          style={{
+            fontSize: '12px',
+            fontWeight: '600',
+            padding: '4px 8px',
+            borderRadius: '4px',
+            border: 'none',
+            cursor: 'pointer',
+            ...getProgressStyle(todo.進度),
+          }}
+        >
+          {PROGRESS_OPTIONS.map((opt) => (
+            <option key={opt} value={opt}>{opt}</option>
+          ))}
+        </select>
       </td>
       <td style={{ padding: '12px 8px', fontSize: '13px', color: 'var(--text-secondary, #666)' }}>
         {todo.備註}
