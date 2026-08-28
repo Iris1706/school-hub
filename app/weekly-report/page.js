@@ -455,6 +455,7 @@ export default function ReportGenerator() {
     const allPeople = ['P', 'E', 'I', 'H', 'M', 'Z', 'A', 'J'];
     const attendance = Array.isArray(data.attendance) ? data.attendance : [];
     const schedule = Array.isArray(data.schedule) ? data.schedule : [];
+    const weeklyStatus = Array.isArray(data.weeklyStatus) ? data.weeklyStatus : [];
 
     const peopleData = {};
 
@@ -467,7 +468,31 @@ export default function ReportGenerator() {
       };
     });
 
-    // 1. 填入特定行程（同時嘗試從行程中提取班表狀態）
+    // 1. 從 weeklyStatus 填入班表狀態（優先級最高）
+    if (weeklyStatus.length > 0) {
+      console.log(`📊 weeklyStatus 數據長度: ${weeklyStatus.length}, 第一筆:`, weeklyStatus[0]);
+
+      weeklyStatus.forEach((status) => {
+        const statusDate = String(status?.date || '').trim();
+        const statusPerson = String(status?.person || '').trim();
+        const statusValue = String(status?.status || status?.attendance || status?.type || '').trim();
+
+        // 嘗試匹配日期
+        const normalizedStatusDate = normalizeDateString(statusDate);
+        const normalizedTarget = normalizeDateString(dateStr);
+
+        if (normalizedStatusDate === normalizedTarget && statusPerson && peopleData[statusPerson]) {
+          if (statusValue) {
+            peopleData[statusPerson].bandSchedule = statusValue;
+            console.log(`✅ 從 weeklyStatus 填入班表: ${statusPerson} [${dateStr}] = ${statusValue}`);
+          }
+        }
+      });
+    } else {
+      console.warn(`⚠️ weeklyStatus 數據為空`);
+    }
+
+    // 2. 填入特定行程
     const daySchedules = schedule.filter((s) => {
       try {
         const apiDate = String(s?.date || '').trim();
@@ -500,11 +525,8 @@ export default function ReportGenerator() {
       });
     });
 
-    // 2. 填入班表狀態（從 attendance 數據，作為備選方案）
-    if (attendance.length === 0) {
-      console.warn(`⚠️ attendance 數據為空 - 班表狀態將從行程數據 (schedule) 中提取`);
-    } else {
-      // 標準化目標日期
+    // 3. 填入班表狀態（從 attendance 數據，作為最後備選方案）
+    if (attendance.length > 0) {
       const normalizedTarget = normalizeDateString(dateStr);
 
       attendance.forEach((att) => {
@@ -512,7 +534,6 @@ export default function ReportGenerator() {
         const attDate = String(att?.date || '').trim();
         const status = String(att?.status || '').trim();
 
-        // 標準化 attendance 的日期
         const normalizedAttDate = normalizeDateString(attDate);
         const isDateMatch = normalizedAttDate === normalizedTarget;
 
