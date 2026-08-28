@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 
-const STATUS_OPTIONS = ['急', '不急', '一般'];
+const PRIORITY_OPTIONS = ['急', '不急', '一般'];
+const PROGRESS_OPTIONS = ['待處理', '已處理待追蹤', '完成'];
 
 // 日期格式化函數
 const formatDate = (dateString) => {
@@ -33,10 +34,9 @@ export default function TodoPage() {
     聯絡人: '',
     電話: '',
     郵件: '',
-    預計處理日期: '',
+    進度: '待處理',
     備註: '',
-    狀態: '一般',
-    完成: '',
+    優先級: '一般',
   });
 
   // 編輯表單狀態
@@ -47,9 +47,9 @@ export default function TodoPage() {
     聯絡人: '',
     電話: '',
     郵件: '',
-    預計處理日期: '',
+    進度: '待處理',
     備註: '',
-    狀態: '一般',
+    優先級: '一般',
   });
 
   // 載入待辦事項
@@ -99,10 +99,9 @@ export default function TodoPage() {
         聯絡人: '',
         電話: '',
         郵件: '',
-        預計處理日期: '',
+        進度: '待處理',
         備註: '',
-        狀態: '一般',
-        完成: '',
+        優先級: '一般',
       });
       await fetchTodos();
     } catch (err) {
@@ -122,9 +121,9 @@ export default function TodoPage() {
       聯絡人: todo.聯絡人,
       電話: todo.電話,
       郵件: todo.郵件,
-      預計處理日期: todo.預計處理日期,
+      進度: todo.進度,
       備註: todo.備註,
-      狀態: todo.狀態,
+      優先級: todo.優先級,
     });
     setShowEditModal(true);
   };
@@ -171,12 +170,12 @@ export default function TodoPage() {
     }
   };
 
-  // 更新待辦事項（特別是完成狀態）
-  const handleToggleComplete = async (todo) => {
+  // 更新進度狀態
+  const handleChangeProgress = async (todo, newProgress) => {
     try {
       const updatedTodo = {
         ...todo,
-        完成: todo.完成 === 'true' ? '' : 'true',
+        進度: newProgress,
       };
 
       const res = await fetch('/api/todos', {
@@ -194,31 +193,41 @@ export default function TodoPage() {
 
   // 分組和排序
   const pendingTodos = todos
-    .filter((t) => !t.完成 || t.完成 !== 'true')
+    .filter((t) => t.進度 !== '完成')
     .sort((a, b) => {
-      const statusOrder = { '急': 1, '不急': 2, '一般': 3 };
-      const orderA = statusOrder[a.狀態] || 999;
-      const orderB = statusOrder[b.狀態] || 999;
+      const priorityOrder = { '急': 1, '不急': 2, '一般': 3 };
+      const orderA = priorityOrder[a.優先級] || 999;
+      const orderB = priorityOrder[b.優先級] || 999;
       return orderA - orderB;
     });
 
   const completedTodos = todos
-    .filter((t) => t.完成 === 'true')
+    .filter((t) => t.進度 === '完成')
     .sort((a, b) => {
-      const statusOrder = { '急': 1, '不急': 2, '一般': 3 };
-      const orderA = statusOrder[a.狀態] || 999;
-      const orderB = statusOrder[b.狀態] || 999;
+      const priorityOrder = { '急': 1, '不急': 2, '一般': 3 };
+      const orderA = priorityOrder[a.優先級] || 999;
+      const orderB = priorityOrder[b.優先級] || 999;
       return orderA - orderB;
     });
 
-  // 狀態樣式
-  const getStatusStyle = (status) => {
+  // 優先級樣式
+  const getPriorityStyle = (priority) => {
     const styles = {
       '急': { backgroundColor: '#dc2626', color: 'white' },
       '不急': { backgroundColor: '#f59e0b', color: 'white' },
       '一般': { backgroundColor: '#6b7280', color: 'white' },
     };
-    return styles[status] || { backgroundColor: '#d1d5db', color: 'white' };
+    return styles[priority] || { backgroundColor: '#d1d5db', color: 'white' };
+  };
+
+  // 進度樣式
+  const getProgressStyle = (progress) => {
+    const styles = {
+      '待處理': { backgroundColor: '#3b82f6', color: 'white' },
+      '已處理待追蹤': { backgroundColor: '#8b5cf6', color: 'white' },
+      '完成': { backgroundColor: '#10b981', color: 'white' },
+    };
+    return styles[progress] || { backgroundColor: '#d1d5db', color: 'white' };
   };
 
   // 表格行組件
@@ -228,7 +237,7 @@ export default function TodoPage() {
       borderBottom: '1px solid var(--border, #e1e3e8)',
     }}>
       <td style={{ padding: '12px 8px' }}>
-        {todo.狀態 && (
+        {todo.優先級 && (
           <span
             style={{
               fontSize: '12px',
@@ -236,10 +245,10 @@ export default function TodoPage() {
               padding: '4px 8px',
               borderRadius: '4px',
               whiteSpace: 'nowrap',
-              ...getStatusStyle(todo.狀態),
+              ...getPriorityStyle(todo.優先級),
             }}
           >
-            {todo.狀態}
+            {todo.優先級}
           </span>
         )}
       </td>
@@ -259,7 +268,25 @@ export default function TodoPage() {
         {todo.電話 && <div style={{ fontSize: '12px', color: 'var(--text-secondary, #666)' }}>{todo.電話}</div>}
         {todo.郵件 && <div style={{ fontSize: '12px', color: 'var(--text-secondary, #666)' }}>{todo.郵件}</div>}
       </td>
-      <td style={{ padding: '12px 8px', fontSize: '13px' }}>{formatDate(todo.預計處理日期)}</td>
+      <td style={{ padding: '12px 8px' }}>
+        {todo.進度 && (
+          <span
+            style={{
+              fontSize: '12px',
+              fontWeight: '600',
+              padding: '4px 8px',
+              borderRadius: '4px',
+              whiteSpace: 'nowrap',
+              ...getProgressStyle(todo.進度),
+            }}
+          >
+            {todo.進度}
+          </span>
+        )}
+      </td>
+      <td style={{ padding: '12px 8px', fontSize: '13px', color: 'var(--text-secondary, #666)' }}>
+        {todo.備註}
+      </td>
       <td style={{ padding: '12px 8px', textAlign: 'center' }}>
         <div style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
           <button
@@ -295,14 +322,6 @@ export default function TodoPage() {
             刪除
           </button>
         </div>
-      </td>
-      <td style={{ padding: '12px 8px', textAlign: 'center' }}>
-        <input
-          type="checkbox"
-          checked={isCompleted}
-          onChange={() => handleToggleComplete(todo)}
-          style={{ cursor: 'pointer', width: '18px', height: '18px' }}
-        />
       </td>
     </tr>
   );
@@ -402,13 +421,16 @@ export default function TodoPage() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>預計處理日期</label>
-            <input
-              type="date"
-              value={formData.預計處理日期}
-              onChange={(e) => setFormData({ ...formData, 預計處理日期: e.target.value })}
+            <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>進度</label>
+            <select
+              value={formData.進度}
+              onChange={(e) => setFormData({ ...formData, 進度: e.target.value })}
               style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
-            />
+            >
+              {PROGRESS_OPTIONS.map((opt) => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -423,13 +445,13 @@ export default function TodoPage() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>狀態</label>
+            <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>優先級</label>
             <select
-              value={formData.狀態}
-              onChange={(e) => setFormData({ ...formData, 狀態: e.target.value })}
+              value={formData.優先級}
+              onChange={(e) => setFormData({ ...formData, 優先級: e.target.value })}
               style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
             >
-              {STATUS_OPTIONS.map((opt) => (
+              {PRIORITY_OPTIONS.map((opt) => (
                 <option key={opt} value={opt}>{opt}</option>
               ))}
             </select>
@@ -516,14 +538,14 @@ export default function TodoPage() {
                       backgroundColor: 'var(--background-secondary, #f9f9f9)',
                       borderBottom: '2px solid var(--border, #e1e3e8)',
                     }}>
-                      <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>狀態</th>
+                      <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>優先級</th>
                       <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>日期</th>
                       <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>學校</th>
                       <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>事件</th>
                       <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>聯絡人</th>
-                      <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>預計處理日期</th>
+                      <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>進度</th>
+                      <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>備註</th>
                       <th style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600' }}>操作</th>
-                      <th style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600' }}>完成</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -564,14 +586,14 @@ export default function TodoPage() {
                       backgroundColor: 'var(--background-secondary, #f9f9f9)',
                       borderBottom: '2px solid var(--border, #e1e3e8)',
                     }}>
-                      <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>狀態</th>
+                      <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>優先級</th>
                       <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>日期</th>
                       <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>學校</th>
                       <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>事件</th>
                       <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>聯絡人</th>
-                      <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>預計處理日期</th>
+                      <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>進度</th>
+                      <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600' }}>備註</th>
                       <th style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600' }}>操作</th>
-                      <th style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600' }}>取消</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -687,23 +709,26 @@ export default function TodoPage() {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>預計處理日期</label>
-                <input
-                  type="date"
-                  value={editFormData.預計處理日期}
-                  onChange={(e) => setEditFormData({ ...editFormData, 預計處理日期: e.target.value })}
+                <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>進度</label>
+                <select
+                  value={editFormData.進度}
+                  onChange={(e) => setEditFormData({ ...editFormData, 進度: e.target.value })}
                   style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
-                />
+                >
+                  {PROGRESS_OPTIONS.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>狀態</label>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>優先級</label>
                 <select
-                  value={editFormData.狀態}
-                  onChange={(e) => setEditFormData({ ...editFormData, 狀態: e.target.value })}
+                  value={editFormData.優先級}
+                  onChange={(e) => setEditFormData({ ...editFormData, 優先級: e.target.value })}
                   style={{ padding: '8px 10px', fontSize: '13px', border: '1px solid var(--border, #e1e3e8)', borderRadius: '8px' }}
                 >
-                  {STATUS_OPTIONS.map((opt) => (
+                  {PRIORITY_OPTIONS.map((opt) => (
                     <option key={opt} value={opt}>{opt}</option>
                   ))}
                 </select>

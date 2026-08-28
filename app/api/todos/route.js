@@ -14,10 +14,9 @@ const FIELD_NAMES = [
   "聯絡人",
   "電話",
   "郵件",
-  "預計處理日期",
+  "進度",
   "備註",
-  "狀態",
-  "完成",
+  "優先級",
 ];
 
 // GET: 獲取所有待辦事項（無上限）
@@ -50,10 +49,9 @@ export async function GET() {
           聯絡人: row[headerIndex.聯絡人] || "",
           電話: row[headerIndex.電話] || "",
           郵件: row[headerIndex.郵件] || "",
-          預計處理日期: row[headerIndex.預計處理日期] || "",
+          進度: row[headerIndex.進度] || "",
           備註: row[headerIndex.備註] || "",
-          狀態: row[headerIndex.狀態] || "",
-          完成: row[headerIndex.完成] || "",
+          優先級: row[headerIndex.優先級] || "",
         };
       });
 
@@ -78,10 +76,9 @@ export async function POST(req) {
       body.聯絡人 || "",
       body.電話 || "",
       body.郵件 || "",
-      body.預計處理日期 || "",
+      body.進度 || "",
       body.備註 || "",
-      body.狀態 || "",
-      body.完成 || "",
+      body.優先級 || "",
     ];
 
     // 使用 append 方法自動新增到最後（推薦方法）
@@ -126,10 +123,9 @@ export async function PUT(req) {
       data.聯絡人 || "",
       data.電話 || "",
       data.郵件 || "",
-      data.預計處理日期 || "",
+      data.進度 || "",
       data.備註 || "",
-      data.狀態 || "",
-      data.完成 || "",
+      data.優先級 || "",
     ];
 
     // 更新行
@@ -169,10 +165,10 @@ export async function DELETE(req) {
     // 刪除行（實際上是清空該行）
     await sheets.spreadsheets.values.update({
       spreadsheetId: SPREADSHEET_ID,
-      range: `'${TODO_TAB}'!A${__row}:J${__row}`,
+      range: `'${TODO_TAB}'!A${__row}:I${__row}`,
       valueInputOption: "RAW",
       requestBody: {
-        values: [Array(10).fill("")],
+        values: [Array(9).fill("")],
       },
     });
 
