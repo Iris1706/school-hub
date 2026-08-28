@@ -450,10 +450,17 @@ export default function ReportGenerator() {
     return trimmed;
   };
 
+  // 提取目標日期的日期數字（如 "2026/8/24" → 24）
+  const getDateDay = (dateStr) => {
+    const parts = dateStr.split('/');
+    return parseInt(parts[parts.length - 1]);
+  };
+
   // 獲取當天所有人員的班表數據（包括特定行程和班表狀態）
   const getAllPeopleForDay = (dateStr) => {
     const allPeople = ['P', 'E', 'I', 'H', 'M', 'Z', 'A', 'J'];
     const schedule = Array.isArray(data.schedule) ? data.schedule : [];
+    const weeklyStatus = data.weeklyStatus || {};
 
     const peopleData = {};
 
@@ -466,7 +473,36 @@ export default function ReportGenerator() {
       };
     });
 
-    // 從行程數據中提取所有信息
+    // 1. 從 weeklyStatus 提取班表狀態
+    const targetDay = getDateDay(dateStr);
+    const employees = Array.isArray(weeklyStatus) ? weeklyStatus : (weeklyStatus?.data || weeklyStatus?.employees || []);
+    const dates = weeklyStatus?.dates || [];
+
+    if (employees.length > 0 && dates.length > 0) {
+      // 在 dates 陣列中找到目標日期的索引
+      const dateIndex = dates.indexOf(targetDay);
+
+      if (dateIndex >= 0) {
+        console.log(`📊 [${dateStr}] 找到日期索引: ${dateIndex}`);
+
+        employees.forEach((emp) => {
+          const empId = String(emp?.employeeId || emp?.person || '').trim().toUpperCase();
+          const dailyStatus = emp?.dailyStatus;
+
+          if (dailyStatus && Array.isArray(dailyStatus) && dateIndex < dailyStatus.length) {
+            const status = String(dailyStatus[dateIndex] || '').trim();
+            if (status && peopleData[empId]) {
+              peopleData[empId].bandSchedule = status;
+              if (empId === 'I') {
+                console.log(`✅ Iris [${dateStr}] 班表狀態: ${status}`);
+              }
+            }
+          }
+        });
+      }
+    }
+
+    // 2. 填入特定行程
     const daySchedules = schedule.filter((s) => {
       try {
         const apiDate = String(s?.date || '').trim();
@@ -476,29 +512,15 @@ export default function ReportGenerator() {
       }
     });
 
-    console.log(`[${dateStr}] 找到 ${daySchedules.length} 筆行程數據`);
-
-    daySchedules.forEach((scheduleItem, idx) => {
+    daySchedules.forEach((scheduleItem) => {
       const persons = String(scheduleItem?.person || '')
         .split('/')
         .map((p) => p.trim())
         .filter((p) => p);
 
-      const eventName = String(scheduleItem?.event || '').trim();
-
       persons.forEach((person) => {
         if (peopleData[person]) {
-          // 添加行程
           peopleData[person].schedules.push(scheduleItem);
-
-          // 從 event 提取班表狀態（作為主要班表信息）
-          if (eventName && !peopleData[person].bandSchedule) {
-            // event 欄位就是班表狀態
-            peopleData[person].bandSchedule = eventName;
-            if (person === 'I') {
-              console.log(`✅ Iris [${dateStr}] 班表狀態: ${eventName}`);
-            }
-          }
         }
       });
     });
