@@ -227,13 +227,21 @@ export default function DashboardPage() {
           }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
               {todos.map((todo, idx) => {
-                const status = (todo.狀態 || "一般").trim();
-                let statusStyles = { background: "#f3f4f6", color: "#374151", border: "1px solid #e5e7eb" };
+                const priority = (todo.優先級 || "一般").trim();
+                const progress = (todo.進度 || "待處理").trim();
 
-                if (status.includes("急")) {
-                  statusStyles = { background: "#fce4e4", color: "#dc2626", border: "1px solid #f5c5c5" };
-                } else if (status.includes("不急")) {
-                  statusStyles = { background: "#fde8d0", color: "#d97706", border: "1px solid #f5d4a8" };
+                let priorityStyles = { background: "#d4edbc", color: "black" };
+                if (priority === "急") {
+                  priorityStyles = { background: "#b10202", color: "white" };
+                } else if (priority === "不急") {
+                  priorityStyles = { background: "#e6cff2", color: "black" };
+                }
+
+                let progressStyles = { background: "#bfe1f6", color: "black" };
+                if (progress === "待處理") {
+                  progressStyles = { background: "#b10202", color: "white" };
+                } else if (progress === "已處理待追蹤") {
+                  progressStyles = { background: "#ffe5a0", color: "black" };
                 }
 
                 return (
@@ -255,13 +263,13 @@ export default function DashboardPage() {
                       padding: "4px 10px",
                       borderRadius: 6,
                       whiteSpace: "nowrap",
-                      ...statusStyles
+                      ...priorityStyles
                     }}>
-                      {todo.狀態 || "一般"}
+                      {todo.優先級 || "一般"}
                     </span>
                     <span style={{ color: "#d1d5db" }}>|</span>
                     <span style={{ color: "#1f2937", whiteSpace: "nowrap" }}>
-                      {todo.預計處理日期 || "未設定"}
+                      {todo.日期 || "未設定"}
                     </span>
                     <span style={{ color: "#d1d5db" }}>|</span>
                     <span style={{ color: "#1f2937", whiteSpace: "nowrap" }}>
@@ -282,6 +290,16 @@ export default function DashboardPage() {
                         </span>
                       )}
                     </div>
+                    <span style={{ color: "#d1d5db" }}>|</span>
+                    <span style={{
+                      fontWeight: 600,
+                      padding: "4px 10px",
+                      borderRadius: 6,
+                      whiteSpace: "nowrap",
+                      ...progressStyles
+                    }}>
+                      {todo.進度 || "待處理"}
+                    </span>
                   </div>
                 );
               })}
