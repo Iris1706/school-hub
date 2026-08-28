@@ -681,50 +681,6 @@ export default function ReportGenerator() {
                   // 篩選出 Iris（'I'）的數據
                   const irisPerson = dayPeople.find(p => p.person === 'I');
 
-                  const getEventColor = (event) => {
-                    if (!event) return { bgColor: '#d4edbb', textColor: '#374151' };
-                    const eventStr = String(event).trim();
-                    const colorMap = {
-                      '三多': { bgColor: '#d4edbb', textColor: '#374151' },
-                      '上午(外)': { bgColor: '#c6dbe1', textColor: '#374151' },
-                      '下午(外)': { bgColor: '#ffcfc8', textColor: '#374151' },
-                      '特休': { bgColor: '#ca3750', textColor: '#ffffff' },
-                      '排休': { bgColor: '#ffe59f', textColor: '#374151' },
-                      '巡檢': { bgColor: '#c0e1f6', textColor: '#374151' },
-                      '上午(巡)': { bgColor: '#5b3286', textColor: '#ffffff' },
-                      '下午(巡)': { bgColor: '#5b3286', textColor: '#ffffff' },
-                      '國定假日': { bgColor: '#d81b91', textColor: '#ffffff' },
-                      '彈性假': { bgColor: '#a7adb6', textColor: '#374151' },
-                      '病假': { bgColor: '#7d9ac4', textColor: '#374151' },
-                      '事假': { bgColor: '#473822', textColor: '#ffffff' },
-                      '駐點': { bgColor: '#e28d38', textColor: '#374151' },
-                      '上午(特)': { bgColor: '#b10202', textColor: '#ffffff' },
-                      '下午(特)': { bgColor: '#b10202', textColor: '#ffffff' },
-                    };
-                    return colorMap[eventStr] || { bgColor: '#d4edbb', textColor: '#374151' };
-                  };
-
-                  const hasSchedules = irisPerson && irisPerson.schedules && irisPerson.schedules.length > 0;
-                  const bandSchedule = irisPerson ? irisPerson.bandSchedule : null;
-
-                  // 生成 Iris 的顯示文本和顏色
-                  let displayText = '';
-                  let statusColor = { bgColor: '#d4edbb', textColor: '#374151' };
-
-                  if (hasSchedules) {
-                    // 有行程時：顯示 "iris 事件（細項：區域 地點 事件）"
-                    const schedule = irisPerson.schedules[0];
-                    displayText = `iris ${schedule.event || ''}（細項：${[schedule.region || '', schedule.location || '', schedule.event || ''].filter(Boolean).join(' ')}）`;
-                    statusColor = getEventColor(schedule.event);
-                  } else if (bandSchedule) {
-                    // 沒有行程時：顯示 "iris 班表狀態（沒有細項）"
-                    displayText = `iris ${bandSchedule}（沒有細項）`;
-                    statusColor = getEventColor(bandSchedule);
-                  } else {
-                    // 都沒有時：不顯示
-                    displayText = '';
-                  }
-
                   return (
                     <div
                       key={idx}
@@ -737,6 +693,7 @@ export default function ReportGenerator() {
                         display: 'flex',
                         flexDirection: 'column',
                         gap: '9px',
+                        minHeight: '280px',
                       }}
                     >
                       {/* 日期和星期 - 黑色背景 */}
@@ -767,35 +724,107 @@ export default function ReportGenerator() {
                         }}
                       />
 
-                      {/* Iris 班表信息 */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
-                        {displayText ? (
-                          <div
-                            style={{
-                              padding: '8px',
-                              backgroundColor: statusColor.bgColor,
-                              color: statusColor.textColor,
-                              borderRadius: '4px',
-                              fontSize: '12px',
-                              lineHeight: '1.4',
-                              fontWeight: '500',
-                            }}
-                          >
-                            {displayText}
-                          </div>
-                        ) : (
-                          <div
-                            style={{
-                              padding: '8px',
-                              backgroundColor: '#f3f4f6',
-                              color: '#9ca3af',
-                              borderRadius: '4px',
-                              fontSize: '12px',
-                              textAlign: 'center',
-                            }}
-                          >
-                            無班表資料
-                          </div>
+                      {/* 行程列表 */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1 }}>
+                        {irisPerson && (
+                          (() => {
+                            const getEventColor = (event) => {
+                              if (!event) return { bgColor: '#d4edbb', textColor: '#374151' };
+                              const eventStr = String(event).trim();
+                              const colorMap = {
+                                '三多': { bgColor: '#d4edbb', textColor: '#374151' },
+                                '上午(外)': { bgColor: '#c6dbe1', textColor: '#374151' },
+                                '下午(外)': { bgColor: '#ffcfc8', textColor: '#374151' },
+                                '特休': { bgColor: '#ca3750', textColor: '#ffffff' },
+                                '排休': { bgColor: '#ffe59f', textColor: '#374151' },
+                                '巡檢': { bgColor: '#c0e1f6', textColor: '#374151' },
+                                '上午(巡)': { bgColor: '#5b3286', textColor: '#ffffff' },
+                                '下午(巡)': { bgColor: '#5b3286', textColor: '#ffffff' },
+                                '國定假日': { bgColor: '#d81b91', textColor: '#ffffff' },
+                                '彈性假': { bgColor: '#a7adb6', textColor: '#374151' },
+                                '病假': { bgColor: '#7d9ac4', textColor: '#374151' },
+                                '事假': { bgColor: '#473822', textColor: '#ffffff' },
+                                '駐點': { bgColor: '#e28d38', textColor: '#374151' },
+                                '上午(特)': { bgColor: '#b10202', textColor: '#ffffff' },
+                                '下午(特)': { bgColor: '#b10202', textColor: '#ffffff' },
+                              };
+                              return colorMap[eventStr] || { bgColor: '#d4edbb', textColor: '#374151' };
+                            };
+
+                            const hasSchedules = irisPerson.schedules && irisPerson.schedules.length > 0;
+                            const bandSchedule = irisPerson.bandSchedule;
+                            const statusColor = getEventColor(bandSchedule);
+
+                            return (
+                              <div style={{ marginBottom: '2px' }}>
+                                {bandSchedule && (
+                                  <div
+                                    style={{
+                                      display: 'flex',
+                                      gap: '6px',
+                                      alignItems: 'center',
+                                      marginBottom: '3px',
+                                      padding: '4px 6px',
+                                      backgroundColor: '#f3f4f6',
+                                      borderRadius: '4px',
+                                      minHeight: '24px',
+                                    }}
+                                  >
+                                    <span
+                                      style={{
+                                        fontWeight: '600',
+                                        color: '#1f2937',
+                                        fontSize: '12px',
+                                        minWidth: '50px',
+                                      }}
+                                    >
+                                      iris
+                                    </span>
+                                    <span
+                                      style={{
+                                        display: 'inline-block',
+                                        backgroundColor: statusColor.bgColor,
+                                        color: statusColor.textColor,
+                                        padding: '2px 6px',
+                                        borderRadius: '3px',
+                                        fontSize: '10px',
+                                        fontWeight: '600',
+                                        whiteSpace: 'nowrap',
+                                      }}
+                                    >
+                                      {bandSchedule}
+                                    </span>
+                                  </div>
+                                )}
+                                {hasSchedules && (
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', paddingLeft: '6px' }}>
+                                    {irisPerson.schedules.map((schedule, sidx) => (
+                                      <div
+                                        key={sidx}
+                                        style={{
+                                          padding: '3px 6px',
+                                          backgroundColor: '#f9fafb',
+                                          borderRadius: '3px',
+                                          color: '#374151',
+                                          fontSize: '10px',
+                                          lineHeight: '1.3',
+                                          borderLeft: '2px solid #e5e7eb',
+                                        }}
+                                      >
+                                        {schedule.region && schedule.location ? (
+                                          `${schedule.region} ${schedule.location} ${schedule.event || ''}`
+                                        ) : schedule.location ? (
+                                          `${schedule.location} ${schedule.event || ''}`
+                                        ) : (
+                                          schedule.event
+                                        )}
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })()
                         )}
                       </div>
                     </div>
