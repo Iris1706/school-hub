@@ -20,13 +20,14 @@ const FIELD_NAMES = [
   "完成",
 ];
 
-// GET: 獲取所有待辦事項
+// GET: 獲取所有待辦事項（無上限）
 export async function GET() {
   try {
     const sheets = getSheetsClient();
+    // 移除行數限制，讀取整個表格
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: `'${TODO_TAB}'!A1:J1000`,
+      range: `'${TODO_TAB}'!A:J`,
     });
     const rows = res.data.values || [];
     const headers = rows[0] || [];
@@ -37,22 +38,24 @@ export async function GET() {
       headerIndex[field] = headers.indexOf(field);
     });
 
-    // 解析資料行
-    const data = rows.slice(1).map((row, idx) => {
-      return {
-        __row: idx + 2,
-        日期: row[headerIndex.日期] || "",
-        學校: row[headerIndex.學校] || "",
-        事件: row[headerIndex.事件] || "",
-        聯絡人: row[headerIndex.聯絡人] || "",
-        電話: row[headerIndex.電話] || "",
-        郵件: row[headerIndex.郵件] || "",
-        預計處理日期: row[headerIndex.預計處理日期] || "",
-        備註: row[headerIndex.備註] || "",
-        狀態: row[headerIndex.狀態] || "",
-        完成: row[headerIndex.完成] || "",
-      };
-    });
+    // 解析資料行（過濾掉空行）
+    const data = rows.slice(1)
+      .filter(row => row && row.some(cell => cell?.trim()))
+      .map((row, idx) => {
+        return {
+          __row: idx + 2,
+          日期: row[headerIndex.日期] || "",
+          學校: row[headerIndex.學校] || "",
+          事件: row[headerIndex.事件] || "",
+          聯絡人: row[headerIndex.聯絡人] || "",
+          電話: row[headerIndex.電話] || "",
+          郵件: row[headerIndex.郵件] || "",
+          預計處理日期: row[headerIndex.預計處理日期] || "",
+          備註: row[headerIndex.備註] || "",
+          狀態: row[headerIndex.狀態] || "",
+          完成: row[headerIndex.完成] || "",
+        };
+      });
 
     return NextResponse.json({ headers, data });
   } catch (err) {
@@ -61,7 +64,7 @@ export async function GET() {
   }
 }
 
-// POST: 新增待辦事項
+// POST: 新增待辦事項（無上限）
 export async function POST(req) {
   try {
     const body = await req.json();
@@ -81,18 +84,10 @@ export async function POST(req) {
       body.完成 || "",
     ];
 
-    // 取得最後一列
-    const getRes = await sheets.spreadsheets.values.get({
-      spreadsheetId: SPREADSHEET_ID,
-      range: `'${TODO_TAB}'!A:A`,
-    });
-
-    const lastRow = getRes.data.values?.length || 1;
-
-    // 添加新行
+    // 使用 append 方法自動新增到最後（推薦方法）
     await sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
-      range: `'${TODO_TAB}'!A${lastRow + 1}`,
+      range: `'${TODO_TAB}'!A:J`,
       valueInputOption: "RAW",
       requestBody: {
         values: [newRow],
@@ -102,7 +97,6 @@ export async function POST(req) {
     return NextResponse.json({
       success: true,
       message: "待辦事項已新增",
-      rowNumber: lastRow + 1,
     });
   } catch (err) {
     console.error("POST /api/todos error:", err);
