@@ -915,6 +915,7 @@ export default function ReportGenerator() {
                                 '駐點': { bgColor: '#e28d38', textColor: '#374151' },
                                 '上午(特)': { bgColor: '#b10202', textColor: '#ffffff' },
                                 '下午(特)': { bgColor: '#b10202', textColor: '#ffffff' },
+                                '颱風假': { bgColor: '#215a6c', textColor: '#ffffff' },
                               };
                               return colorMap[eventStr] || { bgColor: '#d4edbb', textColor: '#374151' };
                             };
