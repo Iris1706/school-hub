@@ -26,7 +26,7 @@ export default function ReportGenerator() {
     schedule: [],
     attendance: [],
     todos: [],
-    weeklyStatus: { employees: [], dates: [] },
+    weeklyStatus: {}, // 改為物件，key 是 "year/month"
     foreignObjects: { count: 0, weekStart: '', weekEnd: '' },
     annualStats: { data: [], total: 0 },
     repairDetails: { headers: [], data: [], count: 0 },
@@ -59,6 +59,25 @@ export default function ReportGenerator() {
     return { startDate, endDate };
   };
 
+  // 獲取本週涉及的所有月份
+  const getMonthsInWeek = () => {
+    const { startDate, endDate } = getDateRange();
+    const months = [];
+    const current = new Date(startDate);
+
+    while (current <= endDate) {
+      const year = current.getFullYear();
+      const month = current.getMonth() + 1;
+      const key = `${year}/${month}`;
+      if (!months.find(m => m.key === key)) {
+        months.push({ year, month, key });
+      }
+      current.setDate(current.getDate() + 1);
+    }
+
+    return months;
+  };
+
   // 獲取本週日期（週一到週日）
   const getWeekDays = () => {
     const { startDate } = getDateRange();
@@ -87,17 +106,14 @@ export default function ReportGenerator() {
       setLoading(true);
       setError('');
       try {
-        // 計算年月參數
-        const { startDate } = getDateRange();
-        const year = startDate.getFullYear();
-        const month = startDate.getMonth() + 1;
+        // 獲取本週涉及的所有月份
+        const monthsInWeek = getMonthsInWeek();
 
         const endpoints = [
           { key: 'inspect', url: '/api/inspect' },
           { key: 'schedule', url: '/api/daily-schedule' },
           { key: 'attendance', url: '/api/schedule' },
           { key: 'todos', url: '/api/todos' },
-          { key: 'weeklyStatus', url: `/api/weekly-status?year=${year}&month=${month}` },
           { key: 'foreignObjects', url: '/api/foreign-objects' },
           { key: 'annualStats', url: '/api/annual-stats' },
           { key: 'repairDetails', url: '/api/repair-details' },
@@ -109,7 +125,7 @@ export default function ReportGenerator() {
           schedule: [],
           attendance: [],
           todos: [],
-          weeklyStatus: { employees: [], dates: [] },
+          weeklyStatus: {},
           foreignObjects: { count: 0, weekStart: '', weekEnd: '' },
           annualStats: { data: [], total: 0 },
           repairDetails: { headers: [], data: [], count: 0 },
@@ -171,55 +187,7 @@ export default function ReportGenerator() {
                 extractedData = [];
               }
 
-              // 特別處理 weeklyStatus - 返回格式 { data: [...], dates: [...] }
-              if (endpoint.key === 'weeklyStatus') {
-                console.log('📊 weeklyStatus API 完整回應:', json);
-                console.log('json.data:', json?.data);
-                console.log('json.dates:', json?.dates);
-                console.log('json 的所有 keys:', Object.keys(json || {}));
-
-                // 保存調試信息供頁面顯示
-                setApiDebug({
-                  endpoint: endpoint.url,
-                  rawJson: json,
-                  dataLength: json?.data?.length || 0,
-                  datesLength: json?.dates?.length || 0,
-                  dates: json?.dates,
-                  firstEmployee: json?.data?.[0],
-                });
-
-                newData[endpoint.key] = {
-                  employees: json?.data || [],
-                  dates: json?.dates || [],
-                };
-                console.log('提取後的 newData[weeklyStatus]:', newData[endpoint.key]);
-              } else {
-                newData[endpoint.key] = Array.isArray(extractedData) ? extractedData : [];
-              }
-
-              // 調試日志
-              if (endpoint.key === 'attendance') {
-                console.log(`======== 班表數據（attendance）完整信息 ========`);
-                console.log(`✓ API 返回成功`);
-                console.log(`提取後的 newData[attendance]:`, newData[endpoint.key]);
-                console.log(`是否為陣列:`, Array.isArray(newData[endpoint.key]));
-                console.log(`陣列長度:`, Array.isArray(newData[endpoint.key]) ? newData[endpoint.key].length : 'N/A');
-                if (Array.isArray(newData[endpoint.key]) && newData[endpoint.key].length > 0) {
-                  console.log(`第一筆完整數據:`, JSON.stringify(newData[endpoint.key][0], null, 2));
-                  const irisRecords = newData[endpoint.key].filter(a => String(a?.person || '').trim() === 'I');
-                  console.log(`Iris 的記錄數:`, irisRecords.length);
-                  if (irisRecords.length > 0) {
-                    console.log(`Iris 第一筆:`, JSON.stringify(irisRecords[0], null, 2));
-                  }
-                } else {
-                  console.warn(`❌ attendance 數據為空或不是陣列！`);
-                }
-                console.log(`=====================================`);
-              }
-              if (endpoint.key === 'foreignObjects') {
-                console.log(`夾異物 API 返回:`, json);
-                console.log(`夾異物數據:`, newData[endpoint.key]);
-              }
+              newData[endpoint.key] = Array.isArray(extractedData) ? extractedData : [];
             } else {
               // API 返回錯誤狀態碼
               const errorText = await response.text();
@@ -227,6 +195,44 @@ export default function ReportGenerator() {
             }
           } catch (err) {
             console.error(`❌ 無法獲取 ${endpoint.url}:`, err.message, err);
+          }
+        }
+
+        // 查詢本週涉及的所有月份的 weeklyStatus
+        for (const monthInfo of monthsInWeek) {
+          try {
+            const url = `/api/weekly-status?year=${monthInfo.year}&month=${monthInfo.month}`;
+            const response = await fetch(url);
+
+            console.log(`📡 API 請求: ${url} - 狀態: ${response.status}`);
+
+            if (response.ok) {
+              const json = await response.json();
+              console.log(`📊 weeklyStatus (${monthInfo.key}) API 完整回應:`, json);
+
+              // 保存此月份的數據
+              newData.weeklyStatus[monthInfo.key] = {
+                employees: json?.data || [],
+                dates: json?.dates || [],
+              };
+
+              // 保存第一個月份的數據用於診斷顯示
+              if (monthInfo === monthsInWeek[0]) {
+                setApiDebug({
+                  endpoint: url,
+                  rawJson: json,
+                  dataLength: json?.data?.length || 0,
+                  datesLength: json?.dates?.length || 0,
+                  dates: json?.dates,
+                  firstEmployee: json?.data?.[0],
+                });
+              }
+            } else {
+              const errorText = await response.text();
+              console.error(`❌ API 錯誤 ${url}: 狀態 ${response.status}`, errorText);
+            }
+          } catch (err) {
+            console.error(`❌ 無法獲取 weeklyStatus (${monthInfo.key}):`, err.message, err);
           }
         }
 
@@ -490,7 +496,7 @@ export default function ReportGenerator() {
   const getAllPeopleForDay = (dateStr) => {
     const allPeople = ['P', 'E', 'I', 'H', 'M', 'Z', 'A', 'J'];
     const schedule = Array.isArray(data.schedule) ? data.schedule : [];
-    const weeklyStatus = data.weeklyStatus || {};
+    const weeklyStatusMap = data.weeklyStatus || {};
 
     const peopleData = {};
 
@@ -504,7 +510,15 @@ export default function ReportGenerator() {
     });
 
     // 1. 從 weeklyStatus 提取班表狀態
+    // dateStr 格式: "2026/8/31" 或 "2026/9/1"
     const targetDay = getDateDay(dateStr);
+    const parts = dateStr.split('/');
+    const year = parseInt(parts[0]);
+    const month = parseInt(parts[1]);
+    const monthKey = `${year}/${month}`;
+
+    // 根據日期的月份找到對應的 weeklyStatus
+    const weeklyStatus = weeklyStatusMap[monthKey] || { employees: [], dates: [] };
     const employees = weeklyStatus.employees || [];
     const dates = weeklyStatus.dates || [];
 
