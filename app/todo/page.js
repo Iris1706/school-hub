@@ -280,22 +280,14 @@ export default function TodoPage() {
       <td style={{ padding: '12px 8px' }}>
         <select
           value={todo.進度 || '待處理'}
-          onChange={(e) => handleChangeProgress(todo, e.target.value)}
-          style={{
-            fontSize: '12px',
-            fontWeight: '600',
-            padding: '6px 8px',
-            borderRadius: '4px',
-            border: '1px solid #ccc',
-            cursor: 'pointer',
-            minWidth: '100px',
-            color: '#1e3a8a',
-            backgroundColor: '#93c5fd',
+          onChange={(e) => {
+            console.log('選擇改變:', e.target.value);
+            handleChangeProgress(todo, e.target.value);
           }}
         >
-          <option value="待處理" style={{ color: '#1e3a8a', backgroundColor: '#dbeafe' }}>待處理</option>
-          <option value="已處理待追蹤" style={{ color: '#3730a3', backgroundColor: '#e0e7ff' }}>已處理待追蹤</option>
-          <option value="完成" style={{ color: '#165e31', backgroundColor: '#dcfce7' }}>完成</option>
+          <option value="待處理">待處理</option>
+          <option value="已處理待追蹤">已處理待追蹤</option>
+          <option value="完成">完成</option>
         </select>
       </td>
       <td style={{ padding: '12px 8px', fontSize: '13px', color: 'var(--text-secondary, #666)' }}>
