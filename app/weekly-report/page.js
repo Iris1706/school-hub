@@ -475,50 +475,71 @@ export default function ReportGenerator() {
 
     // 1. 從 weeklyStatus 提取班表狀態
     const targetDay = getDateDay(dateStr);
-    const employees = Array.isArray(weeklyStatus) ? weeklyStatus : (weeklyStatus?.data || weeklyStatus?.employees || []);
-    const dates = weeklyStatus?.dates || [];
 
-    // 僅在第一次時打印調試信息（避免重複）
-    if (targetDay === 24) {
-      console.log(`🔍 weeklyStatus 結構診斷:`);
-      console.log(`  - weeklyStatus 本身:`, weeklyStatus);
-      console.log(`  - weeklyStatus 類型:`, typeof weeklyStatus);
-      console.log(`  - weeklyStatus 的 key:`, Object.keys(weeklyStatus));
-      console.log(`  - employees 長度:`, employees.length);
-      console.log(`  - dates 陣列:`, dates);
+    // 詳細診斷邏輯
+    let employees = [];
+    let dates = [];
+    let dateIndex = -1;
+
+    // 嘗試從不同的結構中提取 employees 和 dates
+    if (Array.isArray(weeklyStatus) && weeklyStatus.length > 0) {
+      // 情況 1: weeklyStatus 直接是員工陣列
+      employees = weeklyStatus;
+      // dates 可能在第一個員工對象的某個地方，或者我們需要從 API 重新思考
+    } else if (weeklyStatus?.employees && Array.isArray(weeklyStatus.employees)) {
+      // 情況 2: weeklyStatus.employees 存在
+      employees = weeklyStatus.employees;
+      dates = weeklyStatus.dates || [];
+    } else if (weeklyStatus?.data && Array.isArray(weeklyStatus.data)) {
+      // 情況 3: weeklyStatus.data 存在
+      employees = weeklyStatus.data;
+      dates = weeklyStatus.dates || [];
+    }
+
+    // 診斷：僅在第一次調用 8/24 時打印
+    if (targetDay === 24 && dateStr.includes('2026/8')) {
+      console.log('🔍 === 週報班表診斷 ===');
+      console.log('weeklyStatus 型態:', typeof weeklyStatus);
+      console.log('weeklyStatus 是陣列?', Array.isArray(weeklyStatus));
+      console.log('weeklyStatus 長度/屬性:',
+        Array.isArray(weeklyStatus) ? weeklyStatus.length : Object.keys(weeklyStatus).length);
+      console.log('weeklyStatus.employees 長度:', weeklyStatus?.employees?.length || 0);
+      console.log('weeklyStatus.dates:', weeklyStatus?.dates);
+      console.log('員工陣列長度:', employees.length);
+      console.log('日期陣列:', dates);
       if (employees.length > 0) {
-        console.log(`  - 第一個 employee:`, JSON.stringify(employees[0], null, 2));
+        console.log('第一個員工結構:', JSON.stringify(employees[0], null, 2));
       }
     }
 
+    // 只有當有員工和日期時才繼續
     if (employees.length > 0 && dates.length > 0) {
-      // 在 dates 陣列中找到目標日期的索引
-      const dateIndex = dates.indexOf(targetDay);
+      dateIndex = dates.indexOf(targetDay);
 
       if (dateIndex >= 0) {
-        console.log(`📊 [${dateStr}] 找到日期索引: ${dateIndex}`);
-
         employees.forEach((emp) => {
+          if (!emp) return;
+
           const empId = String(emp?.employeeId || emp?.person || '').trim().toUpperCase();
           const dailyStatus = emp?.dailyStatus;
 
           if (dailyStatus && Array.isArray(dailyStatus) && dateIndex < dailyStatus.length) {
             const status = String(dailyStatus[dateIndex] || '').trim();
-            if (status && peopleData[empId]) {
+            if (status && status !== '無' && peopleData[empId]) {
               peopleData[empId].bandSchedule = status;
-              if (empId === 'I') {
-                console.log(`✅ Iris [${dateStr}] 班表狀態: ${status}`);
-              }
             }
           }
         });
-      } else {
-        console.log(`⚠️ [${dateStr}] 日期 ${targetDay} 不在 dates 陣列中`);
+
+        if (targetDay === 24) {
+          const irisStatus = employees.find(emp =>
+            String(emp?.employeeId || emp?.person || '').trim().toUpperCase() === 'I'
+          );
+          console.log('Iris 班表狀態:', irisStatus?.dailyStatus?.[dateIndex] || '找不到');
+        }
       }
-    } else {
-      if (targetDay === 24) {
-        console.log(`❌ weeklyStatus 數據不完整: employees=${employees.length}, dates=${dates.length}`);
-      }
+    } else if (targetDay === 24) {
+      console.log('❌ 無法提取: employees長度=' + employees.length + ', dates長度=' + dates.length);
     }
 
     // 2. 填入特定行程
@@ -543,9 +564,6 @@ export default function ReportGenerator() {
         }
       });
     });
-
-    const irisData = Object.values(peopleData).find(p => p.person === 'I');
-    console.log(`[${dateStr}] Iris: bandSchedule="${irisData?.bandSchedule || '無'}", 有行程=${(irisData?.schedules?.length || 0) > 0}`);
 
     return Object.values(peopleData);
   };
