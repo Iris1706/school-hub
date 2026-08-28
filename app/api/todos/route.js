@@ -41,6 +41,13 @@ export async function GET() {
     const data = rows.slice(1)
       .filter(row => row && row.some(cell => cell?.trim()))
       .map((row, idx) => {
+        // 相容舊資料：如果找不到新的進度欄位，檢查是否有舊的完成欄位
+        let progress = row[headerIndex.進度] || "";
+        // 如果進度欄位為空，檢查第10列是否有舊的完成狀態
+        if (!progress && row[9] === 'true') {
+          progress = '完成';
+        }
+
         return {
           __row: idx + 2,
           日期: row[headerIndex.日期] || "",
@@ -49,7 +56,7 @@ export async function GET() {
           聯絡人: row[headerIndex.聯絡人] || "",
           電話: row[headerIndex.電話] || "",
           郵件: row[headerIndex.郵件] || "",
-          進度: row[headerIndex.進度] || "",
+          進度: progress,
           備註: row[headerIndex.備註] || "",
           優先級: row[headerIndex.優先級] || "",
         };
@@ -131,7 +138,7 @@ export async function PUT(req) {
     // 更新行
     await sheets.spreadsheets.values.update({
       spreadsheetId: SPREADSHEET_ID,
-      range: `'${TODO_TAB}'!A${__row}:J${__row}`,
+      range: `'${TODO_TAB}'!A${__row}:I${__row}`,
       valueInputOption: "RAW",
       requestBody: {
         values: [updateRow],
