@@ -467,7 +467,7 @@ export default function ReportGenerator() {
       };
     });
 
-    // 1. 填入特定行程
+    // 1. 填入特定行程（同時嘗試從行程中提取班表狀態）
     const daySchedules = schedule.filter((s) => {
       try {
         const apiDate = String(s?.date || '').trim();
@@ -477,48 +477,53 @@ export default function ReportGenerator() {
       }
     });
 
-    daySchedules.forEach((schedule) => {
-      const persons = String(schedule?.person || '')
+    daySchedules.forEach((scheduleItem) => {
+      const persons = String(scheduleItem?.person || '')
         .split('/')
         .map((p) => p.trim())
         .filter((p) => p);
 
       persons.forEach((person) => {
         if (peopleData[person]) {
-          peopleData[person].schedules.push(schedule);
+          // 從行程中提取班表狀態（event 或 status 字段可能包含班表信息）
+          const eventName = String(scheduleItem?.event || '').trim();
+          if (eventName && !peopleData[person].bandSchedule) {
+            // 如果 event 看起來像班表狀態（例如「三多」、「上午(外)」等）
+            const bandScheduleKeywords = ['三多', '上午', '下午', '特休', '排休', '巡檢', '國定', '病假', '事假', '駐點', '彈性', '假'];
+            if (bandScheduleKeywords.some(kw => eventName.includes(kw))) {
+              peopleData[person].bandSchedule = eventName;
+              console.log(`✅ 從行程提取班表狀態: ${person} [${dateStr}] = ${eventName}`);
+            }
+          }
+          peopleData[person].schedules.push(scheduleItem);
         }
       });
     });
 
-    // 2. 填入班表狀態（智能日期匹配）
+    // 2. 填入班表狀態（從 attendance 數據，作為備選方案）
     if (attendance.length === 0) {
-      console.warn(`⚠️ 沒有 attendance 數據！請檢查 /api/schedule API`);
-    }
+      console.warn(`⚠️ attendance 數據為空 - 班表狀態將從行程數據 (schedule) 中提取`);
+    } else {
+      // 標準化目標日期
+      const normalizedTarget = normalizeDateString(dateStr);
 
-    // 標準化目標日期
-    const normalizedTarget = normalizeDateString(dateStr);
+      attendance.forEach((att) => {
+        const person = String(att?.person || '').trim();
+        const attDate = String(att?.date || '').trim();
+        const status = String(att?.status || '').trim();
 
-    attendance.forEach((att, idx) => {
-      const person = String(att?.person || '').trim();
-      const attDate = String(att?.date || '').trim();
-      const status = String(att?.status || '').trim();
+        // 標準化 attendance 的日期
+        const normalizedAttDate = normalizeDateString(attDate);
+        const isDateMatch = normalizedAttDate === normalizedTarget;
 
-      // 標準化 attendance 的日期
-      const normalizedAttDate = normalizeDateString(attDate);
-      const isDateMatch = normalizedAttDate === normalizedTarget;
-
-      // 只在前幾筆或 Iris 時打印
-      if (idx < 2 || person === 'I') {
-        console.log(`Attendance[${person}]: 原始日期="${attDate}" → 標準化="${normalizedAttDate}", 目標="${normalizedTarget}", 匹配=${isDateMatch}, 狀態="${status}"`);
-      }
-
-      if (person && isDateMatch && peopleData[person]) {
-        if (status) {
-          peopleData[person].bandSchedule = status;
-          console.log(`✅ 班表匹配成功: ${person} [${normalizedTarget}] = ${status}`);
+        if (person && isDateMatch && peopleData[person]) {
+          if (status && !peopleData[person].bandSchedule) {
+            peopleData[person].bandSchedule = status;
+            console.log(`✅ 從 attendance 填入班表狀態: ${person} [${normalizedTarget}] = ${status}`);
+          }
         }
-      }
-    });
+      });
+    }
 
     const irisData = Object.values(peopleData).find(p => p.person === 'I');
     console.log(`[${dateStr}] Iris 班表: bandSchedule="${irisData?.bandSchedule}", 有行程=${(irisData?.schedules?.length || 0) > 0}`);
