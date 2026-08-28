@@ -270,7 +270,7 @@ export default function SchedulePage() {
                       if (!status) return "var(--text-primary)";
                       if (status.includes("上午(巡)") || status.includes("下午(巡)")) return "white";
                       if (status.includes("上午(特)") || status.includes("下午(特)")) return "white";
-                      if (status.includes("事假")) return "white";
+                      if (status.includes("事假")) return "black";
                       return "var(--text-primary)";
                     };
 
