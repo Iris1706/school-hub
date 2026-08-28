@@ -173,20 +173,30 @@ export default function TodoPage() {
   // 更新進度狀態
   const handleChangeProgress = async (todo, newProgress) => {
     try {
+      console.log('更新進度:', { todo, newProgress });
       const updatedTodo = {
         ...todo,
         進度: newProgress,
       };
 
+      console.log('發送更新:', updatedTodo);
       const res = await fetch('/api/todos', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedTodo),
       });
 
-      if (!res.ok) throw new Error('更新失敗');
+      console.log('API 回應狀態:', res.status);
+      const responseData = await res.json();
+      console.log('API 回應內容:', responseData);
+
+      if (!res.ok) throw new Error(responseData.error || '更新失敗');
+
+      console.log('開始重新載入資料...');
       await fetchTodos();
+      console.log('資料已重新載入');
     } catch (err) {
+      console.error('錯誤詳情:', err);
       alert('錯誤: ' + err.message);
     }
   };

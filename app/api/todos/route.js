@@ -112,15 +112,20 @@ export async function POST(req) {
 export async function PUT(req) {
   try {
     const body = await req.json();
+    console.log("PUT 收到資料:", body);
+
     const sheets = getSheetsClient();
     const { __row, ...data } = body;
 
     if (!__row) {
+      console.error("缺少 __row，收到的資料:", body);
       return NextResponse.json(
         { error: "缺少 __row 資訊" },
         { status: 400 }
       );
     }
+
+    console.log(`更新第 ${__row} 列，資料:`, data);
 
     // 構建更新資料
     const updateRow = [
@@ -135,8 +140,10 @@ export async function PUT(req) {
       data.優先級 || "",
     ];
 
+    console.log("要寫入的行資料:", updateRow);
+
     // 更新行
-    await sheets.spreadsheets.values.update({
+    const updateResult = await sheets.spreadsheets.values.update({
       spreadsheetId: SPREADSHEET_ID,
       range: `'${TODO_TAB}'!A${__row}:I${__row}`,
       valueInputOption: "RAW",
@@ -145,9 +152,12 @@ export async function PUT(req) {
       },
     });
 
+    console.log("Google Sheets 更新成功:", updateResult.data);
+
     return NextResponse.json({
       success: true,
       message: "待辦事項已更新",
+      updatedRow: __row,
     });
   } catch (err) {
     console.error("PUT /api/todos error:", err);
