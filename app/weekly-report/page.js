@@ -114,6 +114,10 @@ export default function ReportGenerator() {
         for (const endpoint of endpoints) {
           try {
             const response = await fetch(endpoint.url);
+
+            // 調試日志：記錄所有 API 請求
+            console.log(`📡 API 請求: ${endpoint.url} - 狀態: ${response.status}`);
+
             if (response.ok) {
               const json = await response.json();
               // 處理兩種 API 格式：{ data: [...] } 或直接 [...]
@@ -121,28 +125,35 @@ export default function ReportGenerator() {
 
               // 調試日志
               if (endpoint.key === 'attendance') {
-                console.log(`======== 班表數據完整信息 ========`);
-                console.log(`raw json:`, json);
-                console.log(`newData[attendance]:`, newData[endpoint.key]);
-                console.log(`數據類型:`, Array.isArray(newData[endpoint.key]) ? '陣列' : typeof newData[endpoint.key]);
-                console.log(`數據長度:`, Array.isArray(newData[endpoint.key]) ? newData[endpoint.key].length : '非陣列');
+                console.log(`======== 班表數據（attendance）完整信息 ========`);
+                console.log(`✓ API 返回成功`);
+                console.log(`原始 json:`, json);
+                console.log(`提取後的 newData[attendance]:`, newData[endpoint.key]);
+                console.log(`是否為陣列:`, Array.isArray(newData[endpoint.key]));
+                console.log(`陣列長度:`, Array.isArray(newData[endpoint.key]) ? newData[endpoint.key].length : 'N/A');
                 if (Array.isArray(newData[endpoint.key]) && newData[endpoint.key].length > 0) {
-                  console.log(`第一筆數據:`, newData[endpoint.key][0]);
+                  console.log(`第一筆完整數據:`, JSON.stringify(newData[endpoint.key][0], null, 2));
                   const irisRecords = newData[endpoint.key].filter(a => String(a?.person || '').trim() === 'I');
-                  console.log(`Iris 記錄數:`, irisRecords.length);
+                  console.log(`Iris 的記錄數:`, irisRecords.length);
                   if (irisRecords.length > 0) {
-                    console.log(`Iris 的第一筆:`, irisRecords[0]);
+                    console.log(`Iris 第一筆:`, JSON.stringify(irisRecords[0], null, 2));
                   }
+                } else {
+                  console.warn(`❌ attendance 數據為空或不是陣列！`);
                 }
-                console.log(`================================`);
+                console.log(`=====================================`);
               }
               if (endpoint.key === 'foreignObjects') {
                 console.log(`夾異物 API 返回:`, json);
                 console.log(`夾異物數據:`, newData[endpoint.key]);
               }
+            } else {
+              // API 返回錯誤狀態碼
+              const errorText = await response.text();
+              console.error(`❌ API 錯誤 ${endpoint.url}: 狀態 ${response.status}`, errorText);
             }
           } catch (err) {
-            console.warn(`無法獲取 ${endpoint.url}:`, err.message);
+            console.error(`❌ 無法獲取 ${endpoint.url}:`, err.message, err);
           }
         }
 
