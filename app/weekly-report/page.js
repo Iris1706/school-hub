@@ -776,36 +776,6 @@ export default function ReportGenerator() {
         </div>
       )}
 
-      {/* API 調試信息 */}
-      {apiDebug && (
-        <div
-          style={{
-            padding: '15px',
-            backgroundColor: '#e0e7ff',
-            borderLeft: '4px solid #6366f1',
-            marginBottom: '20px',
-            borderRadius: '6px',
-            color: '#1e1b4b',
-            fontSize: '11px',
-            fontFamily: 'monospace',
-            whiteSpace: 'pre-wrap',
-            wordBreak: 'break-word',
-            maxHeight: '500px',
-            overflowY: 'auto',
-          }}
-        >
-          <strong>📡 weeklyStatus API 診斷信息：</strong>
-          {`\n\nAPI 端點: ${apiDebug.endpoint}\n`}
-          {`data 長度: ${apiDebug.dataLength}\n`}
-          {`dates 長度: ${apiDebug.datesLength}\n`}
-          {`dates 內容: ${JSON.stringify(apiDebug.dates)}\n\n`}
-          {`第一個員工:\n${JSON.stringify(apiDebug.firstEmployee, null, 2)}\n\n`}
-          {`完整 JSON:\n${JSON.stringify(apiDebug.rawJson, null, 2)}`}
-        </div>
-      )}
-
-
-
       {/* 預覽區域 */}
       {!loading && (
         <div id="report-content" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
