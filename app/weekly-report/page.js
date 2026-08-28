@@ -119,18 +119,35 @@ export default function ReportGenerator() {
             console.log(`📡 API 請求: ${endpoint.url} - 狀態: ${response.status}`);
 
             if (response.ok) {
-              const json = await response.json();
+              // 先取得原始文本，然後解析
+              const responseText = await response.text();
+              let json;
+
+              // 特別調試 attendance API - 記錄原始響應
+              if (endpoint.key === 'attendance') {
+                console.log(`===== /api/schedule 原始響應（前200字符） =====`);
+                console.log(responseText.substring(0, 200));
+                console.log(`全部文本長度: ${responseText.length}`);
+              }
+
+              try {
+                json = JSON.parse(responseText);
+              } catch (e) {
+                console.error(`JSON 解析失敗: ${endpoint.url}`, e);
+                json = {};
+              }
 
               // 特別調試 attendance API
               if (endpoint.key === 'attendance') {
-                console.log(`======== /api/schedule 原始響應 ========`);
+                console.log(`======== /api/schedule 解析後的JSON ========`);
                 console.log(`json 本身:`, json);
                 console.log(`json 的類型:`, typeof json);
-                console.log(`JSON.stringify(json):`, JSON.stringify(json).substring(0, 500));
+                console.log(`json 的所有 key:`, Object.keys(json));
                 console.log(`json?.data:`, json?.data);
                 console.log(`json?.attendance:`, json?.attendance);
                 console.log(`json?.records:`, json?.records);
                 console.log(`是否為陣列:`, Array.isArray(json));
+                console.log(`json 長度:`, json?.length);
                 console.log(`================================`);
               }
 
