@@ -468,23 +468,30 @@ export default function ReportGenerator() {
       };
     });
 
-    // 1. 從 weeklyStatus 填入班表狀態（優先級最高）
+    // 1. 從 weeklyStatus 的 employees 填入班表狀態（使用 dailyStatus 陣列）
     if (weeklyStatus.length > 0) {
-      console.log(`📊 weeklyStatus 數據長度: ${weeklyStatus.length}, 第一筆:`, weeklyStatus[0]);
+      // weeklyStatus 包含 employees 陣列，每個有 dailyStatus 陣列
+      const employees = Array.isArray(weeklyStatus) ? weeklyStatus : (weeklyStatus?.data || []);
 
-      weeklyStatus.forEach((status) => {
-        const statusDate = String(status?.date || '').trim();
-        const statusPerson = String(status?.person || '').trim();
-        const statusValue = String(status?.status || status?.attendance || status?.type || '').trim();
+      // 解析目標日期的日期部分
+      const targetDate = new Date(dateStr.replace(/\//g, '-'));
+      const targetDay = targetDate.getDate();
 
-        // 嘗試匹配日期
-        const normalizedStatusDate = normalizeDateString(statusDate);
-        const normalizedTarget = normalizeDateString(dateStr);
+      console.log(`📊 尋找日期: ${dateStr} (日期: ${targetDay}), employees 數量: ${employees.length}`);
 
-        if (normalizedStatusDate === normalizedTarget && statusPerson && peopleData[statusPerson]) {
-          if (statusValue) {
-            peopleData[statusPerson].bandSchedule = statusValue;
-            console.log(`✅ 從 weeklyStatus 填入班表: ${statusPerson} [${dateStr}] = ${statusValue}`);
+      employees.forEach((emp) => {
+        const empPerson = String(emp?.employeeId || emp?.person || '').trim().toUpperCase();
+        const dailyStatus = emp?.dailyStatus;
+
+        if (dailyStatus && Array.isArray(dailyStatus)) {
+          // dailyStatus 是按日期排列的陣列，索引 = 日期 - 1
+          const statusIndex = targetDay - 1;
+          if (statusIndex >= 0 && statusIndex < dailyStatus.length) {
+            const status = String(dailyStatus[statusIndex] || '').trim();
+            if (status && peopleData[empPerson]) {
+              peopleData[empPerson].bandSchedule = status;
+              console.log(`✅ 從 weeklyStatus.dailyStatus 填入: ${empPerson} [${dateStr}] = ${status}`);
+            }
           }
         }
       });
@@ -510,41 +517,10 @@ export default function ReportGenerator() {
 
       persons.forEach((person) => {
         if (peopleData[person]) {
-          // 從行程中提取班表狀態（event 或 status 字段可能包含班表信息）
-          const eventName = String(scheduleItem?.event || '').trim();
-          if (eventName && !peopleData[person].bandSchedule) {
-            // 如果 event 看起來像班表狀態（例如「三多」、「上午(外)」等）
-            const bandScheduleKeywords = ['三多', '上午', '下午', '特休', '排休', '巡檢', '國定', '病假', '事假', '駐點', '彈性', '假'];
-            if (bandScheduleKeywords.some(kw => eventName.includes(kw))) {
-              peopleData[person].bandSchedule = eventName;
-              console.log(`✅ 從行程提取班表狀態: ${person} [${dateStr}] = ${eventName}`);
-            }
-          }
           peopleData[person].schedules.push(scheduleItem);
         }
       });
     });
-
-    // 3. 填入班表狀態（從 attendance 數據，作為最後備選方案）
-    if (attendance.length > 0) {
-      const normalizedTarget = normalizeDateString(dateStr);
-
-      attendance.forEach((att) => {
-        const person = String(att?.person || '').trim();
-        const attDate = String(att?.date || '').trim();
-        const status = String(att?.status || '').trim();
-
-        const normalizedAttDate = normalizeDateString(attDate);
-        const isDateMatch = normalizedAttDate === normalizedTarget;
-
-        if (person && isDateMatch && peopleData[person]) {
-          if (status && !peopleData[person].bandSchedule) {
-            peopleData[person].bandSchedule = status;
-            console.log(`✅ 從 attendance 填入班表狀態: ${person} [${normalizedTarget}] = ${status}`);
-          }
-        }
-      });
-    }
 
     const irisData = Object.values(peopleData).find(p => p.person === 'I');
     console.log(`[${dateStr}] Iris 班表: bandSchedule="${irisData?.bandSchedule}", 有行程=${(irisData?.schedules?.length || 0) > 0}`);
