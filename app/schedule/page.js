@@ -247,23 +247,23 @@ export default function SchedulePage() {
                     const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
                     const getBgColor = () => {
                       if (!status) return "#7a7a7a"; // 深灰色 - 沒有排班內容
-                      if (status.includes("三多")) return "#9fbc5f";
-                      if (status.includes("外出")) return "#c696d4";
-                      if (status.includes("上午(外)")) return "#8ab3bd";
-                      if (status.includes("下午(外)")) return "#e89a87";
-                      if (status.includes("特休")) return "#a02a42";
-                      if (status.includes("排休")) return "#d4b855";
-                      if (status.includes("巡檢")) return "#7db5d8";
-                      if (status.includes("上午(巡)")) return "#432056";
-                      if (status.includes("下午(巡)")) return "#432056";
-                      if (status.includes("上午(特)")) return "#800101";
-                      if (status.includes("下午(特)")) return "#800101";
-                      if (status.includes("國定假日")) return "#a61473";
-                      if (status.includes("彈性假")) return "#7a7f88";
-                      if (status.includes("病假")) return "#4d6a9f";
-                      if (status.includes("事假")) return "#8a8585";
-                      if (status.includes("駐點")) return "#b86618";
-                      if (status.includes("颱風假")) return "#184252";
+                      if (status.includes("三多")) return "#d4edbb";
+                      if (status.includes("外出")) return "#e6cff3";
+                      if (status.includes("上午(外)")) return "#c6dbe1";
+                      if (status.includes("下午(外)")) return "#ffcfc8";
+                      if (status.includes("特休")) return "#ca3750";
+                      if (status.includes("排休")) return "#ffe59f";
+                      if (status.includes("巡檢")) return "#bfe1f6";
+                      if (status.includes("上午(巡)")) return "#5a3286";
+                      if (status.includes("下午(巡)")) return "#5a3286";
+                      if (status.includes("上午(特)")) return "#b10202";
+                      if (status.includes("下午(特)")) return "#b10202";
+                      if (status.includes("國定假日")) return "#d81b91";
+                      if (status.includes("彈性假")) return "#a7adb6";
+                      if (status.includes("病假")) return "#7e9ac4";
+                      if (status.includes("事假")) return "#b9b3b3";
+                      if (status.includes("駐點")) return "#e28d38";
+                      if (status.includes("颱風假")) return "#215a6c";
                       return "#7a7a7a"; // 深灰色 - 預設
                     };
 
