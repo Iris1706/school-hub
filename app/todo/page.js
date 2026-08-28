@@ -233,23 +233,23 @@ export default function TodoPage() {
   };
 
   // 分組和排序
-  const pendingTodos = todos
-    .filter((t) => t.進度 !== '完成')
-    .sort((a, b) => {
-      const priorityOrder = { '急': 1, '不急': 2, '一般': 3 };
-      const orderA = priorityOrder[a.優先級] || 999;
-      const orderB = priorityOrder[b.優先級] || 999;
-      return orderA - orderB;
-    });
+  // 排序函數 - 按優先級排序
+  const sortByPriority = (a, b) => {
+    const priorityOrder = { '急': 1, '不急': 2, '一般': 3 };
+    const orderA = priorityOrder[a.優先級] || 999;
+    const orderB = priorityOrder[b.優先級] || 999;
+    return orderA - orderB;
+  };
 
+  // 待辦事項：進度為「待處理」或「已處理待追蹤」
+  const pendingTodos = todos
+    .filter((t) => t.進度 === '待處理' || t.進度 === '已處理待追蹤')
+    .sort(sortByPriority);
+
+  // 已完成事項：進度為「完成」
   const completedTodos = todos
     .filter((t) => t.進度 === '完成')
-    .sort((a, b) => {
-      const priorityOrder = { '急': 1, '不急': 2, '一般': 3 };
-      const orderA = priorityOrder[a.優先級] || 999;
-      const orderB = priorityOrder[b.優先級] || 999;
-      return orderA - orderB;
-    });
+    .sort(sortByPriority);
 
   // 優先級樣式
   const getPriorityStyle = (priority) => {
