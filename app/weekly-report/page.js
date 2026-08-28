@@ -927,7 +927,6 @@ export default function ReportGenerator() {
                                     alignItems: 'center',
                                     marginBottom: '3px',
                                     padding: '4px 6px',
-                                    backgroundColor: '#f3f4f6',
                                     borderRadius: '4px',
                                     minHeight: '24px',
                                   }}
