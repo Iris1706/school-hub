@@ -456,6 +456,9 @@ export default function ReportGenerator() {
     return parseInt(parts[parts.length - 1]);
   };
 
+  // 診斷 state - 存儲診斷信息
+  const [diagData, setDiagData] = useState(null);
+
   // 獲取當天所有人員的班表數據（包括特定行程和班表狀態）
   const getAllPeopleForDay = (dateStr) => {
     const allPeople = ['P', 'E', 'I', 'H', 'M', 'Z', 'A', 'J'];
@@ -485,7 +488,6 @@ export default function ReportGenerator() {
     if (Array.isArray(weeklyStatus) && weeklyStatus.length > 0) {
       // 情況 1: weeklyStatus 直接是員工陣列
       employees = weeklyStatus;
-      // dates 可能在第一個員工對象的某個地方，或者我們需要從 API 重新思考
     } else if (weeklyStatus?.employees && Array.isArray(weeklyStatus.employees)) {
       // 情況 2: weeklyStatus.employees 存在
       employees = weeklyStatus.employees;
@@ -496,20 +498,25 @@ export default function ReportGenerator() {
       dates = weeklyStatus.dates || [];
     }
 
-    // 診斷：僅在第一次調用 8/24 時打印
-    if (targetDay === 24 && dateStr.includes('2026/8')) {
-      console.log('🔍 === 週報班表診斷 ===');
-      console.log('weeklyStatus 型態:', typeof weeklyStatus);
-      console.log('weeklyStatus 是陣列?', Array.isArray(weeklyStatus));
-      console.log('weeklyStatus 長度/屬性:',
-        Array.isArray(weeklyStatus) ? weeklyStatus.length : Object.keys(weeklyStatus).length);
-      console.log('weeklyStatus.employees 長度:', weeklyStatus?.employees?.length || 0);
-      console.log('weeklyStatus.dates:', weeklyStatus?.dates);
-      console.log('員工陣列長度:', employees.length);
-      console.log('日期陣列:', dates);
-      if (employees.length > 0) {
-        console.log('第一個員工結構:', JSON.stringify(employees[0], null, 2));
-      }
+    // 診斷：僅在第一次調用 8/24 時記錄
+    if (targetDay === 24 && dateStr.includes('2026/8') && !diagData) {
+      const diagInfo = {
+        weeklyStatusType: typeof weeklyStatus,
+        isArray: Array.isArray(weeklyStatus),
+        length: Array.isArray(weeklyStatus) ? weeklyStatus.length : Object.keys(weeklyStatus).length,
+        employeesLength: weeklyStatus?.employees?.length || 0,
+        datesArray: weeklyStatus?.dates,
+        extractedEmployeesLength: employees.length,
+        extractedDatesLength: dates.length,
+        firstEmployee: employees[0] ? JSON.stringify(employees[0]) : 'N/A',
+        allEmployees: employees.map(emp => ({
+          id: emp?.employeeId || emp?.person,
+          dailyStatusLength: emp?.dailyStatus?.length || 0,
+          dailyStatus: emp?.dailyStatus
+        }))
+      };
+      setDiagData(diagInfo);
+      console.log('📊 完整診斷數據:', diagInfo);
     }
 
     // 只有當有員工和日期時才繼續
@@ -530,16 +537,7 @@ export default function ReportGenerator() {
             }
           }
         });
-
-        if (targetDay === 24) {
-          const irisStatus = employees.find(emp =>
-            String(emp?.employeeId || emp?.person || '').trim().toUpperCase() === 'I'
-          );
-          console.log('Iris 班表狀態:', irisStatus?.dailyStatus?.[dateIndex] || '找不到');
-        }
       }
-    } else if (targetDay === 24) {
-      console.log('❌ 無法提取: employees長度=' + employees.length + ', dates長度=' + dates.length);
     }
 
     // 2. 填入特定行程
@@ -764,6 +762,39 @@ export default function ReportGenerator() {
           }}
         >
           ⚠️ {error}
+        </div>
+      )}
+
+      {/* 診斷信息顯示（用於調試weeklyStatus結構） */}
+      {diagData && (
+        <div
+          style={{
+            padding: '15px',
+            backgroundColor: '#dbeafe',
+            borderLeft: '4px solid #3b82f6',
+            marginBottom: '20px',
+            borderRadius: '6px',
+            color: '#1e40af',
+            fontSize: '12px',
+            fontFamily: 'monospace',
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
+            maxHeight: '400px',
+            overflowY: 'auto',
+          }}
+        >
+          <strong>📊 weeklyStatus 結構診斷：</strong>{'\n\n'}
+          {`weeklyStatus 型態: ${diagData.weeklyStatusType}\n`}
+          {`是陣列? ${diagData.isArray}\n`}
+          {`長度: ${diagData.length}\n`}
+          {`employees 長度: ${diagData.employeesLength}\n`}
+          {`dates 陣列: ${JSON.stringify(diagData.datesArray)}\n\n`}
+          {`提取的 employees 長度: ${diagData.extractedEmployeesLength}\n`}
+          {`提取的 dates 長度: ${diagData.extractedDatesLength}\n\n`}
+          {`所有員工及其班表:\n`}
+          {diagData.allEmployees.map((emp, idx) =>
+            `[${idx}] id=${emp.id}, dailyStatus長度=${emp.dailyStatusLength}, 值=${JSON.stringify(emp.dailyStatus)}\n`
+          ).join('')}
         </div>
       )}
 
