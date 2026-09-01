@@ -906,6 +906,26 @@ export default function ReportGenerator() {
                   }}
                 />
               )}
+
+              {/* 被勾選的選項摘要 - 只在報表中顯示 */}
+              {(weeklyHighlightsOptions.tabletRepair || weeklyHighlightsOptions.businessDelivery || weeklyHighlightsOptions.manualInput) && (
+                <div style={{ marginTop: '20px', paddingTop: '15px', borderTop: '1px solid #e5e7eb' }}>
+                  <p style={{ fontSize: '13px', fontWeight: 'bold', color: '#6b7280', marginBottom: '10px' }}>
+                    本週重點摘要：
+                  </p>
+                  <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '14px', color: '#374151', lineHeight: '1.8' }}>
+                    {weeklyHighlightsOptions.tabletRepair && (
+                      <li>✓ 南區生生平板維修開單</li>
+                    )}
+                    {weeklyHighlightsOptions.businessDelivery && (
+                      <li>✓ 協助業務送貨、發票</li>
+                    )}
+                    {weeklyHighlightsOptions.manualInput && weeklyHighlights && (
+                      <li>✓ {weeklyHighlights}</li>
+                    )}
+                  </ul>
+                </div>
+              )}
             </div>
           </ReportCard>
 
