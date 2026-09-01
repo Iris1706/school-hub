@@ -24,7 +24,7 @@ function getSheetsClient() {
   return google.sheets({ version: "v4", auth });
 }
 
-// GET: 獲取當週南區夾異物筆數
+// GET: 獲取南區夾異物筆數（支援日期範圍）
 export async function GET(request) {
   try {
     const FOREIGN_SHEET_ID = process.env.FOREIGN_SHEET_ID;
@@ -37,6 +37,31 @@ export async function GET(request) {
         { error: "缺少環境變數 FOREIGN_SHEET_ID", count: 0 },
         { status: 500 }
       );
+    }
+
+    // 從 query 參數獲取日期範圍
+    const { searchParams } = new URL(request.url);
+    const startDateParam = searchParams.get('startDate');
+    const endDateParam = searchParams.get('endDate');
+
+    let rangeStart, rangeEnd;
+
+    // 如果提供了日期參數，使用提供的日期；否則計算本週
+    if (startDateParam && endDateParam) {
+      rangeStart = new Date(startDateParam);
+      rangeEnd = new Date(endDateParam);
+      console.log(`使用提供的日期範圍: ${rangeStart.toLocaleDateString('zh-TW')} ~ ${rangeEnd.toLocaleDateString('zh-TW')}`);
+    } else {
+      // 計算本週日期（備用）
+      const today = new Date();
+      rangeStart = new Date(today);
+      const day = rangeStart.getDay();
+      const diff = rangeStart.getDate() - day + (day === 0 ? -6 : 1);
+      rangeStart.setDate(diff);
+
+      rangeEnd = new Date(rangeStart);
+      rangeEnd.setDate(rangeEnd.getDate() + 6);
+      console.log(`使用計算的本週日期: ${rangeStart.toLocaleDateString('zh-TW')} ~ ${rangeEnd.toLocaleDateString('zh-TW')}`);
     }
 
     const sheets = getSheetsClient();
@@ -65,25 +90,15 @@ export async function GET(request) {
       // 如果找不到，使用第一列
       const dateIndex = 0;
 
-      // 計算本週日期
-      const today = new Date();
-      const weekStart = new Date(today);
-      const day = weekStart.getDay();
-      const diff = weekStart.getDate() - day + (day === 0 ? -6 : 1);
-      weekStart.setDate(diff);
-
-      const weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekEnd.getDate() + 6);
-
-      let weekCount = 0;
+      let count = 0;
       for (let i = 1; i < rows.length; i++) {
         const row = rows[i];
         if (!row[dateIndex]) continue;
 
         try {
           const itemDate = new Date(row[dateIndex]);
-          if (itemDate >= weekStart && itemDate <= weekEnd) {
-            weekCount++;
+          if (itemDate >= rangeStart && itemDate <= rangeEnd) {
+            count++;
           }
         } catch (e) {
           // 日期解析失敗，跳過
@@ -91,25 +106,15 @@ export async function GET(request) {
       }
 
       return NextResponse.json({
-        count: weekCount,
-        weekStart: weekStart.toLocaleDateString('zh-TW'),
-        weekEnd: weekEnd.toLocaleDateString('zh-TW'),
+        count: count,
+        startDate: rangeStart.toLocaleDateString('zh-TW'),
+        endDate: rangeEnd.toLocaleDateString('zh-TW'),
       });
     }
 
-    // 計算本週日期
-    const today = new Date();
-    const weekStart = new Date(today);
-    const day = weekStart.getDay();
-    const diff = weekStart.getDate() - day + (day === 0 ? -6 : 1);
-    weekStart.setDate(diff);
-
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekEnd.getDate() + 6);
-
-    // 篩選本週數據
-    let weekCount = 0;
-    console.log(`週期範圍: ${weekStart.toLocaleDateString('zh-TW')} ~ ${weekEnd.toLocaleDateString('zh-TW')}`);
+    // 篩選日期範圍內的數據
+    let count = 0;
+    console.log(`日期範圍: ${rangeStart.toLocaleDateString('zh-TW')} ~ ${rangeEnd.toLocaleDateString('zh-TW')}`);
 
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
@@ -135,21 +140,21 @@ export async function GET(request) {
 
         console.log(`解析後的日期: ${itemDate.toLocaleDateString('zh-TW')}`);
 
-        if (itemDate >= weekStart && itemDate <= weekEnd) {
-          weekCount++;
-          console.log(`✓ 匹配當週`);
+        if (itemDate >= rangeStart && itemDate <= rangeEnd) {
+          count++;
+          console.log(`✓ 匹配日期範圍`);
         }
       } catch (e) {
         console.error(`第 ${i} 行日期解析失敗:`, e.message);
       }
     }
 
-    console.log(`最終計數: ${weekCount}`);
+    console.log(`最終計數: ${count}`);
 
     return NextResponse.json({
-      count: weekCount,
-      weekStart: weekStart.toLocaleDateString('zh-TW'),
-      weekEnd: weekEnd.toLocaleDateString('zh-TW'),
+      count: count,
+      startDate: rangeStart.toLocaleDateString('zh-TW'),
+      endDate: rangeEnd.toLocaleDateString('zh-TW'),
     });
   } catch (err) {
     console.error("夾異物統計 API 錯誤:", err);

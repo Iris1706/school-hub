@@ -116,12 +116,17 @@ export default function ReportGenerator() {
         // 獲取本週涉及的所有月份
         const monthsInWeek = getMonthsInWeek();
 
+        // 獲取日期範圍
+        const { startDate, endDate } = getDateRange();
+        const startDateStr = `${startDate.getFullYear()}/${startDate.getMonth() + 1}/${startDate.getDate()}`;
+        const endDateStr = `${endDate.getFullYear()}/${endDate.getMonth() + 1}/${endDate.getDate()}`;
+
         const endpoints = [
           { key: 'inspect', url: '/api/inspect' },
           { key: 'schedule', url: '/api/daily-schedule' },
           { key: 'attendance', url: '/api/schedule' },
           { key: 'todos', url: '/api/todos' },
-          { key: 'foreignObjects', url: '/api/foreign-objects' },
+          { key: 'foreignObjects', url: `/api/foreign-objects?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}` },
           { key: 'annualStats', url: '/api/annual-stats' },
           { key: 'repairDetails', url: '/api/repair-details' },
         ];
@@ -133,7 +138,7 @@ export default function ReportGenerator() {
           attendance: [],
           todos: [],
           weeklyStatus: {},
-          foreignObjects: { count: 0, weekStart: '', weekEnd: '' },
+          foreignObjects: { count: 0, startDate: '', endDate: '' },
           annualStats: { data: [], total: 0 },
           repairDetails: { headers: [], data: [], count: 0 },
           tabletRepairsInProgress: 0,
