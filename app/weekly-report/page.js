@@ -126,7 +126,7 @@ export default function ReportGenerator() {
           { key: 'schedule', url: '/api/daily-schedule' },
           { key: 'attendance', url: '/api/schedule' },
           { key: 'todos', url: '/api/todos' },
-          { key: 'foreignObjects', url: `/api/foreign-objects?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}` },
+          { key: 'foreignObjects', url: `/api/foreign-objects?startDate=${startDateStr}&endDate=${endDateStr}` },
           { key: 'annualStats', url: '/api/annual-stats' },
           { key: 'repairDetails', url: '/api/repair-details' },
         ];

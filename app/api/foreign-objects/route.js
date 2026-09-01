@@ -46,10 +46,26 @@ export async function GET(request) {
 
     let rangeStart, rangeEnd;
 
+    // 解析 yyyy/m/d 格式的日期
+    const parseLocalDate = (dateStr) => {
+      if (!dateStr) return null;
+      const parts = dateStr.split('/');
+      if (parts.length === 3) {
+        const year = parseInt(parts[0]);
+        const month = parseInt(parts[1]) - 1;
+        const day = parseInt(parts[2]);
+        return new Date(year, month, day);
+      }
+      return null;
+    };
+
     // 如果提供了日期參數，使用提供的日期；否則計算本週
     if (startDateParam && endDateParam) {
-      rangeStart = new Date(startDateParam);
-      rangeEnd = new Date(endDateParam);
+      rangeStart = parseLocalDate(startDateParam);
+      rangeEnd = parseLocalDate(endDateParam);
+      if (!rangeStart || !rangeEnd) {
+        throw new Error('日期格式錯誤，應為 yyyy/m/d 格式');
+      }
       console.log(`使用提供的日期範圍: ${rangeStart.toLocaleDateString('zh-TW')} ~ ${rangeEnd.toLocaleDateString('zh-TW')}`);
     } else {
       // 計算本週日期（備用）
