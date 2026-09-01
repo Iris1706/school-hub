@@ -783,6 +783,111 @@ export default function ReportGenerator() {
         </div>
       )}
 
+      {/* 本週重點選項 - 複選框（不在報表內，不會被匯出） */}
+      {!loading && (
+        <div
+          style={{
+            padding: '20px',
+            backgroundColor: 'white',
+            borderRadius: '8px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+            border: '1px solid #e5e7eb',
+            marginBottom: '20px',
+          }}
+        >
+          <p style={{ fontSize: '14px', fontWeight: 'bold', color: '#1f2937', marginBottom: '12px' }}>
+            本週重點選擇
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {/* 南區生生平板維修開單 */}
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={weeklyHighlightsOptions.tabletRepair}
+                onChange={(e) =>
+                  setWeeklyHighlightsOptions({
+                    ...weeklyHighlightsOptions,
+                    tabletRepair: e.target.checked,
+                  })
+                }
+                style={{
+                  width: '18px',
+                  height: '18px',
+                  cursor: 'pointer',
+                }}
+              />
+              <span style={{ fontSize: '14px', color: '#374151' }}>
+                南區生生平板維修開單
+              </span>
+            </label>
+
+            {/* 協助業務送貨,發票 */}
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={weeklyHighlightsOptions.businessDelivery}
+                onChange={(e) =>
+                  setWeeklyHighlightsOptions({
+                    ...weeklyHighlightsOptions,
+                    businessDelivery: e.target.checked,
+                  })
+                }
+                style={{
+                  width: '18px',
+                  height: '18px',
+                  cursor: 'pointer',
+                }}
+              />
+              <span style={{ fontSize: '14px', color: '#374151' }}>
+                協助業務送貨、發票
+              </span>
+            </label>
+
+            {/* 手動輸入 */}
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={weeklyHighlightsOptions.manualInput}
+                onChange={(e) =>
+                  setWeeklyHighlightsOptions({
+                    ...weeklyHighlightsOptions,
+                    manualInput: e.target.checked,
+                  })
+                }
+                style={{
+                  width: '18px',
+                  height: '18px',
+                  cursor: 'pointer',
+                }}
+              />
+              <span style={{ fontSize: '14px', color: '#374151' }}>
+                手動輸入
+              </span>
+            </label>
+          </div>
+
+          {/* 文字輸入框 - 只在選中「手動輸入」時顯示 */}
+          {weeklyHighlightsOptions.manualInput && (
+            <textarea
+              value={weeklyHighlights}
+              onChange={(e) => setWeeklyHighlights(e.target.value)}
+              placeholder="請輸入本週重點內容..."
+              style={{
+                width: '100%',
+                minHeight: '120px',
+                padding: '12px',
+                borderRadius: '6px',
+                border: '1px solid #d1d5db',
+                fontSize: '14px',
+                fontFamily: 'inherit',
+                resize: 'vertical',
+                marginTop: '12px',
+              }}
+            />
+          )}
+        </div>
+      )}
+
       {/* 預覽區域 */}
       {!loading && (
         <div id="report-content" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -814,102 +919,9 @@ export default function ReportGenerator() {
                 <StatCard title="夾異物（本週）" value={data.foreignObjects?.count || 0} />
               </div>
 
-              {/* 本週重點選項 - 複選框 */}
-              <div style={{ marginBottom: '20px' }}>
-                <p style={{ fontSize: '14px', fontWeight: 'bold', color: '#1f2937', marginBottom: '12px' }}>
-                  本週重點
-                </p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {/* 南區生生平板維修開單 */}
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                    <input
-                      type="checkbox"
-                      checked={weeklyHighlightsOptions.tabletRepair}
-                      onChange={(e) =>
-                        setWeeklyHighlightsOptions({
-                          ...weeklyHighlightsOptions,
-                          tabletRepair: e.target.checked,
-                        })
-                      }
-                      style={{
-                        width: '18px',
-                        height: '18px',
-                        cursor: 'pointer',
-                      }}
-                    />
-                    <span style={{ fontSize: '14px', color: '#374151' }}>
-                      南區生生平板維修開單
-                    </span>
-                  </label>
-
-                  {/* 協助業務送貨,發票 */}
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                    <input
-                      type="checkbox"
-                      checked={weeklyHighlightsOptions.businessDelivery}
-                      onChange={(e) =>
-                        setWeeklyHighlightsOptions({
-                          ...weeklyHighlightsOptions,
-                          businessDelivery: e.target.checked,
-                        })
-                      }
-                      style={{
-                        width: '18px',
-                        height: '18px',
-                        cursor: 'pointer',
-                      }}
-                    />
-                    <span style={{ fontSize: '14px', color: '#374151' }}>
-                      協助業務送貨、發票
-                    </span>
-                  </label>
-
-                  {/* 手動輸入 */}
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                    <input
-                      type="checkbox"
-                      checked={weeklyHighlightsOptions.manualInput}
-                      onChange={(e) =>
-                        setWeeklyHighlightsOptions({
-                          ...weeklyHighlightsOptions,
-                          manualInput: e.target.checked,
-                        })
-                      }
-                      style={{
-                        width: '18px',
-                        height: '18px',
-                        cursor: 'pointer',
-                      }}
-                    />
-                    <span style={{ fontSize: '14px', color: '#374151' }}>
-                      手動輸入
-                    </span>
-                  </label>
-                </div>
-              </div>
-
-              {/* 文字輸入框 - 只在選中「手動輸入」時顯示 */}
-              {weeklyHighlightsOptions.manualInput && (
-                <textarea
-                  value={weeklyHighlights}
-                  onChange={(e) => setWeeklyHighlights(e.target.value)}
-                  placeholder="請輸入本週重點內容..."
-                  style={{
-                    width: '100%',
-                    minHeight: '120px',
-                    padding: '12px',
-                    borderRadius: '6px',
-                    border: '1px solid #d1d5db',
-                    fontSize: '14px',
-                    fontFamily: 'inherit',
-                    resize: 'vertical',
-                  }}
-                />
-              )}
-
               {/* 被勾選的選項摘要 - 只在報表中顯示 */}
               {(weeklyHighlightsOptions.tabletRepair || weeklyHighlightsOptions.businessDelivery || weeklyHighlightsOptions.manualInput) && (
-                <div style={{ marginTop: '20px', paddingTop: '15px', borderTop: '1px solid #e5e7eb' }}>
+                <div style={{ paddingTop: '15px', borderTop: '1px solid #e5e7eb' }}>
                   <p style={{ fontSize: '13px', fontWeight: 'bold', color: '#6b7280', marginBottom: '10px' }}>
                     本週重點摘要：
                   </p>
