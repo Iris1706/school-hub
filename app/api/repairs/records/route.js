@@ -18,16 +18,30 @@ function getSheetsClient() {
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const sheetName = searchParams.get('sheetName') || 'Pawn';
+    const sheetName = searchParams.get('sheetName') || '總表';
+    const getSheets = searchParams.get('getSheets') === 'true';
 
     const sheets = getSheetsClient();
+
+    // 如果請求列表，返回所有可用的 sheets
+    if (getSheets) {
+      const spreadsheet = await sheets.spreadsheets.get({
+        spreadsheetId: process.env.Repair_SHEET_ID,
+      });
+
+      const sheetNames = spreadsheet.data.sheets.map(sheet => sheet.properties.title);
+      return Response.json({
+        success: true,
+        availableSheets: sheetNames,
+      });
+    }
 
     // 讀取標題行和資料行
     // 標題：A1:K1 及 O1:P1
     // 資料：從第2行開始
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.Repair_SHEET_ID,
-      range: `'${sheetName}'!A1:P`,
+      range: `${sheetName}!A1:P`,
     });
 
     const allData = response.data.values || [];
