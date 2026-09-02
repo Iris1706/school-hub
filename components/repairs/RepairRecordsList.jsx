@@ -208,7 +208,14 @@ export default function RepairRecordsList({ sheetName }) {
                     const header = headers[colIdx];
                     const isStatus = header?.includes('狀態');
                     const isProblem = header?.includes('問題');
-                    const displayValue = isProblem && value && value.length > 12 ? value.substring(0, 12) + '...' : value;
+                    const isMethod = header?.includes('報修方式');
+
+                    let displayValue = value;
+                    if (isProblem && value && value.length > 12) {
+                      displayValue = value.substring(0, 12) + '...';
+                    } else if (isMethod && value && value.includes('（')) {
+                      displayValue = value.substring(0, value.indexOf('（'));
+                    }
 
                     return (
                       <td
@@ -219,7 +226,7 @@ export default function RepairRecordsList({ sheetName }) {
                           borderRight: colIdx < headers.length - 1 ? '1px solid var(--border-color, #e5e7eb)' : 'none',
                           whiteSpace: 'nowrap',
                         }}
-                        title={isProblem && value ? value : ''}
+                        title={(isProblem || isMethod) && value ? value : ''}
                       >
                         {isStatus ? (
                           <span
