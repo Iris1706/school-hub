@@ -131,27 +131,35 @@ export async function GET(request) {
     // 篩選日期範圍內的數據
     let count = 0;
     let matchedDates = [];
+    let allDateParsed = [];
     let debugInfo = {
       totalRows: rows.length - 1,
       dateColumnIndex,
+      dateColumnName: headers[dateColumnIndex] || 'N/A',
       rangeStart: rangeStart.toLocaleDateString('zh-TW'),
       rangeEnd: rangeEnd.toLocaleDateString('zh-TW'),
+      rangeStartISO: rangeStart.toISOString(),
+      rangeEndISO: rangeEnd.toISOString(),
       rangeStartTime: rangeStart.getTime(),
       rangeEndTime: rangeEnd.getTime(),
     };
 
-    console.log(`日期範圍: ${rangeStart.toLocaleDateString('zh-TW')} (${rangeStart.getTime()}) ~ ${rangeEnd.toLocaleDateString('zh-TW')} (${rangeEnd.getTime()})`);
+    console.log(`\n========== 夾異物數據篩選開始 ==========`);
+    console.log(`日期欄位: ${headers[dateColumnIndex]} (index: ${dateColumnIndex})`);
+    console.log(`日期範圍: ${rangeStart.toLocaleDateString('zh-TW')} ~ ${rangeEnd.toLocaleDateString('zh-TW')}`);
+    console.log(`範圍時間戳: ${rangeStart.getTime()} ~ ${rangeEnd.getTime()}`);
 
-    // 限制日誌輸出，只記錄前10行和最後10行
-    const sampleSize = 10;
+    // 掃描所有行
+    const MAX_LOG_SAMPLES = 20;
+    let logCount = 0;
 
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
-      if (!row[dateColumnIndex]) continue;
+      const dateStr = String(row[dateColumnIndex] || '').trim();
+
+      if (!dateStr) continue;
 
       try {
-        const dateStr = String(row[dateColumnIndex]).trim();
-
         // 解析格式 "2026/08/23" 或 "2026/8/23"
         let itemDate;
         if (dateStr.includes('/')) {
@@ -166,28 +174,47 @@ export async function GET(request) {
           itemDate = new Date(dateStr);
         }
 
-        // 只記錄樣本日期（前10行或最後10行）
-        if (i <= sampleSize || i > rows.length - sampleSize) {
-          console.log(`第 ${i} 行: "${dateStr}" => ${itemDate?.toLocaleDateString('zh-TW') || 'Invalid'} (${itemDate?.getTime() || 'N/A'})`);
+        // 記錄樣本
+        if (logCount < MAX_LOG_SAMPLES) {
+          const isMatched = itemDate && !isNaN(itemDate.getTime()) && (itemDate >= rangeStart && itemDate <= rangeEnd);
+          const itemDateObj = itemDate && !isNaN(itemDate.getTime()) ? {
+            zh_TW: itemDate.toLocaleDateString('zh-TW'),
+            timestamp: itemDate.getTime(),
+            iso: itemDate.toISOString()
+          } : null;
+
+          console.log(`行 ${i}: "${dateStr}" => ${JSON.stringify(itemDateObj)} | 匹配: ${isMatched ? '✓' : '✗'}`);
+          logCount++;
         }
 
+        // 日期比較
         if (itemDate && !isNaN(itemDate.getTime())) {
-          if (itemDate >= rangeStart && itemDate <= rangeEnd) {
+          const itemTime = itemDate.getTime();
+          const inRange = itemTime >= rangeStart.getTime() && itemTime <= rangeEnd.getTime();
+
+          if (inRange) {
             count++;
             matchedDates.push(dateStr);
-            if (matchedDates.length <= 5) {
-              console.log(`  ✓ 匹配: ${dateStr}`);
-            }
+          }
+
+          // 記錄第一個匹配項
+          if (count === 1) {
+            console.log(`🎯 首個匹配: 行 ${i}, "${dateStr}", ${itemDate.toLocaleDateString('zh-TW')}`);
+          }
+        } else {
+          if (logCount < MAX_LOG_SAMPLES) {
+            console.warn(`⚠️ 行 ${i}: 日期無效 "${dateStr}"`);
           }
         }
       } catch (e) {
-        if (i <= sampleSize) {
-          console.error(`第 ${i} 行日期解析失敗:`, e.message);
-        }
+        console.error(`❌ 行 ${i} 解析錯誤:`, e.message, dateStr);
       }
     }
 
-    console.log(`✅ 最終計數: ${count} (共掃描 ${rows.length - 1} 行)`);
+    console.log(`\n========== 結果 ==========`);
+    console.log(`✅ 匹配筆數: ${count}`);
+    console.log(`📊 樣本匹配: ${matchedDates.slice(0, 5).join(', ')}`);
+    console.log(`==========================================\n`);
 
     return NextResponse.json({
       count: count,
@@ -196,7 +223,9 @@ export async function GET(request) {
       debug: {
         ...debugInfo,
         matchedCount: count,
-        sampleMatches: matchedDates.slice(0, 5),
+        sampleMatches: matchedDates.slice(0, 10),
+        totalScanned: rows.length - 1,
+        successRate: rows.length > 1 ? `${((count / (rows.length - 1)) * 100).toFixed(2)}%` : '0%',
       }
     });
   } catch (err) {
