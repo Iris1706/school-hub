@@ -58,7 +58,7 @@ export async function GET(request) {
     // 使用正確的 sheet ID 讀取資料
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: spreadsheetId,
-      range: `'${sheetName}'!A1:P1000`,
+      range: `'${sheetName}'!A1:P100000`,
     });
 
     const allData = response.data.values || [];
