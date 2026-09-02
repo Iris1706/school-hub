@@ -192,21 +192,26 @@ export default function ReportGenerator() {
                 console.log(`================================`);
               }
 
-              // 處理多種 API 格式
-              let extractedData;
-              if (json?.data) {
-                extractedData = json.data;
-              } else if (json?.attendance) {
-                extractedData = json.attendance;
-              } else if (json?.records) {
-                extractedData = json.records;
-              } else if (Array.isArray(json)) {
-                extractedData = json;
+              // 特別處理 foreignObjects API（返回對象，不是數組）
+              if (endpoint.key === 'foreignObjects') {
+                newData[endpoint.key] = json;
               } else {
-                extractedData = [];
-              }
+                // 處理多種 API 格式
+                let extractedData;
+                if (json?.data) {
+                  extractedData = json.data;
+                } else if (json?.attendance) {
+                  extractedData = json.attendance;
+                } else if (json?.records) {
+                  extractedData = json.records;
+                } else if (Array.isArray(json)) {
+                  extractedData = json;
+                } else {
+                  extractedData = [];
+                }
 
-              newData[endpoint.key] = Array.isArray(extractedData) ? extractedData : [];
+                newData[endpoint.key] = Array.isArray(extractedData) ? extractedData : [];
+              }
             } else {
               // API 返回錯誤狀態碼
               const errorText = await response.text();
