@@ -24,7 +24,7 @@ export async function GET(request) {
 
     // 先列出所有 sheets 用於診斷
     const spreadsheet = await sheets.spreadsheets.get({
-      spreadsheetId: process.env.Repair_SHEET_ID,
+      spreadsheetId: process.env.Recode_SHEET_ID,
     });
 
     const availableSheets = spreadsheet.data.sheets.map(sheet => ({
@@ -47,7 +47,7 @@ export async function GET(request) {
 
     // 使用正確的 sheet ID 讀取資料
     const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: process.env.Repair_SHEET_ID,
+      spreadsheetId: process.env.Recode_SHEET_ID,
       range: `'${sheetName}'!A1:P1000`,
     });
 
