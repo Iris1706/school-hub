@@ -40,7 +40,8 @@ export default function RepairRecordsList({ sheetName }) {
       }
 
       setHeaders(result.headers);
-      setRecords(result.records);
+      // 反向排序，最新的在前面
+      setRecords([...result.records].reverse());
       setError(null);
       setLastUpdated(new Date());
     } catch (err) {
@@ -65,14 +66,6 @@ export default function RepairRecordsList({ sheetName }) {
 
     return () => clearInterval(interval);
   }, [sheetName]);
-
-  const formatTime = (date) => {
-    if (!date) return '';
-    return new Date(date).toLocaleTimeString('zh-TW', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
 
   const getStatusColor = (status) => {
     switch (status?.trim().toLowerCase()) {
@@ -137,29 +130,24 @@ export default function RepairRecordsList({ sheetName }) {
 
   return (
     <div>
-      {/* 標題和刷新按鈕 */}
+      {/* 刷新按鈕和統計信息 */}
       <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: '24px',
-          paddingBottom: '16px',
+          marginBottom: '16px',
+          paddingBottom: '12px',
           borderBottom: '1px solid var(--border-color, #e5e7eb)',
         }}
       >
-        <div>
-          <h2 style={{ margin: '0 0 8px 0', fontSize: '20px', fontWeight: '600' }}>
-            報修紀錄
-          </h2>
-          <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-            共 {records.length} 筆紀錄
-            {lastUpdated && (
-              <>
-                ・最後更新: {lastUpdated.toLocaleTimeString('zh-TW')}
-              </>
-            )}
-          </div>
+        <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+          共 {records.length} 筆紀錄
+          {lastUpdated && (
+            <>
+              ・最後更新: {lastUpdated.toLocaleTimeString('zh-TW')}
+            </>
+          )}
         </div>
         <button
           onClick={fetchRecords}
@@ -196,68 +184,89 @@ export default function RepairRecordsList({ sheetName }) {
           <div style={{ fontSize: '14px' }}>暫無報修紀錄</div>
         </div>
       ) : (
-        // 清單視圖
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {records.map((record) => (
-            <div
-              key={record.rowIndex}
-              style={{
-                background: 'var(--background, white)',
-                border: '1px solid var(--border-color, #e5e7eb)',
-                borderRadius: '8px',
-                padding: '16px',
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-                gap: '16px',
-              }}
-            >
-              {/* 為每個欄位創建卡片 */}
-              {headers.map((header, idx) => {
-                const value = record.values[idx] || '';
-                const isStatus = header?.includes('狀態');
+        // 表格視圖
+        <div style={{ overflowX: 'auto' }}>
+          <table
+            style={{
+              width: '100%',
+              borderCollapse: 'collapse',
+              fontSize: '14px',
+            }}
+          >
+            <thead>
+              <tr style={{ background: 'var(--background-secondary, #f9f9f9)', borderBottom: '1px solid var(--border-color, #e5e7eb)' }}>
+                {headers.map((header, idx) => (
+                  <th
+                    key={idx}
+                    style={{
+                      padding: '12px',
+                      textAlign: 'left',
+                      fontWeight: '600',
+                      color: 'var(--text-secondary)',
+                      fontSize: '13px',
+                      whiteSpace: 'nowrap',
+                      borderRight: idx < headers.length - 1 ? '1px solid var(--border-color, #e5e7eb)' : 'none',
+                    }}
+                  >
+                    {header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {records.map((record, rowIdx) => (
+                <tr
+                  key={rowIdx}
+                  style={{
+                    borderBottom: '1px solid var(--border-color, #e5e7eb)',
+                    backgroundColor: rowIdx % 2 === 0 ? 'transparent' : 'var(--background-secondary, #f9f9f9)',
+                  }}
+                >
+                  {record.values.map((value, colIdx) => {
+                    const header = headers[colIdx];
+                    const isStatus = header?.includes('狀態');
 
-                return (
-                  <div key={idx}>
-                    <div
-                      style={{
-                        fontSize: '12px',
-                        fontWeight: '600',
-                        color: 'var(--text-secondary)',
-                        marginBottom: '4px',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.5px',
-                      }}
-                    >
-                      {header}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: '14px',
-                        wordBreak: 'break-word',
-                        ...(isStatus && {
-                          display: 'inline-block',
-                          padding: '4px 12px',
-                          borderRadius: '4px',
-                          background: getStatusBgColor(value),
-                          color: getStatusColor(value),
-                          fontWeight: '600',
-                        }),
-                      }}
-                    >
-                      {value || '—'}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ))}
+                    return (
+                      <td
+                        key={colIdx}
+                        style={{
+                          padding: '12px',
+                          borderRight: colIdx < headers.length - 1 ? '1px solid var(--border-color, #e5e7eb)' : 'none',
+                          maxWidth: '200px',
+                          wordBreak: 'break-word',
+                        }}
+                      >
+                        {isStatus ? (
+                          <span
+                            style={{
+                              display: 'inline-block',
+                              padding: '4px 12px',
+                              borderRadius: '4px',
+                              background: getStatusBgColor(value),
+                              color: getStatusColor(value),
+                              fontWeight: '600',
+                              fontSize: '13px',
+                            }}
+                          >
+                            {value || '—'}
+                          </span>
+                        ) : (
+                          <span>{value || '—'}</span>
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 
       {/* 自動更新提示 */}
       <div
         style={{
-          marginTop: '24px',
+          marginTop: '16px',
           padding: '12px 16px',
           background: 'rgba(59, 130, 246, 0.05)',
           border: '1px solid rgba(59, 130, 246, 0.2)',
