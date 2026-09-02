@@ -138,52 +138,71 @@ export default function RepairRecordsList({ sheetName }) {
     );
   }
 
-  // 提取所有可用月份
+  // 提取所有可用月份（支持多種日期格式）
   const availableMonths = [...new Set(records
-    .map(r => r.values[0])
-    .filter(date => date)
-    .map(date => date.substring(0, 7))
+    .map(r => {
+      const dateStr = r.values[0];
+      if (!dateStr) return null;
+      // 支持 "2026/4" 或 "2026/04" 格式
+      const match = dateStr.match(/(\d{4})[\/-](\d{1,2})/);
+      return match ? `${match[1]}/${String(match[2]).padStart(2, '0')}` : null;
+    })
+    .filter(Boolean)
   )].sort().reverse();
 
   // 篩選出選定月份的資料
   const filteredRecords = selectedMonth ? records.filter(r => {
     const dateStr = r.values[0];
-    return dateStr ? dateStr.substring(0, 7) === selectedMonth : false;
+    if (!dateStr) return false;
+    const match = dateStr.match(/(\d{4})[\/-](\d{1,2})/);
+    if (!match) return false;
+    const monthStr = `${match[1]}/${String(match[2]).padStart(2, '0')}`;
+    return monthStr === selectedMonth;
   }) : [];
 
+  // 月份轉換函數
+  const formatMonth = (monthStr) => {
+    const [year, month] = monthStr.split('/');
+    return `${parseInt(month)}月`;
+  };
+
   return (
-    <div>
-      {/* 月份選擇器 */}
+    <div style={{ display: 'flex', gap: '20px' }}>
+      {/* 左側月份選擇器 */}
       {availableMonths.length > 0 && selectedMonth && (
         <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: '20px',
+          position: 'sticky',
+          top: '20px',
+          width: '100px',
+          flexShrink: 0,
         }}>
           <select
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(e.target.value)}
             style={{
-              padding: '10px 16px',
-              fontSize: '12px',
+              width: '100%',
+              padding: '10px 12px',
+              fontSize: '13px',
               fontWeight: '600',
               background: '#3b82f6',
               color: 'white',
               border: 'none',
               borderRadius: '6px',
               cursor: 'pointer',
-              minWidth: '120px',
+              textAlign: 'center',
             }}
           >
             {availableMonths.map(month => (
               <option key={month} value={month} style={{ background: 'white', color: '#1f2937' }}>
-                {month}
+                {formatMonth(month)}
               </option>
             ))}
           </select>
         </div>
       )}
+
+      {/* 右側主要內容 */}
+      <div style={{ flex: 1, minWidth: 0 }}>
 
       {/* 空資料提示 */}
       {filteredRecords.length === 0 ? (
@@ -288,23 +307,24 @@ export default function RepairRecordsList({ sheetName }) {
         </div>
       )}
 
-      {/* 自動更新提示 */}
-      <div
-        style={{
-          marginTop: '16px',
-          padding: '12px 16px',
-          background: 'rgba(59, 130, 246, 0.05)',
-          border: '1px solid rgba(59, 130, 246, 0.2)',
-          borderRadius: '6px',
-          fontSize: '10px',
-          color: 'var(--text-secondary)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-        }}
-      >
-        <RefreshCw size={14} />
-        資料每30秒自動更新一次
+        {/* 自動更新提示 */}
+        <div
+          style={{
+            marginTop: '16px',
+            padding: '12px 16px',
+            background: 'rgba(59, 130, 246, 0.05)',
+            border: '1px solid rgba(59, 130, 246, 0.2)',
+            borderRadius: '6px',
+            fontSize: '10px',
+            color: 'var(--text-secondary)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+        >
+          <RefreshCw size={14} />
+          資料每30秒自動更新一次
+        </div>
       </div>
     </div>
   );
