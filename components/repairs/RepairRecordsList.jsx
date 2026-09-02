@@ -40,7 +40,8 @@ export default function RepairRecordsList({ sheetName }) {
       }
 
       setHeaders(result.headers);
-      setRecords(result.records);
+      // 反向排序，最新的在前面
+      setRecords([...result.records].reverse());
       setError(null);
       setLastUpdated(new Date());
     } catch (err) {
@@ -129,28 +130,6 @@ export default function RepairRecordsList({ sheetName }) {
 
   return (
     <div>
-      {/* 刷新按鈕 */}
-      <div style={{ marginBottom: '16px', textAlign: 'right' }}>
-        <button
-          onClick={fetchRecords}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '8px 16px',
-            background: '#3b82f6',
-            color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '10px',
-            fontWeight: '500',
-          }}
-        >
-          <RefreshCw size={16} />
-          刷新
-        </button>
-      </div>
 
       {/* 空資料提示 */}
       {records.length === 0 ? (
@@ -166,37 +145,68 @@ export default function RepairRecordsList({ sheetName }) {
           <div style={{ fontSize: '10px' }}>暫無報修紀錄</div>
         </div>
       ) : (
-        // 表格視圖
-        <div style={{ overflowX: 'auto' }}>
-          <table
-            style={{
-              width: '100%',
-              borderCollapse: 'collapse',
-              fontSize: '10px',
-            }}
-          >
-            <thead>
-              <tr style={{ background: 'var(--background-secondary, #f9f9f9)', borderBottom: '1px solid var(--border-color, #e5e7eb)' }}>
-                {headers.map((header, idx) => (
-                  <th
-                    key={idx}
+        // 表格視圖 - 按月份分組
+        <div>
+          {(() => {
+            // 按月份分組數據
+            const groupedByMonth = records.reduce((acc, record) => {
+              const dateStr = record.values[0]; // 假設第一列是日期
+              const monthKey = dateStr ? dateStr.substring(0, 7) : 'unknown'; // "2026/9" 格式
+              if (!acc[monthKey]) {
+                acc[monthKey] = [];
+              }
+              acc[monthKey].push(record);
+              return acc;
+            }, {});
+
+            // 按月份排序（降序，最新在前）
+            const sortedMonths = Object.keys(groupedByMonth).sort().reverse();
+
+            return sortedMonths.map((monthKey) => (
+              <div key={monthKey} style={{ marginBottom: '24px' }}>
+                {/* 月份標題 */}
+                <div style={{
+                  fontSize: '11px',
+                  fontWeight: '600',
+                  color: 'var(--text-primary, #1f2937)',
+                  marginBottom: '12px',
+                  paddingBottom: '8px',
+                  borderBottom: '2px solid var(--border-color, #e5e7eb)',
+                }}>
+                  {monthKey}
+                </div>
+
+                {/* 月份內的表格 */}
+                <div style={{ overflowX: 'auto' }}>
+                  <table
                     style={{
-                      padding: '12px',
-                      textAlign: 'center',
-                      fontWeight: '600',
-                      color: 'var(--text-secondary)',
+                      width: '100%',
+                      borderCollapse: 'collapse',
                       fontSize: '10px',
-                      whiteSpace: 'nowrap',
-                      borderRight: idx < headers.length - 1 ? '1px solid var(--border-color, #e5e7eb)' : 'none',
                     }}
                   >
-                    {header}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {records.map((record, rowIdx) => (
+                    <thead>
+                      <tr style={{ background: 'var(--background-secondary, #f9f9f9)', borderBottom: '1px solid var(--border-color, #e5e7eb)' }}>
+                        {headers.map((header, idx) => (
+                          <th
+                            key={idx}
+                            style={{
+                              padding: '12px',
+                              textAlign: 'center',
+                              fontWeight: '600',
+                              color: 'var(--text-secondary)',
+                              fontSize: '10px',
+                              whiteSpace: 'nowrap',
+                              borderRight: idx < headers.length - 1 ? '1px solid var(--border-color, #e5e7eb)' : 'none',
+                            }}
+                          >
+                            {header}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {groupedByMonth[monthKey].map((record, rowIdx) => (
                 <tr
                   key={rowIdx}
                   style={{
@@ -249,9 +259,13 @@ export default function RepairRecordsList({ sheetName }) {
                     );
                   })}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ));
+          })()}
         </div>
       )}
 
