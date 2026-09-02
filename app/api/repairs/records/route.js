@@ -22,10 +22,10 @@ export async function GET(request) {
 
     const sheets = getSheetsClient();
 
-    // 讀取資料（避免開放式範圍的問題，使用具體行數）
+    // 讀取資料
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.Repair_SHEET_ID,
-      range: `'總表'!A1:P1000`,
+      range: `總表!A1:P1000`,
     });
 
     const allData = response.data.values || [];
