@@ -40,8 +40,7 @@ export default function RepairRecordsList({ sheetName }) {
       }
 
       setHeaders(result.headers);
-      // 反向排序，最新的在前面
-      setRecords([...result.records].reverse());
+      setRecords(result.records);
       setError(null);
       setLastUpdated(new Date());
     } catch (err) {
@@ -100,7 +99,7 @@ export default function RepairRecordsList({ sheetName }) {
   if (loading && records.length === 0) {
     return (
       <div style={{ padding: '32px', textAlign: 'center', color: '#6b7280' }}>
-        <div style={{ marginBottom: '12px', fontSize: '14px' }}>載入中...</div>
+        <div style={{ marginBottom: '12px', fontSize: '12px' }}>載入中...</div>
       </div>
     );
   }
@@ -122,7 +121,7 @@ export default function RepairRecordsList({ sheetName }) {
         <AlertCircle size={20} />
         <div>
           <div style={{ fontWeight: '600' }}>讀取失敗</div>
-          <div style={{ fontSize: '14px', opacity: 0.8 }}>{error}</div>
+          <div style={{ fontSize: '12px', opacity: 0.8 }}>{error}</div>
         </div>
       </div>
     );
@@ -130,29 +129,12 @@ export default function RepairRecordsList({ sheetName }) {
 
   return (
     <div>
-      {/* 刷新按鈕和統計信息 */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '16px',
-          paddingBottom: '12px',
-          borderBottom: '1px solid var(--border-color, #e5e7eb)',
-        }}
-      >
-        <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-          共 {records.length} 筆紀錄
-          {lastUpdated && (
-            <>
-              ・最後更新: {lastUpdated.toLocaleTimeString('zh-TW')}
-            </>
-          )}
-        </div>
+      {/* 刷新按鈕 */}
+      <div style={{ marginBottom: '16px', textAlign: 'right' }}>
         <button
           onClick={fetchRecords}
           style={{
-            display: 'flex',
+            display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
             padding: '8px 16px',
@@ -161,7 +143,7 @@ export default function RepairRecordsList({ sheetName }) {
             border: 'none',
             borderRadius: '6px',
             cursor: 'pointer',
-            fontSize: '14px',
+            fontSize: '12px',
             fontWeight: '500',
           }}
         >
@@ -181,7 +163,7 @@ export default function RepairRecordsList({ sheetName }) {
             borderRadius: '8px',
           }}
         >
-          <div style={{ fontSize: '14px' }}>暫無報修紀錄</div>
+          <div style={{ fontSize: '12px' }}>暫無報修紀錄</div>
         </div>
       ) : (
         // 表格視圖
@@ -190,7 +172,7 @@ export default function RepairRecordsList({ sheetName }) {
             style={{
               width: '100%',
               borderCollapse: 'collapse',
-              fontSize: '14px',
+              fontSize: '12px',
             }}
           >
             <thead>
@@ -200,10 +182,10 @@ export default function RepairRecordsList({ sheetName }) {
                     key={idx}
                     style={{
                       padding: '12px',
-                      textAlign: 'left',
+                      textAlign: 'center',
                       fontWeight: '600',
                       color: 'var(--text-secondary)',
-                      fontSize: '13px',
+                      fontSize: '12px',
                       whiteSpace: 'nowrap',
                       borderRight: idx < headers.length - 1 ? '1px solid var(--border-color, #e5e7eb)' : 'none',
                     }}
@@ -225,16 +207,20 @@ export default function RepairRecordsList({ sheetName }) {
                   {record.values.map((value, colIdx) => {
                     const header = headers[colIdx];
                     const isStatus = header?.includes('狀態');
+                    const isProblem = header?.includes('問題');
+                    const displayValue = isProblem && value && value.length > 14 ? value.substring(0, 14) + '...' : value;
 
                     return (
                       <td
                         key={colIdx}
                         style={{
                           padding: '12px',
+                          textAlign: 'center',
                           borderRight: colIdx < headers.length - 1 ? '1px solid var(--border-color, #e5e7eb)' : 'none',
                           maxWidth: '200px',
                           wordBreak: 'break-word',
                         }}
+                        title={isProblem && value ? value : ''}
                       >
                         {isStatus ? (
                           <span
@@ -245,13 +231,13 @@ export default function RepairRecordsList({ sheetName }) {
                               background: getStatusBgColor(value),
                               color: getStatusColor(value),
                               fontWeight: '600',
-                              fontSize: '13px',
+                              fontSize: '12px',
                             }}
                           >
                             {value || '—'}
                           </span>
                         ) : (
-                          <span>{value || '—'}</span>
+                          <span>{displayValue || '—'}</span>
                         )}
                       </td>
                     );
