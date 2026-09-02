@@ -13,26 +13,40 @@ export default function RepairRecordsList({ sheetName }) {
   const fetchRecords = async () => {
     try {
       setLoading(true);
-      const response = await fetch(
-        `/api/repairs/records?sheetName=${encodeURIComponent(sheetName)}`
-      );
+      const url = `/api/repairs/records?sheetName=${encodeURIComponent(sheetName)}`;
+      console.log('正在請求 API:', url);
+
+      const response = await fetch(url);
+      console.log('HTTP 狀態:', response.status, response.statusText);
+
+      let result;
+      const text = await response.text();
+      console.log('API 原始響應:', text);
+
+      try {
+        result = JSON.parse(text);
+      } catch (parseErr) {
+        throw new Error(`無法解析 API 響應: ${text.substring(0, 200)}`);
+      }
+
+      console.log('解析後的 API 響應:', result);
 
       if (!response.ok) {
-        throw new Error('讀取報修紀錄失敗');
+        throw new Error(`HTTP ${response.status}: ${result.error || response.statusText}`);
       }
 
-      const result = await response.json();
-      if (result.success) {
-        setHeaders(result.headers);
-        setRecords(result.records);
-        setError(null);
-        setLastUpdated(new Date());
-      } else {
-        throw new Error(result.error || '無法取得資料');
+      if (!result.success) {
+        throw new Error(result.error || '讀取報修紀錄失敗');
       }
+
+      setHeaders(result.headers);
+      setRecords(result.records);
+      setError(null);
+      setLastUpdated(new Date());
     } catch (err) {
-      setError(err.message);
-      console.error('讀取報修紀錄錯誤:', err);
+      const errorMsg = err.message || '未知錯誤';
+      setError(errorMsg);
+      console.error('讀取報修紀錄錯誤:', errorMsg);
     } finally {
       setLoading(false);
     }
