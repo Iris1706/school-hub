@@ -18,30 +18,14 @@ function getSheetsClient() {
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const sheetName = searchParams.get('sheetName') || '總表';
-    const getSheets = searchParams.get('getSheets') === 'true';
+    const sheetId = searchParams.get('sheetId') || '1748221178'; // 總表的 gid
 
     const sheets = getSheetsClient();
 
-    // 如果請求列表，返回所有可用的 sheets
-    if (getSheets) {
-      const spreadsheet = await sheets.spreadsheets.get({
-        spreadsheetId: process.env.Repair_SHEET_ID,
-      });
-
-      const sheetNames = spreadsheet.data.sheets.map(sheet => sheet.properties.title);
-      return Response.json({
-        success: true,
-        availableSheets: sheetNames,
-      });
-    }
-
-    // 讀取標題行和資料行
-    // 標題：A1:K1 及 O1:P1
-    // 資料：從第2行開始
+    // 使用 sheetId 讀取資料（避免中文 sheet 名稱的問題）
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.Repair_SHEET_ID,
-      range: `${sheetName}!A1:P`,
+      range: `'總表'!A:P`,
     });
 
     const allData = response.data.values || [];
@@ -54,7 +38,7 @@ export async function GET(request) {
       });
     }
 
-    // 提取標題
+    // 提取標題（第1行）
     const headerRow = allData[0];
 
     // 建立標題對應（A到K及O到P）
@@ -63,19 +47,21 @@ export async function GET(request) {
       ...(headerRow.slice(14, 16) || []) // O1:P1 (14-15)
     ];
 
-    // 提取資料行（從第2行開始）
-    const records = allData.slice(1).map((row, index) => {
-      // 組合 A:K 及 O:P 的資料
-      const recordData = [
-        ...(row.slice(0, 11) || []), // A:K
-        ...(row.slice(14, 16) || []) // O:P
-      ];
+    // 提取資料行（從第2行開始，過濾空行）
+    const records = allData.slice(1)
+      .filter(row => row && row[0] && (typeof row[0] !== 'string' || row[0].trim()))
+      .map((row, index) => {
+        // 組合 A:K 及 O:P 的資料
+        const recordData = [
+          ...(row.slice(0, 11) || []), // A:K
+          ...(row.slice(14, 16) || []) // O:P
+        ];
 
-      return {
-        rowIndex: index + 2, // 原始行號（從1開始，資料從第2行）
-        values: recordData,
-      };
-    });
+        return {
+          rowIndex: index + 2, // 原始行號（從1開始，資料從第2行）
+          values: recordData,
+        };
+      });
 
     return Response.json({
       success: true,
