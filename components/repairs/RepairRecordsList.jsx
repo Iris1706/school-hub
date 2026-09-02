@@ -9,10 +9,7 @@ export default function RepairRecordsList({ sheetName }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
-  const [selectedMonth, setSelectedMonth] = useState(() => {
-    const now = new Date();
-    return `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}`;
-  });
+  const [selectedMonth, setSelectedMonth] = useState(null);
 
   const fetchRecords = async () => {
     try {
@@ -45,9 +42,18 @@ export default function RepairRecordsList({ sheetName }) {
 
       setHeaders(result.headers);
       // 反向排序，最新的在前面
-      setRecords([...result.records].reverse());
+      const reversed = [...result.records].reverse();
+      setRecords(reversed);
       setError(null);
       setLastUpdated(new Date());
+
+      // 設置預設月份為最新的月份
+      if (reversed.length > 0) {
+        const latestMonth = reversed[0].values[0]?.substring(0, 7);
+        if (latestMonth) {
+          setSelectedMonth(latestMonth);
+        }
+      }
     } catch (err) {
       const errorMsg = err.message || '未知錯誤';
       setError(errorMsg);
@@ -139,81 +145,43 @@ export default function RepairRecordsList({ sheetName }) {
     .map(date => date.substring(0, 7))
   )].sort().reverse();
 
-  // 切換月份
-  const handlePrevMonth = () => {
-    const idx = availableMonths.indexOf(selectedMonth);
-    if (idx < availableMonths.length - 1) {
-      setSelectedMonth(availableMonths[idx + 1]);
-    }
-  };
-
-  const handleNextMonth = () => {
-    const idx = availableMonths.indexOf(selectedMonth);
-    if (idx > 0) {
-      setSelectedMonth(availableMonths[idx - 1]);
-    }
-  };
-
   // 篩選出選定月份的資料
-  const filteredRecords = records.filter(r => {
+  const filteredRecords = selectedMonth ? records.filter(r => {
     const dateStr = r.values[0];
     return dateStr ? dateStr.substring(0, 7) === selectedMonth : false;
-  });
+  }) : [];
 
   return (
     <div>
-      {/* 月份導航 */}
-      {availableMonths.length > 0 && (
+      {/* 月份選擇器 */}
+      {availableMonths.length > 0 && selectedMonth && (
         <div style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: '16px',
           marginBottom: '20px',
-          padding: '12px',
-          background: 'var(--background-secondary, #f9f9f9)',
-          borderRadius: '6px',
         }}>
-          <button
-            onClick={handlePrevMonth}
-            disabled={availableMonths.indexOf(selectedMonth) === availableMonths.length - 1}
+          <select
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(e.target.value)}
             style={{
-              padding: '8px 12px',
-              background: availableMonths.indexOf(selectedMonth) === availableMonths.length - 1 ? '#ccc' : '#3b82f6',
+              padding: '10px 16px',
+              fontSize: '12px',
+              fontWeight: '600',
+              background: '#3b82f6',
               color: 'white',
               border: 'none',
-              borderRadius: '4px',
-              cursor: availableMonths.indexOf(selectedMonth) === availableMonths.length - 1 ? 'not-allowed' : 'pointer',
-              fontSize: '10px',
-              fontWeight: '600',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              minWidth: '120px',
             }}
           >
-            ← 上個月
-          </button>
-          <div style={{
-            fontSize: '12px',
-            fontWeight: '600',
-            minWidth: '80px',
-            textAlign: 'center',
-          }}>
-            {selectedMonth}
-          </div>
-          <button
-            onClick={handleNextMonth}
-            disabled={availableMonths.indexOf(selectedMonth) === 0}
-            style={{
-              padding: '8px 12px',
-              background: availableMonths.indexOf(selectedMonth) === 0 ? '#ccc' : '#3b82f6',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: availableMonths.indexOf(selectedMonth) === 0 ? 'not-allowed' : 'pointer',
-              fontSize: '10px',
-              fontWeight: '600',
-            }}
-          >
-            下個月 →
-          </button>
+            {availableMonths.map(month => (
+              <option key={month} value={month} style={{ background: 'white', color: '#1f2937' }}>
+                {month}
+              </option>
+            ))}
+          </select>
         </div>
       )}
 
