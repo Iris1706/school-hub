@@ -20,11 +20,21 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const sheetName = searchParams.get('sheetName') || '總表';
 
+    // Fallback：同時嘗試新舊環境變數名稱
+    const spreadsheetId = process.env.Recode_SHEET_ID || process.env.Repair_SHEET_ID;
+
+    if (!spreadsheetId) {
+      return Response.json({
+        success: false,
+        error: '環境變數未設定：Recode_SHEET_ID 或 Repair_SHEET_ID',
+      }, { status: 500 });
+    }
+
     const sheets = getSheetsClient();
 
     // 先列出所有 sheets 用於診斷
     const spreadsheet = await sheets.spreadsheets.get({
-      spreadsheetId: process.env.Recode_SHEET_ID,
+      spreadsheetId: spreadsheetId,
     });
 
     const availableSheets = spreadsheet.data.sheets.map(sheet => ({
@@ -47,7 +57,7 @@ export async function GET(request) {
 
     // 使用正確的 sheet ID 讀取資料
     const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: process.env.Recode_SHEET_ID,
+      spreadsheetId: spreadsheetId,
       range: `'${sheetName}'!A1:P1000`,
     });
 
