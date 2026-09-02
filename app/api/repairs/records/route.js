@@ -18,14 +18,37 @@ function getSheetsClient() {
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const sheetId = searchParams.get('sheetId') || '1748221178'; // 總表的 gid
+    const sheetName = searchParams.get('sheetName') || '總表';
 
     const sheets = getSheetsClient();
 
-    // 讀取資料
+    // 先列出所有 sheets 用於診斷
+    const spreadsheet = await sheets.spreadsheets.get({
+      spreadsheetId: process.env.Repair_SHEET_ID,
+    });
+
+    const availableSheets = spreadsheet.data.sheets.map(sheet => ({
+      title: sheet.properties.title,
+      sheetId: sheet.properties.sheetId,
+    }));
+
+    console.log('可用的 sheets:', availableSheets);
+
+    // 找到匹配的 sheet
+    const targetSheet = availableSheets.find(s => s.title === sheetName);
+
+    if (!targetSheet) {
+      return Response.json({
+        success: false,
+        error: `找不到名為 "${sheetName}" 的 sheet。可用的 sheets: ${availableSheets.map(s => s.title).join(', ')}`,
+        availableSheets: availableSheets,
+      });
+    }
+
+    // 使用正確的 sheet ID 讀取資料
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.Repair_SHEET_ID,
-      range: `總表!A1:P1000`,
+      range: `'${sheetName}'!A1:P1000`,
     });
 
     const allData = response.data.values || [];
