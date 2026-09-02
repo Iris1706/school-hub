@@ -99,7 +99,7 @@ export default function RepairRecordsList({ sheetName }) {
   if (loading && records.length === 0) {
     return (
       <div style={{ padding: '32px', textAlign: 'center', color: '#6b7280' }}>
-        <div style={{ marginBottom: '12px', fontSize: '12px' }}>載入中...</div>
+        <div style={{ marginBottom: '12px', fontSize: '10px' }}>載入中...</div>
       </div>
     );
   }
@@ -121,7 +121,7 @@ export default function RepairRecordsList({ sheetName }) {
         <AlertCircle size={20} />
         <div>
           <div style={{ fontWeight: '600' }}>讀取失敗</div>
-          <div style={{ fontSize: '12px', opacity: 0.8 }}>{error}</div>
+          <div style={{ fontSize: '10px', opacity: 0.8 }}>{error}</div>
         </div>
       </div>
     );
@@ -143,7 +143,7 @@ export default function RepairRecordsList({ sheetName }) {
             border: 'none',
             borderRadius: '6px',
             cursor: 'pointer',
-            fontSize: '12px',
+            fontSize: '10px',
             fontWeight: '500',
           }}
         >
@@ -163,7 +163,7 @@ export default function RepairRecordsList({ sheetName }) {
             borderRadius: '8px',
           }}
         >
-          <div style={{ fontSize: '12px' }}>暫無報修紀錄</div>
+          <div style={{ fontSize: '10px' }}>暫無報修紀錄</div>
         </div>
       ) : (
         // 表格視圖
@@ -172,7 +172,7 @@ export default function RepairRecordsList({ sheetName }) {
             style={{
               width: '100%',
               borderCollapse: 'collapse',
-              fontSize: '12px',
+              fontSize: '10px',
             }}
           >
             <thead>
@@ -185,7 +185,7 @@ export default function RepairRecordsList({ sheetName }) {
                       textAlign: 'center',
                       fontWeight: '600',
                       color: 'var(--text-secondary)',
-                      fontSize: '12px',
+                      fontSize: '10px',
                       whiteSpace: 'nowrap',
                       borderRight: idx < headers.length - 1 ? '1px solid var(--border-color, #e5e7eb)' : 'none',
                     }}
@@ -208,7 +208,7 @@ export default function RepairRecordsList({ sheetName }) {
                     const header = headers[colIdx];
                     const isStatus = header?.includes('狀態');
                     const isProblem = header?.includes('問題');
-                    const displayValue = isProblem && value && value.length > 14 ? value.substring(0, 14) + '...' : value;
+                    const displayValue = isProblem && value && value.length > 12 ? value.substring(0, 12) + '...' : value;
 
                     return (
                       <td
@@ -217,8 +217,7 @@ export default function RepairRecordsList({ sheetName }) {
                           padding: '12px',
                           textAlign: 'center',
                           borderRight: colIdx < headers.length - 1 ? '1px solid var(--border-color, #e5e7eb)' : 'none',
-                          maxWidth: '200px',
-                          wordBreak: 'break-word',
+                          whiteSpace: 'nowrap',
                         }}
                         title={isProblem && value ? value : ''}
                       >
@@ -231,7 +230,7 @@ export default function RepairRecordsList({ sheetName }) {
                               background: getStatusBgColor(value),
                               color: getStatusColor(value),
                               fontWeight: '600',
-                              fontSize: '12px',
+                              fontSize: '10px',
                             }}
                           >
                             {value || '—'}
@@ -257,7 +256,7 @@ export default function RepairRecordsList({ sheetName }) {
           background: 'rgba(59, 130, 246, 0.05)',
           border: '1px solid rgba(59, 130, 246, 0.2)',
           borderRadius: '6px',
-          fontSize: '12px',
+          fontSize: '10px',
           color: 'var(--text-secondary)',
           display: 'flex',
           alignItems: 'center',
