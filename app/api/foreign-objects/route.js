@@ -130,7 +130,20 @@ export async function GET(request) {
 
     // 篩選日期範圍內的數據
     let count = 0;
-    console.log(`日期範圍: ${rangeStart.toLocaleDateString('zh-TW')} ~ ${rangeEnd.toLocaleDateString('zh-TW')}`);
+    let matchedDates = [];
+    let debugInfo = {
+      totalRows: rows.length - 1,
+      dateColumnIndex,
+      rangeStart: rangeStart.toLocaleDateString('zh-TW'),
+      rangeEnd: rangeEnd.toLocaleDateString('zh-TW'),
+      rangeStartTime: rangeStart.getTime(),
+      rangeEndTime: rangeEnd.getTime(),
+    };
+
+    console.log(`日期範圍: ${rangeStart.toLocaleDateString('zh-TW')} (${rangeStart.getTime()}) ~ ${rangeEnd.toLocaleDateString('zh-TW')} (${rangeEnd.getTime()})`);
+
+    // 限制日誌輸出，只記錄前10行和最後10行
+    const sampleSize = 10;
 
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
@@ -138,7 +151,6 @@ export async function GET(request) {
 
       try {
         const dateStr = String(row[dateColumnIndex]).trim();
-        console.log(`第 ${i} 行日期字符串: "${dateStr}"`);
 
         // 解析格式 "2026/08/23" 或 "2026/8/23"
         let itemDate;
@@ -154,23 +166,38 @@ export async function GET(request) {
           itemDate = new Date(dateStr);
         }
 
-        console.log(`解析後的日期: ${itemDate.toLocaleDateString('zh-TW')}`);
+        // 只記錄樣本日期（前10行或最後10行）
+        if (i <= sampleSize || i > rows.length - sampleSize) {
+          console.log(`第 ${i} 行: "${dateStr}" => ${itemDate?.toLocaleDateString('zh-TW') || 'Invalid'} (${itemDate?.getTime() || 'N/A'})`);
+        }
 
-        if (itemDate >= rangeStart && itemDate <= rangeEnd) {
-          count++;
-          console.log(`✓ 匹配日期範圍`);
+        if (itemDate && !isNaN(itemDate.getTime())) {
+          if (itemDate >= rangeStart && itemDate <= rangeEnd) {
+            count++;
+            matchedDates.push(dateStr);
+            if (matchedDates.length <= 5) {
+              console.log(`  ✓ 匹配: ${dateStr}`);
+            }
+          }
         }
       } catch (e) {
-        console.error(`第 ${i} 行日期解析失敗:`, e.message);
+        if (i <= sampleSize) {
+          console.error(`第 ${i} 行日期解析失敗:`, e.message);
+        }
       }
     }
 
-    console.log(`最終計數: ${count}`);
+    console.log(`✅ 最終計數: ${count} (共掃描 ${rows.length - 1} 行)`);
 
     return NextResponse.json({
       count: count,
       startDate: rangeStart.toLocaleDateString('zh-TW'),
       endDate: rangeEnd.toLocaleDateString('zh-TW'),
+      debug: {
+        ...debugInfo,
+        matchedCount: count,
+        sampleMatches: matchedDates.slice(0, 5),
+      }
     });
   } catch (err) {
     console.error("夾異物統計 API 錯誤:", err);

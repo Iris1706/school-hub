@@ -157,6 +157,11 @@ export default function ReportGenerator() {
               const responseText = await response.text();
               let json;
 
+              // 特別調試 foreignObjects API
+              if (endpoint.key === 'foreignObjects') {
+                console.log(`🔍 foreignObjects API 原始響應:`, responseText.substring(0, 500));
+              }
+
               // 特別調試 attendance API - 記錄原始響應
               if (endpoint.key === 'attendance') {
                 console.log(`===== /api/schedule 原始響應（前200字符） =====`);
