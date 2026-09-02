@@ -9,6 +9,10 @@ export default function RepairRecordsList({ sheetName }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState(() => {
+    const now = new Date();
+    return `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}`;
+  });
 
   const fetchRecords = async () => {
     try {
@@ -128,11 +132,93 @@ export default function RepairRecordsList({ sheetName }) {
     );
   }
 
+  // 提取所有可用月份
+  const availableMonths = [...new Set(records
+    .map(r => r.values[0])
+    .filter(date => date)
+    .map(date => date.substring(0, 7))
+  )].sort().reverse();
+
+  // 切換月份
+  const handlePrevMonth = () => {
+    const idx = availableMonths.indexOf(selectedMonth);
+    if (idx < availableMonths.length - 1) {
+      setSelectedMonth(availableMonths[idx + 1]);
+    }
+  };
+
+  const handleNextMonth = () => {
+    const idx = availableMonths.indexOf(selectedMonth);
+    if (idx > 0) {
+      setSelectedMonth(availableMonths[idx - 1]);
+    }
+  };
+
+  // 篩選出選定月份的資料
+  const filteredRecords = records.filter(r => {
+    const dateStr = r.values[0];
+    return dateStr ? dateStr.substring(0, 7) === selectedMonth : false;
+  });
+
   return (
     <div>
+      {/* 月份導航 */}
+      {availableMonths.length > 0 && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '16px',
+          marginBottom: '20px',
+          padding: '12px',
+          background: 'var(--background-secondary, #f9f9f9)',
+          borderRadius: '6px',
+        }}>
+          <button
+            onClick={handlePrevMonth}
+            disabled={availableMonths.indexOf(selectedMonth) === availableMonths.length - 1}
+            style={{
+              padding: '8px 12px',
+              background: availableMonths.indexOf(selectedMonth) === availableMonths.length - 1 ? '#ccc' : '#3b82f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: availableMonths.indexOf(selectedMonth) === availableMonths.length - 1 ? 'not-allowed' : 'pointer',
+              fontSize: '10px',
+              fontWeight: '600',
+            }}
+          >
+            ← 上個月
+          </button>
+          <div style={{
+            fontSize: '12px',
+            fontWeight: '600',
+            minWidth: '80px',
+            textAlign: 'center',
+          }}>
+            {selectedMonth}
+          </div>
+          <button
+            onClick={handleNextMonth}
+            disabled={availableMonths.indexOf(selectedMonth) === 0}
+            style={{
+              padding: '8px 12px',
+              background: availableMonths.indexOf(selectedMonth) === 0 ? '#ccc' : '#3b82f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: availableMonths.indexOf(selectedMonth) === 0 ? 'not-allowed' : 'pointer',
+              fontSize: '10px',
+              fontWeight: '600',
+            }}
+          >
+            下個月 →
+          </button>
+        </div>
+      )}
 
       {/* 空資料提示 */}
-      {records.length === 0 ? (
+      {filteredRecords.length === 0 ? (
         <div
           style={{
             padding: '48px 24px',
@@ -142,71 +228,40 @@ export default function RepairRecordsList({ sheetName }) {
             borderRadius: '8px',
           }}
         >
-          <div style={{ fontSize: '10px' }}>暫無報修紀錄</div>
+          <div style={{ fontSize: '10px' }}>{records.length === 0 ? '暫無報修紀錄' : `${selectedMonth} 暫無資料`}</div>
         </div>
       ) : (
-        // 表格視圖 - 按月份分組
-        <div>
-          {(() => {
-            // 按月份分組數據
-            const groupedByMonth = records.reduce((acc, record) => {
-              const dateStr = record.values[0]; // 假設第一列是日期
-              const monthKey = dateStr ? dateStr.substring(0, 7) : 'unknown'; // "2026/9" 格式
-              if (!acc[monthKey]) {
-                acc[monthKey] = [];
-              }
-              acc[monthKey].push(record);
-              return acc;
-            }, {});
-
-            // 按月份排序（降序，最新在前）
-            const sortedMonths = Object.keys(groupedByMonth).sort().reverse();
-
-            return sortedMonths.map((monthKey) => (
-              <div key={monthKey} style={{ marginBottom: '24px' }}>
-                {/* 月份標題 */}
-                <div style={{
-                  fontSize: '11px',
-                  fontWeight: '600',
-                  color: 'var(--text-primary, #1f2937)',
-                  marginBottom: '12px',
-                  paddingBottom: '8px',
-                  borderBottom: '2px solid var(--border-color, #e5e7eb)',
-                }}>
-                  {monthKey}
-                </div>
-
-                {/* 月份內的表格 */}
-                <div style={{ overflowX: 'auto' }}>
-                  <table
+        // 表格視圖 - 顯示選定月份
+        <div style={{ overflowX: 'auto' }}>
+          <table
+            style={{
+              width: '100%',
+              borderCollapse: 'collapse',
+              fontSize: '10px',
+            }}
+          >
+            <thead>
+              <tr style={{ background: 'var(--background-secondary, #f9f9f9)', borderBottom: '1px solid var(--border-color, #e5e7eb)' }}>
+                {headers.map((header, idx) => (
+                  <th
+                    key={idx}
                     style={{
-                      width: '100%',
-                      borderCollapse: 'collapse',
+                      padding: '12px',
+                      textAlign: 'center',
+                      fontWeight: '600',
+                      color: 'var(--text-secondary)',
                       fontSize: '10px',
+                      whiteSpace: 'nowrap',
+                      borderRight: idx < headers.length - 1 ? '1px solid var(--border-color, #e5e7eb)' : 'none',
                     }}
                   >
-                    <thead>
-                      <tr style={{ background: 'var(--background-secondary, #f9f9f9)', borderBottom: '1px solid var(--border-color, #e5e7eb)' }}>
-                        {headers.map((header, idx) => (
-                          <th
-                            key={idx}
-                            style={{
-                              padding: '12px',
-                              textAlign: 'center',
-                              fontWeight: '600',
-                              color: 'var(--text-secondary)',
-                              fontSize: '10px',
-                              whiteSpace: 'nowrap',
-                              borderRight: idx < headers.length - 1 ? '1px solid var(--border-color, #e5e7eb)' : 'none',
-                            }}
-                          >
-                            {header}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {groupedByMonth[monthKey].map((record, rowIdx) => (
+                    {header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filteredRecords.map((record, rowIdx) => (
                 <tr
                   key={rowIdx}
                   style={{
@@ -259,13 +314,9 @@ export default function RepairRecordsList({ sheetName }) {
                     );
                   })}
                 </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            ));
-          })()}
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 
