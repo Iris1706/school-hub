@@ -49,12 +49,18 @@ export default function ReportGenerator() {
     let startDate, endDate;
 
     if (dateMode === 'week') {
+      // 計算目標週的任一日期
       const targetDate = new Date(today);
       targetDate.setDate(targetDate.getDate() + weekOffset * 7);
 
+      // 計算該週的週一（正確方法：避免月份邊界問題）
       const day = targetDate.getDay();
-      const diff = targetDate.getDate() - day + (day === 0 ? -6 : 1);
-      startDate = new Date(targetDate.setDate(diff));
+      const daysToSubtract = day === 0 ? 6 : day - 1;
+
+      startDate = new Date(targetDate);
+      startDate.setDate(startDate.getDate() - daysToSubtract);
+
+      // 計算該週的週日
       endDate = new Date(startDate);
       endDate.setDate(endDate.getDate() + 6);
     } else {
@@ -157,10 +163,6 @@ export default function ReportGenerator() {
               const responseText = await response.text();
               let json;
 
-              // 特別調試 foreignObjects API
-              if (endpoint.key === 'foreignObjects') {
-                console.log(`🔍 foreignObjects API 原始響應:`, responseText.substring(0, 500));
-              }
 
               // 特別調試 attendance API - 記錄原始響應
               if (endpoint.key === 'attendance') {
