@@ -3,12 +3,15 @@
 import { useState, useEffect } from 'react';
 import { RefreshCw, AlertCircle } from 'lucide-react';
 
+const STATUS_OPTIONS = ['', '待處理', '已接件', '已處理，待追蹤', '已完成', '報價中', '報價已回簽待送貨', '等待老師回覆', '老師未接待追聯', '已轉其他廠商處理'];
+
 export default function RepairRecordsList({ sheetName }) {
   const [records, setRecords] = useState([]);
   const [headers, setHeaders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(null);
+  const [updatingRowId, setUpdatingRowId] = useState(null);
 
   const fetchRecords = async () => {
     try {
@@ -33,6 +36,49 @@ export default function RepairRecordsList({ sheetName }) {
       console.error('讀取錯誤:', err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleStatusChange = async (rowIndex, newStatus) => {
+    setUpdatingRowId(rowIndex);
+    try {
+      const response = await fetch('/api/repairs/update-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sheetName,
+          rowIndex: rowIndex + 2, // +1 for header, +1 for 1-based indexing
+          newStatus,
+          recordId: `${sheetName}-${rowIndex}`,
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || '更新失敗');
+      }
+
+      // Update local state
+      const updatedRecords = [...records];
+      if (updatedRecords[rowIndex]) {
+        updatedRecords[rowIndex] = {
+          ...updatedRecords[rowIndex],
+          values: updatedRecords[rowIndex].values.map((v, idx) => {
+            // K column is typically column index 10 (0-based: A=0, B=1, ..., K=10)
+            return idx === 10 ? newStatus : v;
+          }),
+        };
+        setRecords(updatedRecords);
+      }
+
+      console.log('狀態已更新:', newStatus);
+    } catch (err) {
+      setError(`更新失敗: ${err.message}`);
+      console.error('更新狀態錯誤:', err.message);
+      // Refresh to get latest data
+      fetchRecords();
+    } finally {
+      setUpdatingRowId(null);
     }
   };
 
@@ -178,60 +224,72 @@ export default function RepairRecordsList({ sheetName }) {
               </tr>
             </thead>
             <tbody>
-              {filteredRecords.map((record, rowIdx) => (
-                <tr
-                  key={rowIdx}
-                  style={{
-                    borderBottom: '1px solid var(--border-color, #e5e7eb)',
-                    backgroundColor: rowIdx % 2 === 0 ? 'transparent' : 'var(--background-secondary, #f9f9f9)',
-                  }}
-                >
-                  {record.values.map((value, colIdx) => {
-                    const header = headers[colIdx];
-                    const isStatus = header?.includes('狀態');
-                    const isProblem = header?.includes('問題');
-                    const isMethod = header?.includes('報修方式');
+              {filteredRecords.map((record, displayIdx) => {
+                const originalIdx = records.indexOf(record);
+                return (
+                  <tr
+                    key={displayIdx}
+                    style={{
+                      borderBottom: '1px solid var(--border-color, #e5e7eb)',
+                      backgroundColor: displayIdx % 2 === 0 ? 'transparent' : 'var(--background-secondary, #f9f9f9)',
+                    }}
+                  >
+                    {record.values.map((value, colIdx) => {
+                      const header = headers[colIdx];
+                      const isStatus = header?.includes('狀態');
+                      const isProblem = header?.includes('問題');
+                      const isMethod = header?.includes('報修方式');
 
-                    let displayValue = value;
-                    if (isProblem && value?.length > 12) {
-                      displayValue = value.substring(0, 12) + '...';
-                    } else if (isMethod && value?.includes('（')) {
-                      displayValue = value.substring(0, value.indexOf('（'));
-                    }
+                      let displayValue = value;
+                      if (isProblem && value?.length > 12) {
+                        displayValue = value.substring(0, 12) + '...';
+                      } else if (isMethod && value?.includes('（')) {
+                        displayValue = value.substring(0, value.indexOf('（'));
+                      }
 
-                    return (
-                      <td
-                        key={colIdx}
-                        style={{
-                          padding: '12px',
-                          textAlign: 'center',
-                          borderRight: colIdx < headers.length - 1 ? '1px solid var(--border-color, #e5e7eb)' : 'none',
-                          whiteSpace: 'nowrap',
-                        }}
-                        title={(isProblem || isMethod) && value ? value : ''}
-                      >
-                        {isStatus ? (
-                          <span
-                            style={{
-                              display: 'inline-block',
-                              padding: '4px 12px',
-                              borderRadius: '4px',
-                              background: getStatusBgColor(value),
-                              color: getStatusColor(value),
-                              fontWeight: '600',
-                              fontSize: '10px',
-                            }}
-                          >
-                            {value || '—'}
-                          </span>
-                        ) : (
-                          <span>{displayValue || '—'}</span>
-                        )}
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
+                      return (
+                        <td
+                          key={colIdx}
+                          style={{
+                            padding: '12px',
+                            textAlign: 'center',
+                            borderRight: colIdx < headers.length - 1 ? '1px solid var(--border-color, #e5e7eb)' : 'none',
+                            whiteSpace: 'nowrap',
+                          }}
+                          title={(isProblem || isMethod) && value ? value : ''}
+                        >
+                          {isStatus ? (
+                            <select
+                              value={value || ''}
+                              onChange={(e) => handleStatusChange(originalIdx, e.target.value)}
+                              disabled={updatingRowId === originalIdx}
+                              style={{
+                                padding: '4px 8px',
+                                borderRadius: '4px',
+                                border: '1px solid #ccc',
+                                background: getStatusBgColor(value),
+                                color: getStatusColor(value),
+                                fontWeight: '600',
+                                fontSize: '10px',
+                                cursor: updatingRowId === originalIdx ? 'not-allowed' : 'pointer',
+                                opacity: updatingRowId === originalIdx ? 0.6 : 1,
+                              }}
+                            >
+                              {STATUS_OPTIONS.map(status => (
+                                <option key={status} value={status}>
+                                  {status || '—'}
+                                </option>
+                              ))}
+                            </select>
+                          ) : (
+                            <span>{displayValue || '—'}</span>
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
