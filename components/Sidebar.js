@@ -184,8 +184,8 @@ export default function Sidebar() {
             style={{
               position: "fixed",
               top: "60px",
-              left: "190px",
-              right: "20px",
+              left: "200px",
+              right: "32px",
               maxHeight: "calc(100vh - 100px)",
               overflowY: "auto",
               background: "var(--surface-1)",
@@ -195,7 +195,7 @@ export default function Sidebar() {
               zIndex: 999,
               padding: "12px",
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+              gridTemplateColumns: "1fr 1fr",
               gap: "12px",
             }}
           >
