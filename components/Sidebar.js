@@ -3,6 +3,63 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
+import { Phone, Smartphone, Mail } from "lucide-react";
+
+const ICONS = { phone: Phone, mobile: Smartphone, mail: Mail };
+
+const TITLE_FIELD = "行政區合併學校名稱";
+
+const FIELD_GROUPS = [
+  {
+    title: "基本資料",
+    fields: [
+      { key: "學校代碼", label: "學校代碼" },
+      { key: "行政區合併學校名稱", label: "行政區合併學校名稱", full: true },
+      { key: "地址", label: "地址", full: true },
+    ],
+  },
+  {
+    title: "主要負責老師",
+    fields: [
+      { key: "負責老師", label: "負責老師" },
+      { key: "老師分機電話", icon: "phone" },
+      { key: "老師手機電話", icon: "mobile" },
+      { key: "老師Email", icon: "mail", full: true },
+    ],
+  },
+  {
+    title: "系統資訊",
+    fields: [
+      { key: "學校ASM", label: "學校ASM" },
+      { key: "管理員權限", label: "管理員權限" },
+      { key: "Jamf Pro URL", label: "Jamf Pro URL", full: true },
+    ],
+  },
+  {
+    title: "專案",
+    fields: [
+      { key: "專案1", label: "專案1" },
+      { key: "專案2", label: "專案2" },
+      { key: "專案3", label: "專案3" },
+      { key: "專案4", label: "專案4" },
+      { key: "專案5", label: "專案5" },
+      { key: "專案6", label: "專案6" },
+    ],
+  },
+  {
+    title: "第二負責老師",
+    fields: [
+      { key: "負責老師2", label: "負責老師2" },
+      { key: "老師分機電話2", icon: "phone" },
+      { key: "老師手機電話2", icon: "mobile" },
+      { key: "老師Email2", icon: "mail" },
+      { key: "Jamf Pro URL2", label: "Jamf Pro URL2", full: true },
+    ],
+  },
+];
+
+const ALL_FIELDS = FIELD_GROUPS.flatMap((g) => g.fields);
+const HEADER_FIELDS = new Set(["學校代碼", TITLE_FIELD]);
 
 const NAV_ITEMS = [
   { href: "/", label: "總覽" },
@@ -23,7 +80,6 @@ export default function Sidebar() {
   const [searchInput, setSearchInput] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [schools, setSchools] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const searchRef = useRef(null);
 
@@ -79,7 +135,7 @@ export default function Sidebar() {
   }, [searchInput, schools]);
 
   // 點擊搜尋結果，跳轉到學校資訊頁籤
-  const handleResultClick = (schoolCode) => {
+  const handleResultClick = (schoolName) => {
     setSearchInput("");
     setShowResults(false);
     router.push("/school-info");
@@ -88,7 +144,7 @@ export default function Sidebar() {
     setTimeout(() => {
       const input = document.querySelector("input[type='search'][placeholder*='搜尋']");
       if (input) {
-        input.value = schoolCode;
+        input.value = schoolName;
         input.dispatchEvent(new Event("input", { bubbles: true }));
       }
     }, 100);
@@ -126,59 +182,92 @@ export default function Sidebar() {
         {showResults && searchResults.length > 0 && (
           <div
             style={{
-              position: "absolute",
-              top: "100%",
-              left: "12px",
-              right: "12px",
-              marginTop: "4px",
+              position: "fixed",
+              top: "60px",
+              left: "190px",
+              right: "20px",
+              maxHeight: "calc(100vh - 100px)",
+              overflowY: "auto",
               background: "var(--surface-1)",
               border: "1px solid var(--border)",
-              borderRadius: "6px",
-              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-              maxHeight: "300px",
-              overflowY: "auto",
-              zIndex: 1000,
+              borderRadius: "8px",
+              boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
+              zIndex: 999,
+              padding: "12px",
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+              gap: "12px",
             }}
           >
-            {searchResults.slice(0, 8).map((school, idx) => (
-              <button
-                key={idx}
-                onClick={() => handleResultClick(school["行政區合併學校名稱"])}
+            {searchResults.map((school) => (
+              <div
+                key={school.__row}
+                onClick={() => handleResultClick(school[TITLE_FIELD])}
                 style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  width: "100%",
-                  padding: "8px 10px",
-                  borderBottom: idx < Math.min(7, searchResults.length - 1) ? "1px solid var(--border)" : "none",
-                  background: "transparent",
-                  border: "none",
-                  borderRadius: "0",
-                  textAlign: "left",
+                  background: "linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%)",
+                  border: "1px solid rgba(99, 102, 241, 0.3)",
+                  borderLeft: "4px solid var(--accent)",
+                  borderRadius: "12px",
+                  padding: "12px 14px",
+                  boxShadow: "0 12px 32px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)",
                   cursor: "pointer",
-                  fontSize: "12px",
-                  color: "var(--text-secondary)",
+                  transition: "all 0.2s ease",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "var(--accent-bg)";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow = "0 16px 40px rgba(99, 102, 241, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.6)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "transparent";
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "0 12px 32px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)";
                 }}
               >
-                <span style={{ fontWeight: 500, color: "var(--text-primary)" }}>
-                  {school["行政區合併學校名稱"]}
-                </span>
-                <span style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>
-                  {school["負責老師"] && `老師：${school["負責老師"]}`}
-                </span>
-              </button>
-            ))}
-            {searchResults.length > 8 && (
-              <div style={{ padding: "8px 10px", fontSize: "11px", color: "var(--text-muted)", textAlign: "center" }}>
-                還有 {searchResults.length - 8} 筆結果，請到學校資訊頁籤查看
+                <div style={{ marginBottom: 14 }}>
+                  <p style={{ fontWeight: 600, fontSize: 16, margin: "0 0 4px", color: "var(--text-primary)" }}>
+                    {school[TITLE_FIELD]}
+                  </p>
+                  <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
+                    {school["學校代碼"]}
+                  </span>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {FIELD_GROUPS.map((group) => {
+                    const visible = group.fields.filter(
+                      (f) => !HEADER_FIELDS.has(f.key) && (school[f.key] || "").trim() !== ""
+                    );
+                    if (visible.length === 0) return null;
+                    return (
+                      <div key={group.title}>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 13, color: "var(--text-secondary)" }}>
+                          {visible.map((f) => {
+                            const Icon = f.icon ? ICONS[f.icon] : null;
+                            const isBold = f.key === "負責老師" || f.key === "負責老師2";
+                            const isUrl = f.key === "Jamf Pro URL" || f.key === "Jamf Pro URL2";
+                            return (
+                              <div key={f.key} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                                {Icon ? (
+                                  <Icon size={14} style={{ color: "var(--accent)", flexShrink: 0, marginTop: 2 }} />
+                                ) : (
+                                  <span style={{ color: "var(--text-muted)", minWidth: "60px" }}>{f.label}</span>
+                                )}
+                                {isUrl ? (
+                                  <a href={school[f.key]} target="_blank" rel="noopener noreferrer" style={{ flex: 1, color: "var(--accent)", textDecoration: "underline", cursor: "pointer", fontSize: "12px" }}>
+                                    {school[f.key]}
+                                  </a>
+                                ) : (
+                                  <span style={{ flex: 1, fontWeight: isBold ? 600 : 400, fontSize: "12px" }}>{school[f.key]}</span>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            )}
+            ))}
           </div>
         )}
       </div>
