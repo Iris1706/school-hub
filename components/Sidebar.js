@@ -82,6 +82,7 @@ export default function Sidebar() {
   const [schools, setSchools] = useState([]);
   const [showResults, setShowResults] = useState(false);
   const searchRef = useRef(null);
+  const resultsRef = useRef(null);
 
   // 從 API 載入學校資料
   useEffect(() => {
@@ -153,14 +154,25 @@ export default function Sidebar() {
   // 點擊外部關閉搜尋結果
   useEffect(() => {
     function handleClickOutside(event) {
-      if (searchRef.current && !searchRef.current.contains(event.target)) {
-        setShowResults(false);
+      // 如果點擊的是搜尋欄或搜尋結果容器內，不關閉
+      if (searchRef.current && searchRef.current.contains(event.target)) {
+        return;
       }
+      if (resultsRef.current && resultsRef.current.contains(event.target)) {
+        return;
+      }
+      // 否則關閉
+      setShowResults(false);
     }
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // 判斷網格列數和寬度
+  const isOneResult = searchResults.length === 1;
+  const gridColumns = isOneResult ? "1fr" : "1fr 1fr";
+  const containerWidth = isOneResult ? "480px" : "auto";
 
   return (
     <nav className="sidebar">
@@ -170,7 +182,11 @@ export default function Sidebar() {
           placeholder="搜尋學校..."
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          onFocus={() => searchInput && setShowResults(searchResults.length > 0)}
+          onFocus={() => {
+            if (searchInput && searchResults.length > 0) {
+              setShowResults(true);
+            }
+          }}
           style={{
             width: "100%",
             padding: "8px 10px",
@@ -181,6 +197,7 @@ export default function Sidebar() {
         
         {showResults && searchResults.length > 0 && (
           <div
+            ref={resultsRef}
             style={{
               position: "fixed",
               top: "60px",
@@ -195,8 +212,9 @@ export default function Sidebar() {
               zIndex: 999,
               padding: "12px",
               display: "grid",
-              gridTemplateColumns: "1fr 1fr",
+              gridTemplateColumns: gridColumns,
               gap: "12px",
+              width: containerWidth,
             }}
           >
             {searchResults.map((school) => (
@@ -204,22 +222,34 @@ export default function Sidebar() {
                 key={school.__row}
                 onClick={() => handleResultClick(school[TITLE_FIELD])}
                 style={{
-                  background: "linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%)",
-                  border: "1px solid rgba(99, 102, 241, 0.3)",
-                  borderLeft: "4px solid var(--accent)",
+                  background: isOneResult 
+                    ? "rgba(138, 144, 156, 0.1)" 
+                    : "linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%)",
+                  border: isOneResult 
+                    ? "1px solid rgba(138, 144, 156, 0.3)" 
+                    : "1px solid rgba(99, 102, 241, 0.3)",
+                  borderLeft: isOneResult 
+                    ? "4px solid rgba(138, 144, 156, 0.6)" 
+                    : "4px solid var(--accent)",
                   borderRadius: "12px",
                   padding: "12px 14px",
-                  boxShadow: "0 12px 32px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)",
+                  boxShadow: isOneResult
+                    ? "0 12px 32px rgba(138, 144, 156, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.6)"
+                    : "0 12px 32px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)",
                   cursor: "pointer",
                   transition: "all 0.2s ease",
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow = "0 16px 40px rgba(99, 102, 241, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.6)";
+                  e.currentTarget.style.boxShadow = isOneResult
+                    ? "0 16px 40px rgba(138, 144, 156, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)"
+                    : "0 16px 40px rgba(99, 102, 241, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.6)";
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "0 12px 32px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)";
+                  e.currentTarget.style.boxShadow = isOneResult
+                    ? "0 12px 32px rgba(138, 144, 156, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.6)"
+                    : "0 12px 32px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)";
                 }}
               >
                 <div style={{ marginBottom: 14 }}>
