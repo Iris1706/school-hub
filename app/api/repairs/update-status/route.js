@@ -15,6 +15,8 @@ export async function POST(request) {
   try {
     const { sheetName, rowIndex, newStatus } = await request.json();
 
+    console.log('更新狀態請求:', { sheetName, rowIndex, newStatus });
+
     if (!sheetName || rowIndex === undefined || newStatus === undefined) {
       return Response.json(
         { success: false, error: '缺少必要參數' },
@@ -33,10 +35,12 @@ export async function POST(request) {
     // K column is the 11th column (A=1, B=2, ..., K=11)
     const cellAddress = `${sheetName}!K${rowIndex}`;
 
+    console.log('更新單元格:', cellAddress, '值:', newStatus);
+
     const authClient = await auth.getClient();
 
     // Update the cell value
-    await sheets.spreadsheets.values.update({
+    const updateResponse = await sheets.spreadsheets.values.update({
       auth: authClient,
       spreadsheetId,
       range: cellAddress,
@@ -45,6 +49,8 @@ export async function POST(request) {
         values: [[newStatus]],
       },
     });
+
+    console.log('Google Sheets 更新結果:', updateResponse.data);
 
     return Response.json({
       success: true,
