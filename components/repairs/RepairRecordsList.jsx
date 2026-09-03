@@ -11,8 +11,7 @@ export default function RepairRecordsList({ sheetName }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(null);
-  const [updatingRowId, setUpdatingRowId] = useState(null);
-  const [originalRecords, setOriginalRecords] = useState([]);
+  const [updatingRecordId, setUpdatingRecordId] = useState(null);
 
   const fetchRecords = async () => {
     try {
@@ -27,7 +26,6 @@ export default function RepairRecordsList({ sheetName }) {
       }
 
       setHeaders(result.headers);
-      setOriginalRecords(result.records);
       const reversed = [...result.records].reverse();
       setRecords(reversed);
       setError(null);
@@ -41,19 +39,25 @@ export default function RepairRecordsList({ sheetName }) {
     }
   };
 
-  const handleStatusChange = async (recordFromApi, displayIndex, newStatus) => {
-    setUpdatingRowId(displayIndex);
+  const handleStatusChange = async (record, newStatus) => {
+    // 用 record 對象本身作為唯一識別符
+    const recordId = JSON.stringify(record);
+    setUpdatingRecordId(recordId);
+
     try {
-      // 計算這條記錄在原始數據中的索引
-      const originalIndex = originalRecords.indexOf(recordFromApi);
-      // Google Sheet 行號 = 原始索引 + 2（第 1 行是標題，第 2 行開始是數據，且原始索引從 0 開始）
-      const sheetRowIndex = originalIndex + 2;
+      // 找到 record 在原始（未反向排序）records 中的索引
+      const originalIdx = records.indexOf(record);
+      if (originalIdx === -1) {
+        throw new Error('找不到要更新的記錄');
+      }
+
+      // Google Sheet 行號 = 原始索引 + 2（第 1 行是標題，第 2 行開始是數據，且索引從 0 開始）
+      const sheetRowIndex = originalIdx + 2;
 
       console.log('更新狀態:', {
-        displayIndex,
-        originalIndex,
+        originalIdx,
         sheetRowIndex,
-        recordFromApi,
+        newStatus,
       });
 
       const response = await fetch('/api/repairs/update-status', {
@@ -71,33 +75,27 @@ export default function RepairRecordsList({ sheetName }) {
         throw new Error(result.error || '更新失敗');
       }
 
-      // 更新本地狀態 - 更新 records 中的對應記錄
-      const updatedRecords = [...records];
-      updatedRecords[displayIndex] = {
-        ...updatedRecords[displayIndex],
-        values: updatedRecords[displayIndex].values.map((v, idx) => {
-          // K column is the 11th column (0-based: A=0, B=1, ..., K=10)
-          return idx === 10 ? newStatus : v;
-        }),
-      };
+      // 更新本地狀態 - 找到 records 中的對應索引並更新
+      const updatedRecords = records.map((r, idx) => {
+        if (idx === originalIdx) {
+          return {
+            ...r,
+            values: r.values.map((v, colIdx) => {
+              // K column is the 11th column (0-based: A=0, B=1, ..., K=10)
+              return colIdx === 10 ? newStatus : v;
+            }),
+          };
+        }
+        return r;
+      });
       setRecords(updatedRecords);
-
-      // 也更新 originalRecords
-      const updatedOriginalRecords = [...originalRecords];
-      updatedOriginalRecords[originalIndex] = {
-        ...updatedOriginalRecords[originalIndex],
-        values: updatedOriginalRecords[originalIndex].values.map((v, idx) => {
-          return idx === 10 ? newStatus : v;
-        }),
-      };
-      setOriginalRecords(updatedOriginalRecords);
 
       console.log('狀態已更新:', newStatus);
     } catch (err) {
       setError(`更新失敗: ${err.message}`);
       console.error('更新狀態錯誤:', err.message);
     } finally {
-      setUpdatingRowId(null);
+      setUpdatingRecordId(null);
     }
   };
 
@@ -244,6 +242,9 @@ export default function RepairRecordsList({ sheetName }) {
             </thead>
             <tbody>
               {filteredRecords.map((record, displayIdx) => {
+                const recordId = JSON.stringify(record);
+                const isUpdating = updatingRecordId === recordId;
+
                 return (
                   <tr
                     key={displayIdx}
@@ -279,8 +280,8 @@ export default function RepairRecordsList({ sheetName }) {
                           {isStatus ? (
                             <select
                               value={value || ''}
-                              onChange={(e) => handleStatusChange(record, displayIdx, e.target.value)}
-                              disabled={updatingRowId === displayIdx}
+                              onChange={(e) => handleStatusChange(record, e.target.value)}
+                              disabled={isUpdating}
                               style={{
                                 padding: '4px 8px',
                                 borderRadius: '4px',
@@ -289,8 +290,8 @@ export default function RepairRecordsList({ sheetName }) {
                                 color: getStatusColor(value),
                                 fontWeight: '600',
                                 fontSize: '10px',
-                                cursor: updatingRowId === displayIdx ? 'not-allowed' : 'pointer',
-                                opacity: updatingRowId === displayIdx ? 0.6 : 1,
+                                cursor: isUpdating ? 'not-allowed' : 'pointer',
+                                opacity: isUpdating ? 0.6 : 1,
                               }}
                             >
                               {STATUS_OPTIONS.map(status => (
