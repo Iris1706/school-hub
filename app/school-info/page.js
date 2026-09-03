@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { Phone, Smartphone, Mail } from "lucide-react";
 
 const ICONS = { phone: Phone, mobile: Smartphone, mail: Mail };
@@ -69,6 +69,7 @@ export default function SchoolInfoPage() {
   const [historyFor, setHistoryFor] = useState(null);
   const [historyEntries, setHistoryEntries] = useState([]);
   const [saving, setSaving] = useState(false);
+  const [maintenance, setMaintenance] = useState(null);
 
   useEffect(() => {
     const t = setTimeout(() => setSearch(searchInput), 300);
@@ -164,7 +165,7 @@ export default function SchoolInfoPage() {
               className="card"
               key={s.__row}
               style={{
-                background: "linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%)",
+                background: "#ffffff",
                 border: "1px solid rgba(99, 102, 241, 0.3)",
                 borderLeft: "4px solid var(--accent)",
                 borderRadius: 12,
@@ -221,6 +222,9 @@ export default function SchoolInfoPage() {
               <button onClick={() => openHistory(s["學校代碼"])}>
                 修改歷程
               </button>
+              <button onClick={() => setMaintenance(s)}>
+                維護紀錄
+              </button>
             </div>
             </div>
           ))}
@@ -236,6 +240,10 @@ export default function SchoolInfoPage() {
 
       {historyFor && (
         <HistoryModal code={historyFor} entries={historyEntries} onClose={() => setHistoryFor(null)} />
+      )}
+
+      {maintenance && (
+        <MaintenanceModal school={maintenance} onClose={() => setMaintenance(null)} />
       )}
     </div>
   );
@@ -319,6 +327,149 @@ function HistoryModal({ code, entries, onClose }) {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MaintenanceModal({ school, onClose }) {
+  const [date, setDate] = useState(() => {
+    const today = new Date();
+    return today.toISOString().split("T")[0];
+  });
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [handler, setHandler] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [message, setMessage] = useState(null);
+  const fileInputRef = useRef(null);
+
+  async function handleUpload() {
+    if (!date || !selectedFile || !handler) {
+      alert("請選擇日期、檔案和處理人");
+      return;
+    }
+
+    setUploading(true);
+    setMessage(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      formData.append("schoolName", school["行政區合併學校名稱"]);
+      formData.append("date", date);
+      formData.append("handler", handler);
+
+      const res = await fetch("/api/maintenance-upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "上傳失敗");
+
+      setMessage({ type: "success", text: "上傳成功！" });
+      setTimeout(() => {
+        onClose();
+      }, 1500);
+    } catch (err) {
+      setMessage({ type: "error", text: "上傳失敗：" + err.message });
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.4)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 10,
+      }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="card" style={{ width: 480, background: "var(--surface-1)" }}>
+        <p style={{ fontWeight: 500, fontSize: 14, margin: "0 0 16px" }}>維護紀錄 — {school["行政區合併學校名稱"]}</p>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 16 }}>
+          <label style={{ fontSize: 13 }}>
+            日期
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              style={{ width: "100%", marginTop: 4 }}
+            />
+          </label>
+
+          <label style={{ fontSize: 13 }}>
+            上傳圖片
+            <div style={{ display: "flex", gap: 8, marginTop: 4, alignItems: "center" }}>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                style={{ display: "none" }}
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                style={{ marginBottom: 0 }}
+              >
+                選擇檔案
+              </button>
+              {selectedFile && (
+                <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
+                  {selectedFile.name}
+                </span>
+              )}
+            </div>
+          </label>
+
+          <label style={{ fontSize: 13 }}>
+            處理人
+            <select
+              value={handler}
+              onChange={(e) => setHandler(e.target.value)}
+              style={{ width: "100%", marginTop: 4, padding: "7px 10px", border: "1px solid var(--border)", borderRadius: 8, fontFamily: "inherit" }}
+            >
+              <option value="">-- 請選擇 --</option>
+              <option value="Iris">Iris</option>
+              <option value="Esther">Esther</option>
+            </select>
+          </label>
+        </div>
+
+        {message && (
+          <p
+            style={{
+              fontSize: 12,
+              marginBottom: 12,
+              padding: "8px 12px",
+              borderRadius: 6,
+              color: message.type === "success" ? "#15803d" : "var(--danger)",
+              background: message.type === "success" ? "#f0fdf4" : "#fee2e2",
+            }}
+          >
+            {message.text}
+          </p>
+        )}
+
+        <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+          <button
+            disabled={uploading}
+            onClick={handleUpload}
+            style={{ marginBottom: 0 }}
+          >
+            {uploading ? "上傳中..." : "上傳"}
+          </button>
         </div>
       </div>
     </div>

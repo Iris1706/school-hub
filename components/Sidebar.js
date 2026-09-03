@@ -196,46 +196,44 @@ export default function Sidebar() {
             position: "fixed",
             left: 12,
             top: 110,
-            width: filtered.length === 1 ? 480 : "calc(100% - 24px)",
+            width: filtered.length === 1 ? 360 : "calc(100% - 24px)",
             maxHeight: "calc(100vh - 140px)",
             overflow: "auto",
             zIndex: 1000,
             display: "grid",
             gridTemplateColumns: filtered.length === 1 ? "1fr" : "1fr 1fr",
-            gap: 12,
+            gap: 8,
           }}
         >
           {filtered.map((s) => (
             <div
-              className="card"
               key={s.__row}
               style={{
-                background: "#9cc1ff",
-                border: "1px solid rgba(99, 102, 241, 0.3)",
-                borderLeft: "4px solid var(--accent)",
-                borderRadius: 12,
-                boxShadow:
-                  "0 12px 32px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)",
-                padding: 14,
+                background: "#ffffff",
+                border: "1px solid rgba(99, 102, 241, 0.2)",
+                borderLeft: "3px solid var(--accent)",
+                borderRadius: 8,
+                padding: 8,
+                boxShadow: "0 2px 8px rgba(99, 102, 241, 0.1)",
               }}
             >
-              <div style={{ marginBottom: 14 }}>
+              <div style={{ marginBottom: 8 }}>
                 <p
                   style={{
-                    fontWeight: 600,
-                    fontSize: 16,
-                    margin: "0 0 4px",
+                    fontWeight: 500,
+                    fontSize: 13,
+                    margin: "0 0 2px",
                     color: "var(--text-primary)",
                   }}
                 >
                   {s[TITLE_FIELD]}
                 </p>
-                <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
+                <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
                   {s["學校代碼"]}
                 </span>
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {FIELD_GROUPS.map((group) => {
                   const visible = group.fields.filter(
                     (f) => !HEADER_FIELDS.has(f.key) && (s[f.key] || "").trim() !== ""
@@ -247,8 +245,8 @@ export default function Sidebar() {
                         style={{
                           display: "flex",
                           flexDirection: "column",
-                          gap: 6,
-                          fontSize: 13,
+                          gap: 4,
+                          fontSize: 11,
                           color: "var(--text-secondary)",
                         }}
                       >
@@ -265,23 +263,24 @@ export default function Sidebar() {
                               style={{
                                 display: "flex",
                                 alignItems: "flex-start",
-                                gap: 8,
+                                gap: 6,
                               }}
                             >
                               {Icon ? (
                                 <Icon
-                                  size={14}
+                                  size={12}
                                   style={{
                                     color: "var(--accent)",
                                     flexShrink: 0,
-                                    marginTop: 2,
+                                    marginTop: 1,
                                   }}
                                 />
                               ) : (
                                 <span
                                   style={{
                                     color: "var(--text-muted)",
-                                    minWidth: "60px",
+                                    minWidth: "50px",
+                                    fontSize: 10,
                                   }}
                                 >
                                   {f.label}
@@ -297,6 +296,7 @@ export default function Sidebar() {
                                     color: "var(--accent)",
                                     textDecoration: "underline",
                                     cursor: "pointer",
+                                    fontSize: 11,
                                   }}
                                 >
                                   {s[f.key]}
@@ -305,7 +305,8 @@ export default function Sidebar() {
                                 <span
                                   style={{
                                     flex: 1,
-                                    fontWeight: isBold ? 600 : 400,
+                                    fontWeight: isBold ? 500 : 400,
+                                    fontSize: 11,
                                   }}
                                 >
                                   {s[f.key]}
@@ -332,11 +333,11 @@ export default function Sidebar() {
             left: 12,
             top: 110,
             width: "auto",
-            padding: "12px 16px",
+            padding: "8px 12px",
             background: "var(--surface-1)",
             border: "1px solid var(--border)",
-            borderRadius: 8,
-            fontSize: 13,
+            borderRadius: 6,
+            fontSize: 12,
             color: "var(--text-muted)",
             zIndex: 1000,
           }}
