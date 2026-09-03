@@ -11,7 +11,7 @@ export default function RepairRecordsList({ sheetName }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(null);
-  const [updatingRecordId, setUpdatingRecordId] = useState(null);
+  const [updatingRowIndex, setUpdatingRowIndex] = useState(null);
 
   const fetchRecords = async () => {
     try {
@@ -40,24 +40,15 @@ export default function RepairRecordsList({ sheetName }) {
   };
 
   const handleStatusChange = async (record, newStatus) => {
-    // 用 record 對象本身作為唯一識別符
-    const recordId = JSON.stringify(record);
-    setUpdatingRecordId(recordId);
+    // 直接使用 record.rowIndex，這是 Google Sheet 中的實際行號
+    const sheetRowIndex = record.rowIndex;
+    setUpdatingRowIndex(sheetRowIndex);
 
     try {
-      // 找到 record 在原始（未反向排序）records 中的索引
-      const originalIdx = records.indexOf(record);
-      if (originalIdx === -1) {
-        throw new Error('找不到要更新的記錄');
-      }
-
-      // Google Sheet 行號 = 原始索引 + 2（第 1 行是標題，第 2 行開始是數據，且索引從 0 開始）
-      const sheetRowIndex = originalIdx + 2;
-
       console.log('更新狀態:', {
-        originalIdx,
         sheetRowIndex,
         newStatus,
+        record,
       });
 
       const response = await fetch('/api/repairs/update-status', {
@@ -75,9 +66,9 @@ export default function RepairRecordsList({ sheetName }) {
         throw new Error(result.error || '更新失敗');
       }
 
-      // 更新本地狀態 - 找到 records 中的對應索引並更新
-      const updatedRecords = records.map((r, idx) => {
-        if (idx === originalIdx) {
+      // 更新本地狀態
+      const updatedRecords = records.map((r) => {
+        if (r.rowIndex === sheetRowIndex) {
           return {
             ...r,
             values: r.values.map((v, colIdx) => {
@@ -95,7 +86,7 @@ export default function RepairRecordsList({ sheetName }) {
       setError(`更新失敗: ${err.message}`);
       console.error('更新狀態錯誤:', err.message);
     } finally {
-      setUpdatingRecordId(null);
+      setUpdatingRowIndex(null);
     }
   };
 
@@ -242,8 +233,7 @@ export default function RepairRecordsList({ sheetName }) {
             </thead>
             <tbody>
               {filteredRecords.map((record, displayIdx) => {
-                const recordId = JSON.stringify(record);
-                const isUpdating = updatingRecordId === recordId;
+                const isUpdating = updatingRowIndex === record.rowIndex;
 
                 return (
                   <tr
