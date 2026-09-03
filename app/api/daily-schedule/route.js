@@ -49,10 +49,10 @@ export async function GET(request) {
       }
     });
 
-    // 讀取行程表資料（B20:M 欄，所有行）
+    // 讀取行程表資料（從 B10 開始讀取足夠大的範圍，以容納不同月份的結構）
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SCHEDULE_SHEET_ID,
-      range: `'${sheetName}'!B20:M`, // 讀取當月的行程表（所有行）
+      range: `'${sheetName}'!B10:M`, // 讀取足夠大的範圍以找到表頭
     });
 
     const rows = response.data.values || [];
@@ -60,9 +60,23 @@ export async function GET(request) {
       return Response.json({ data: [] });
     }
 
-    // 欄位對應：B=日期, C=人員, D=區域, E=地點, F=時間, G=事件, H=備註, I=台數, J=提醒
-    const headers = rows[0];
-    const schedules = rows.slice(1).map((row) => {
+    // 動態找到表頭行（包含「日期」的行）
+    let headerRowIdx = -1;
+    for (let i = 0; i < rows.length; i++) {
+      if (rows[i] && rows[i][0] && rows[i][0].toString().includes("日期")) {
+        headerRowIdx = i;
+        break;
+      }
+    }
+
+    // 如果找不到表頭行，假設第一行是表頭
+    if (headerRowIdx === -1) {
+      headerRowIdx = 0;
+    }
+
+    // 從表頭行之後開始收集行程資料
+    const schedules = rows.slice(headerRowIdx + 1).map((row) => {
+      if (!row || row.length === 0) return null;
       const personName = row[1] || "";
       return {
         date: row[0] || "", // B 列：日期
@@ -76,7 +90,7 @@ export async function GET(request) {
         devices: row[7] || "", // I 列：台數
         reminder: row[8] || "", // J 列：提醒
       };
-    });
+    }).filter(s => s !== null);
 
     // 返回所有行程（不再限制於當週）
     const allSchedules = schedules.filter((s) => {
