@@ -196,13 +196,12 @@ export default function Sidebar() {
             position: "fixed",
             left: 12,
             top: 110,
-            width: "fit-content",
-            maxWidth: "calc(100% - 24px)",
+            width: 320,
             maxHeight: "calc(100vh - 140px)",
             overflow: "auto",
             zIndex: 1000,
-            display: filtered.length === 1 ? "block" : "grid",
-            gridTemplateColumns: filtered.length === 1 ? undefined : "repeat(auto-fit, minmax(280px, 1fr))",
+            display: "flex",
+            flexDirection: "column",
             gap: 8,
           }}
         >
@@ -216,7 +215,6 @@ export default function Sidebar() {
                 borderRadius: 8,
                 padding: 8,
                 boxShadow: "0 2px 8px rgba(99, 102, 241, 0.1)",
-                minWidth: 0,
               }}
             >
               <div style={{ marginBottom: 8 }}>
@@ -226,7 +224,6 @@ export default function Sidebar() {
                     fontSize: 13,
                     margin: "0 0 2px",
                     color: "var(--text-primary)",
-                    wordBreak: "break-word",
                   }}
                 >
                   {s[TITLE_FIELD]}
@@ -267,7 +264,6 @@ export default function Sidebar() {
                                 display: "flex",
                                 alignItems: "flex-start",
                                 gap: 6,
-                                minWidth: 0,
                               }}
                             >
                               {Icon ? (
@@ -284,7 +280,6 @@ export default function Sidebar() {
                                   style={{
                                     color: "var(--text-muted)",
                                     minWidth: "50px",
-                                    flexShrink: 0,
                                     fontSize: 10,
                                   }}
                                 >
@@ -302,7 +297,6 @@ export default function Sidebar() {
                                     textDecoration: "underline",
                                     cursor: "pointer",
                                     fontSize: 11,
-                                    minWidth: 0,
                                     overflow: "hidden",
                                     textOverflow: "ellipsis",
                                     whiteSpace: "nowrap",
@@ -317,10 +311,11 @@ export default function Sidebar() {
                                     flex: 1,
                                     fontWeight: isBold ? 500 : 400,
                                     fontSize: 11,
-                                    minWidth: 0,
                                     overflow: "hidden",
                                     textOverflow: "ellipsis",
-                                    wordBreak: "break-word",
+                                    display: "-webkit-box",
+                                    WebkitLineClamp: 2,
+                                    WebkitBoxOrient: "vertical",
                                   }}
                                   title={s[f.key]}
                                 >
