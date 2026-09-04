@@ -71,6 +71,57 @@ export default function SchoolInfoPage() {
   const [historyEntries, setHistoryEntries] = useState([]);
   const [saving, setSaving] = useState(false);
   const [maintenance, setMaintenance] = useState(null);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [authWindow, setAuthWindow] = useState(null);
+
+  // 檢查授權狀態並自動授權
+  useEffect(() => {
+    async function checkAuth() {
+      try {
+        const res = await fetch("/api/check-auth");
+        const data = await res.json();
+        if (data.authorized) {
+          setIsAuthorized(true);
+        } else {
+          // 未授權，打開授權窗口
+          handleAutoAuth();
+        }
+      } catch (err) {
+        console.error("Auth check failed:", err);
+      }
+    }
+
+    function handleAutoAuth() {
+      const width = 500;
+      const height = 600;
+      const left = window.screenX + (window.outerWidth - width) / 2;
+      const top = window.screenY + (window.outerHeight - height) / 2;
+
+      const window_obj = window.open(
+        "/api/auth/google",
+        "google-auth",
+        `width=${width},height=${height},left=${left},top=${top}`
+      );
+      setAuthWindow(window_obj);
+    }
+
+    checkAuth();
+  }, []);
+
+  // 監聽授權窗口
+  useEffect(() => {
+    if (!authWindow) return;
+
+    const checkWindow = setInterval(() => {
+      if (authWindow.closed) {
+        clearInterval(checkWindow);
+        setAuthWindow(null);
+        setIsAuthorized(true);
+      }
+    }, 500);
+
+    return () => clearInterval(checkWindow);
+  }, [authWindow]);
 
   useEffect(() => {
     const t = setTimeout(() => setSearch(searchInput), 300);
@@ -328,6 +379,310 @@ function HistoryModal({ code, entries, onClose }) {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MaintenanceModal({ school, onClose }) {
+  const [date, setDate] = useState(() => {
+    const today = new Date();
+    return today.toISOString().split("T")[0];
+  });
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [handler, setHandler] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [message, setMessage] = useState(null);
+  const fileInputRef = useRef(null);
+
+  async function handleUpload() {
+    if (!date || !selectedFile || !handler) {
+      alert("請選擇日期、檔案和處理人");
+      return;
+    }
+
+    setUploading(true);
+    setMessage(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      formData.append("schoolName", school["行政區合併學校名稱"]);
+      formData.append("date", date);
+      formData.append("handler", handler);
+
+      const res = await fetch("/api/maintenance-upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "上傳失敗");
+
+      setMessage({ type: "success", text: "上傳成功！" });
+      setTimeout(() => {
+        onClose();
+      }, 1500);
+    } catch (err) {
+      setMessage({ type: "error", text: "上傳失敗：" + err.message });
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.5)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 10,
+        backdropFilter: "blur(4px)",
+      }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div
+        style={{
+          width: 480,
+          background: "linear-gradient(135deg, #ffffff 0%, #f8f9fb 100%)",
+          borderRadius: 16,
+          padding: 28,
+          boxShadow:
+            "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.6)",
+          border: "1px solid rgba(99, 102, 241, 0.1)",
+        }}
+      >
+        <div style={{ marginBottom: 24 }}>
+          <p
+            style={{
+              fontWeight: 600,
+              fontSize: 18,
+              margin: "0 0 8px",
+              color: "var(--text-primary)",
+              background: "linear-gradient(135deg, #2f6f63 0%, #4a8f8a 100%)",
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
+            維護紀錄
+          </p>
+          <p
+            style={{
+              fontSize: 13,
+              margin: 0,
+              color: "var(--text-muted)",
+            }}
+          >
+            {school["行政區合併學校名稱"]}
+          </p>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 20 }}>
+          <div>
+            <label
+              style={{
+                fontSize: 13,
+                fontWeight: 500,
+                color: "var(--text-primary)",
+                display: "block",
+                marginBottom: 8,
+              }}
+            >
+              📅 維護日期
+            </label>
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "10px 12px",
+                border: "1px solid rgba(99, 102, 241, 0.2)",
+                borderRadius: 10,
+                fontSize: 13,
+                boxShadow: "0 2px 8px rgba(99, 102, 241, 0.08)",
+                fontFamily: "inherit",
+                transition: "all 0.2s ease",
+                background: "#ffffff",
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = "var(--accent)";
+                e.target.style.boxShadow = "0 0 0 3px rgba(99, 102, 241, 0.1)";
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = "rgba(99, 102, 241, 0.2)";
+                e.target.style.boxShadow = "0 2px 8px rgba(99, 102, 241, 0.08)";
+              }}
+            />
+          </div>
+
+          <div>
+            <label
+              style={{
+                fontSize: 13,
+                fontWeight: 500,
+                color: "var(--text-primary)",
+                display: "block",
+                marginBottom: 8,
+              }}
+            >
+              📸 上傳圖片
+            </label>
+            <div
+              style={{
+                display: "flex",
+                gap: 8,
+                alignItems: "center",
+                padding: 12,
+                background: "linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)",
+                border: "1px dashed rgba(99, 102, 241, 0.3)",
+                borderRadius: 10,
+              }}
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                style={{ display: "none" }}
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                style={{
+                  marginBottom: 0,
+                  padding: "8px 14px",
+                  fontSize: 12,
+                  fontWeight: 500,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                選擇檔案
+              </button>
+              {selectedFile ? (
+                <span
+                  style={{
+                    fontSize: 12,
+                    color: "var(--accent)",
+                    fontWeight: 500,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    flex: 1,
+                  }}
+                  title={selectedFile.name}
+                >
+                  ✓ {selectedFile.name}
+                </span>
+              ) : (
+                <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
+                  未選擇檔案
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <label
+              style={{
+                fontSize: 13,
+                fontWeight: 500,
+                color: "var(--text-primary)",
+                display: "block",
+                marginBottom: 8,
+              }}
+            >
+              👤 處理人
+            </label>
+            <select
+              value={handler}
+              onChange={(e) => setHandler(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "10px 12px",
+                border: "1px solid rgba(99, 102, 241, 0.2)",
+                borderRadius: 10,
+                fontSize: 13,
+                fontFamily: "inherit",
+                background: "#ffffff",
+                boxShadow: "0 2px 8px rgba(99, 102, 241, 0.08)",
+                transition: "all 0.2s ease",
+                cursor: "pointer",
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = "var(--accent)";
+                e.target.style.boxShadow = "0 0 0 3px rgba(99, 102, 241, 0.1)";
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = "rgba(99, 102, 241, 0.2)";
+                e.target.style.boxShadow = "0 2px 8px rgba(99, 102, 241, 0.08)";
+              }}
+            >
+              <option value="">-- 請選擇 --</option>
+              <option value="Iris">Iris</option>
+              <option value="Esther">Esther</option>
+            </select>
+          </div>
+        </div>
+
+        {message && (
+          <div
+            style={{
+              marginBottom: 16,
+              padding: "12px 14px",
+              borderRadius: 10,
+              fontSize: 13,
+              fontWeight: 500,
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              color: message.type === "success" ? "#15803d" : "var(--danger)",
+              background:
+                message.type === "success"
+                  ? "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)"
+                  : "linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)",
+              border:
+                message.type === "success"
+                  ? "1px solid #86efac"
+                  : "1px solid #fca5a5",
+            }}
+          >
+            {message.type === "success" ? "✓" : "✕"} {message.text}
+          </div>
+        )}
+
+        <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+          <button
+            onClick={onClose}
+            style={{
+              marginBottom: 0,
+              background: "transparent",
+              color: "var(--text-secondary)",
+              border: "1px solid var(--border)",
+            }}
+          >
+            取消
+          </button>
+          <button
+            disabled={uploading}
+            onClick={handleUpload}
+            style={{
+              marginBottom: 0,
+              opacity: uploading ? 0.7 : 1,
+              background: uploading
+                ? "var(--text-muted)"
+                : "linear-gradient(135deg, var(--accent) 0%, #4a8f8a 100%)",
+            }}
+          >
+            {uploading ? "⏳ 上傳中..." : "📤 上傳"}
+          </button>
         </div>
       </div>
     </div>

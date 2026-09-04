@@ -6,66 +6,13 @@ const HANDLERS = ["Iris", "Esther"];
 
 export default function MaintenanceModal({ school, onClose }) {
   if (!school) return null;
-  const isOpen = !!school;
   const schoolName = school["行政區合併學校名稱"];
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [file, setFile] = useState(null);
   const [handler, setHandler] = useState("Iris");
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState(null);
-  const [isAuthorized, setIsAuthorized] = useState(false);
-  const [authWindow, setAuthWindow] = useState(null);
   const fileInputRef = useRef(null);
-
-  // 檢查授權狀態
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await fetch("/api/check-auth");
-        if (res.ok) {
-          const data = await res.json();
-          setIsAuthorized(data.authorized);
-        }
-      } catch (err) {
-        console.error("Check auth failed:", err);
-      }
-    };
-    checkAuth();
-  }, []);
-
-  // 監聽 OAuth 窗口完成
-  useEffect(() => {
-    if (!authWindow) return;
-
-    const checkWindow = setInterval(() => {
-      if (authWindow.closed) {
-        clearInterval(checkWindow);
-        setAuthWindow(null);
-        // 授權完成後，檢查狀態
-        setTimeout(() => {
-          setIsAuthorized(true);
-          setStatus({ type: "success", message: "授權成功！" });
-          setTimeout(() => setStatus(null), 2000);
-        }, 500);
-      }
-    }, 500);
-
-    return () => clearInterval(checkWindow);
-  }, [authWindow]);
-
-  const handleAuthorize = () => {
-    const width = 500;
-    const height = 600;
-    const left = window.screenX + (window.outerWidth - width) / 2;
-    const top = window.screenY + (window.outerHeight - height) / 2;
-
-    const window_obj = window.open(
-      "/api/auth/google",
-      "google-auth",
-      `width=${width},height=${height},left=${left},top=${top}`
-    );
-    setAuthWindow(window_obj);
-  };
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files?.[0];
@@ -305,22 +252,6 @@ export default function MaintenanceModal({ school, onClose }) {
             </select>
           </div>
 
-          {/* 授權狀態提示 */}
-          {!isAuthorized && (
-            <div
-              style={{
-                background: "rgba(239, 68, 68, 0.08)",
-                border: "1px solid rgba(239, 68, 68, 0.2)",
-                borderRadius: 8,
-                padding: 10,
-                fontSize: 12,
-                color: "#b91c1c",
-              }}
-            >
-              需要授予 Google Drive 存取權限才能上傳
-            </div>
-          )}
-
           {/* 狀態訊息 */}
           {status && (
             <div
@@ -348,78 +279,40 @@ export default function MaintenanceModal({ school, onClose }) {
 
           {/* 按鈕 */}
           <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
-            {!isAuthorized ? (
-              <>
-                <button
-                  onClick={handleAuthorize}
-                  style={{
-                    flex: 1,
-                    padding: "10px 16px",
-                    background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
-                    color: "#ffffff",
-                    border: "none",
-                    borderRadius: 8,
-                    fontSize: 13,
-                    fontWeight: 500,
-                    cursor: "pointer",
-                  }}
-                >
-                  🔐 授權 Google Drive
-                </button>
-                <button
-                  onClick={onClose}
-                  style={{
-                    flex: 1,
-                    padding: "10px 16px",
-                    background: "#f3f4f6",
-                    color: "var(--text-secondary)",
-                    border: "none",
-                    borderRadius: 8,
-                    fontSize: 13,
-                    cursor: "pointer",
-                  }}
-                >
-                  取消
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={handleUpload}
-                  disabled={isLoading}
-                  style={{
-                    flex: 1,
-                    padding: "10px 16px",
-                    background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
-                    color: "#ffffff",
-                    border: "none",
-                    borderRadius: 8,
-                    fontSize: 13,
-                    fontWeight: 500,
-                    cursor: isLoading ? "not-allowed" : "pointer",
-                    opacity: isLoading ? 0.6 : 1,
-                  }}
-                >
-                  {isLoading ? "上傳中..." : "📤 上傳"}
-                </button>
-                <button
-                  onClick={onClose}
-                  disabled={isLoading}
-                  style={{
-                    flex: 1,
-                    padding: "10px 16px",
-                    background: "#f3f4f6",
-                    color: "var(--text-secondary)",
-                    border: "none",
-                    borderRadius: 8,
-                    fontSize: 13,
-                    cursor: isLoading ? "not-allowed" : "pointer",
-                  }}
-                >
-                  取消
-                </button>
-              </>
-            )}
+            <button
+              onClick={handleUpload}
+              disabled={isLoading}
+              style={{
+                flex: 1,
+                padding: "10px 16px",
+                background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+                color: "#ffffff",
+                border: "none",
+                borderRadius: 8,
+                fontSize: 13,
+                fontWeight: 500,
+                cursor: isLoading ? "not-allowed" : "pointer",
+                opacity: isLoading ? 0.6 : 1,
+              }}
+            >
+              {isLoading ? "上傳中..." : "📤 上傳"}
+            </button>
+            <button
+              onClick={onClose}
+              disabled={isLoading}
+              style={{
+                flex: 1,
+                padding: "10px 16px",
+                background: "#f3f4f6",
+                color: "var(--text-secondary)",
+                border: "none",
+                borderRadius: 8,
+                fontSize: 13,
+                cursor: isLoading ? "not-allowed" : "pointer",
+              }}
+            >
+              取消
+            </button>
           </div>
         </div>
       </div>
