@@ -4,7 +4,10 @@ import { useState, useEffect, useRef } from "react";
 
 const HANDLERS = ["Iris", "Esther"];
 
-export default function MaintenanceModal({ isOpen, onClose, schoolName }) {
+export default function MaintenanceModal({ school, onClose }) {
+  if (!school) return null;
+  const isOpen = !!school;
+  const schoolName = school["行政區合併學校名稱"];
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [file, setFile] = useState(null);
   const [handler, setHandler] = useState("Iris");

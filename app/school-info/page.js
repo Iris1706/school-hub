@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, useRef } from "react";
 import { Phone, Smartphone, Mail } from "lucide-react";
+import MaintenanceModal from "@/components/MaintenanceModal";
 
 const ICONS = { phone: Phone, mobile: Smartphone, mail: Mail };
 
