@@ -56,6 +56,21 @@ export async function GET(req) {
     tokenCache.set('access_token', tokens.access_token);
     tokenCache.set('expires_at', Date.now() + tokens.expires_in * 1000);
 
+    // 獲取用戶信息
+    const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+      headers: {
+        Authorization: `Bearer ${tokens.access_token}`,
+      },
+    });
+
+    let userEmail = null;
+    if (userInfoRes.ok) {
+      const userInfo = await userInfoRes.json();
+      userEmail = userInfo.email;
+      // 存儲用戶郵箱到緩存
+      tokenCache.set('user_email', userEmail);
+    }
+
     // 重定向回前端，通知授權成功
     const returnUrl = new URL(req.url);
     returnUrl.pathname = '/school-info';

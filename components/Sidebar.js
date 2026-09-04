@@ -79,8 +79,70 @@ export default function Sidebar() {
   const [search, setSearch] = useState("");
   const [schools, setSchools] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [userEmail, setUserEmail] = useState(null);
+  const [authWindow, setAuthWindow] = useState(null);
   const searchContainerRef = useRef(null);
   const resultsRef = useRef(null);
+
+  // 檢查授權狀態
+  useEffect(() => {
+    checkAuthStatus();
+  }, []);
+
+  async function checkAuthStatus() {
+    try {
+      const res = await fetch("/api/check-auth");
+      const data = await res.json();
+      setIsAuthorized(data.authorized);
+      if (data.authorized && data.email) {
+        setUserEmail(data.email);
+      }
+    } catch (err) {
+      console.error("Auth check failed:", err);
+    }
+  }
+
+  // 登入
+  function handleLogin() {
+    const width = 500;
+    const height = 600;
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2;
+
+    const window_obj = window.open(
+      "/api/auth/google",
+      "google-auth",
+      `width=${width},height=${height},left=${left},top=${top}`
+    );
+    setAuthWindow(window_obj);
+  }
+
+  // 監聽授權窗口
+  useEffect(() => {
+    if (!authWindow) return;
+
+    const checkWindow = setInterval(() => {
+      if (authWindow.closed) {
+        clearInterval(checkWindow);
+        setAuthWindow(null);
+        checkAuthStatus();
+      }
+    }, 500);
+
+    return () => clearInterval(checkWindow);
+  }, [authWindow]);
+
+  // 登出
+  async function handleLogout() {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      setIsAuthorized(false);
+      setUserEmail(null);
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
+  }
 
   // Debounce search input
   useEffect(() => {
@@ -187,6 +249,77 @@ export default function Sidebar() {
             {item.label}
           </Link>
         ))}
+
+        {/* 登入/登出區塊 */}
+        <div
+          style={{
+            marginTop: "auto",
+            paddingTop: 16,
+            borderTop: "1px solid var(--border)",
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+          }}
+        >
+          {isAuthorized && userEmail ? (
+            <>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: "var(--text-muted)",
+                  paddingLeft: 12,
+                }}
+              >
+                已登入：
+              </div>
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: "var(--accent)",
+                  paddingLeft: 12,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+                title={userEmail}
+              >
+                {userEmail}
+              </div>
+              <button
+                onClick={handleLogout}
+                style={{
+                  padding: "8px 12px",
+                  background: "transparent",
+                  border: "1px solid var(--border)",
+                  borderRadius: 6,
+                  fontSize: 12,
+                  cursor: "pointer",
+                  color: "var(--text-secondary)",
+                  marginTop: 4,
+                }}
+              >
+                登出
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={handleLogin}
+              style={{
+                padding: "8px 12px",
+                background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+                border: "none",
+                borderRadius: 6,
+                fontSize: 12,
+                fontWeight: 500,
+                cursor: "pointer",
+                color: "#ffffff",
+              }}
+            >
+              🔐 Google Drive 登入
+            </button>
+          )}
+        </div>
       </nav>
 
       {search && filtered.length > 0 && (
