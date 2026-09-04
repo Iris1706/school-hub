@@ -28,11 +28,6 @@ export default function MaintenanceModal({ school, onClose }) {
       return;
     }
 
-    if (!isAuthorized) {
-      setStatus({ type: "error", message: "請先授權" });
-      return;
-    }
-
     setIsLoading(true);
     setStatus(null);
 
@@ -51,15 +46,7 @@ export default function MaintenanceModal({ school, onClose }) {
       const data = await response.json();
 
       if (!response.ok) {
-        if (data.code === "UNAUTHORIZED") {
-          setIsAuthorized(false);
-          setStatus({
-            type: "error",
-            message: "授權已過期，請重新授權",
-          });
-        } else {
-          setStatus({ type: "error", message: data.error || "上傳失敗" });
-        }
+        setStatus({ type: "error", message: data.error || "上傳失敗" });
         return;
       }
 
@@ -81,8 +68,6 @@ export default function MaintenanceModal({ school, onClose }) {
       setIsLoading(false);
     }
   };
-
-  if (!isOpen) return null;
 
   return (
     <div
