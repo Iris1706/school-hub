@@ -265,13 +265,16 @@ export default function Sidebar() {
                 <button
                   onClick={handleLogout}
                   style={{
-                    padding: "8px 12px",
+                    width: "calc(100% - 16px)",
+                    padding: "11px 12px",
                     background: "transparent",
                     border: "1px solid var(--border)",
                     borderRadius: 6,
                     fontSize: 12,
                     cursor: "pointer",
                     color: "var(--text-secondary)",
+                    marginLeft: 8,
+                    marginRight: 8,
                     marginTop: 4,
                   }}
                 >
@@ -282,7 +285,8 @@ export default function Sidebar() {
               <button
                 onClick={handleLogin}
                 style={{
-                  padding: "8px 12px",
+                  width: "calc(100% - 16px)",
+                  padding: "11px 12px",
                   background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
                   border: "none",
                   borderRadius: 6,
@@ -290,6 +294,8 @@ export default function Sidebar() {
                   fontWeight: 500,
                   cursor: "pointer",
                   color: "#ffffff",
+                  marginLeft: 8,
+                  marginRight: 8,
                 }}
               >
                 🔐 Google Drive 登入
@@ -371,66 +377,6 @@ export default function Sidebar() {
         />
       </div>
 
-      <div
-        style={{
-          padding: "12px",
-          borderBottom: "1px solid var(--border)",
-          background: "var(--surface-1)",
-        }}
-      >
-        {isAuthorized && userEmail ? (
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div>
-              <div style={{ fontSize: 11, color: "var(--text-muted)" }}>已登入</div>
-              <div
-                style={{
-                  fontSize: 12,
-                  fontWeight: 500,
-                  color: "var(--accent)",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                }}
-                title={userEmail}
-              >
-                {userEmail}
-              </div>
-            </div>
-            <button
-              onClick={handleLogout}
-              style={{
-                padding: "6px 12px",
-                background: "transparent",
-                border: "1px solid var(--border)",
-                borderRadius: 6,
-                fontSize: 11,
-                cursor: "pointer",
-                color: "var(--text-secondary)",
-              }}
-            >
-              登出
-            </button>
-          </div>
-        ) : (
-          <button
-            onClick={handleLogin}
-            style={{
-              width: "100%",
-              padding: "10px 12px",
-              background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
-              border: "none",
-              borderRadius: 6,
-              fontSize: 12,
-              fontWeight: 500,
-              cursor: "pointer",
-              color: "#ffffff",
-            }}
-          >
-            🔐 Google Drive 登入
-          </button>
-        )}
-      </div>
-
       <nav
         style={{
           position: "fixed",
@@ -473,6 +419,58 @@ export default function Sidebar() {
             scrollBehavior: "smooth",
           }}
         >
+          {/* 登入/登出區域 - 放在導覽項目前面 */}
+          {isAuthorized && userEmail ? (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "4px 8px",
+                background: "transparent",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
+              }}
+            >
+              <span style={{ fontSize: 12, color: "var(--accent)", fontWeight: 500 }}>
+                {userEmail.split("@")[0]}
+              </span>
+              <button
+                onClick={handleLogout}
+                style={{
+                  padding: "4px 8px",
+                  background: "transparent",
+                  border: "1px solid var(--border)",
+                  borderRadius: 4,
+                  fontSize: 11,
+                  cursor: "pointer",
+                  color: "var(--text-secondary)",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                登出
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={handleLogin}
+              style={{
+                padding: "6px 10px",
+                background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+                border: "none",
+                borderRadius: 6,
+                fontSize: 12,
+                fontWeight: 500,
+                cursor: "pointer",
+                color: "#ffffff",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
+              }}
+            >
+              🔐 登入
+            </button>
+          )}
+
           {NAV_ITEMS.map((item) => (
             <Link
               key={item.href}
