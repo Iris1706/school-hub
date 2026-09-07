@@ -89,6 +89,21 @@ export default function Sidebar() {
     checkAuthStatus();
   }, []);
 
+  // 監聽 URL 變更，偵測 OAuth 回調
+  useEffect(() => {
+    const currentUrl = new URL(window.location.href);
+    if (currentUrl.searchParams.get('auth') === 'success') {
+      // 延遲檢查，確保 cookie 已設置
+      const timer = setTimeout(() => {
+        checkAuthStatus();
+        // 清除 URL 的 auth 參數
+        currentUrl.searchParams.delete('auth');
+        window.history.replaceState({}, document.title, currentUrl.toString());
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [pathname]);
+
   async function checkAuthStatus() {
     try {
       const res = await fetch("/api/check-auth");
