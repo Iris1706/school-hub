@@ -392,7 +392,7 @@ export default function Sidebar() {
           }}
         >
           {/* 登入/登出區域 - 放在導覽項目前面 */}
-          {isAuthorized && userEmail ? (
+          {isAuthorized ? (
             <button
               onClick={handleLogout}
               style={{
