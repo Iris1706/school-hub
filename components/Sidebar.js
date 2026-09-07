@@ -393,36 +393,22 @@ export default function Sidebar() {
         >
           {/* 登入/登出區域 - 放在導覽項目前面 */}
           {isAuthorized && userEmail ? (
-            <div
+            <button
+              onClick={handleLogout}
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                padding: "4px 8px",
+                padding: "6px 10px",
                 background: "transparent",
+                border: "1px solid var(--border)",
+                borderRadius: 6,
+                fontSize: 12,
+                cursor: "pointer",
+                color: "var(--text-secondary)",
                 whiteSpace: "nowrap",
                 flexShrink: 0,
               }}
             >
-              <span style={{ fontSize: 12, color: "var(--accent)", fontWeight: 500 }}>
-                {userEmail.split("@")[0]}
-              </span>
-              <button
-                onClick={handleLogout}
-                style={{
-                  padding: "4px 8px",
-                  background: "transparent",
-                  border: "1px solid var(--border)",
-                  borderRadius: 4,
-                  fontSize: 11,
-                  cursor: "pointer",
-                  color: "var(--text-secondary)",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                登出
-              </button>
-            </div>
+              登出
+            </button>
           ) : (
             <button
               onClick={handleLogin}
