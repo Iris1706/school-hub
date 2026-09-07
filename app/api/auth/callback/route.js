@@ -41,13 +41,22 @@ export async function GET(req) {
 
     const tokens = await tokenResponse.json();
 
-    // 存儲 refresh token 到 HTTP-only cookie
+    // 存儲 refresh token 和 access token 到 HTTP-only cookie
     const cookieStore = await cookies();
     cookieStore.set('google_refresh_token', tokens.refresh_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 365, // 1 年
+      path: '/',
+    });
+
+    // 也保存 access token（用於檢查授權時取得用戶信息）
+    cookieStore.set('google_access_token', tokens.access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: tokens.expires_in, // access token 的有效期
       path: '/',
     });
 

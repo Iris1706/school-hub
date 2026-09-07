@@ -8,19 +8,40 @@ export async function GET() {
   try {
     const cookieStore = await cookies();
     const refreshToken = cookieStore.get('google_refresh_token')?.value;
+    const accessToken = cookieStore.get('google_access_token')?.value;
 
-    if (!refreshToken) {
+    if (!refreshToken && !accessToken) {
       return Response.json({
         authorized: false,
       });
     }
 
-    // 从缓存中获取用户邮箱
-    const userEmail = tokenCache.get('user_email');
+    // 先从缓存中获取用户邮箱
+    let userEmail = tokenCache.get('user_email');
+
+    // 如果缓存中没有，尝试用 access token 重新获取用户信息
+    if (!userEmail && accessToken) {
+      try {
+        const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        if (userInfoRes.ok) {
+          const userInfo = await userInfoRes.json();
+          userEmail = userInfo.email;
+          // 保存到缓存
+          tokenCache.set('user_email', userEmail);
+        }
+      } catch (err) {
+        console.error('Failed to fetch user info:', err);
+      }
+    }
 
     return Response.json({
       authorized: true,
-      email: userEmail,
+      email: userEmail || 'user@example.com', // 回退值
     });
   } catch (error) {
     console.error('Check auth error:', error);
