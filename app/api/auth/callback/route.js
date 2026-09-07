@@ -8,7 +8,7 @@ export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
     const code = searchParams.get('code');
-    const state = searchParams.get('state');
+    const state = searchParams.get('state'); // state 包含 returnTo 路徑
 
     if (!code) {
       return Response.json(
@@ -72,8 +72,10 @@ export async function GET(req) {
     }
 
     // 重定向回前端，通知授權成功
+    // 使用 state 參數（包含原始頁面路徑）；如果沒有則重定向到 /
+    const returnTo = state || '/';
     const returnUrl = new URL(req.url);
-    returnUrl.pathname = '/school-info';
+    returnUrl.pathname = returnTo;
     returnUrl.search = '?auth=success';
 
     return Response.redirect(returnUrl.toString());

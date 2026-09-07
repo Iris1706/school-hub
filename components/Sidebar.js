@@ -103,24 +103,12 @@ export default function Sidebar() {
   }
 
   function handleLogin() {
-    // 登入成功後會重新導向回來，設置計時器檢查授權狀態
-    const checkInterval = setInterval(async () => {
-      try {
-        const res = await fetch("/api/check-auth");
-        const data = await res.json();
-        if (data.authorized && data.email) {
-          clearInterval(checkInterval);
-          // 登入成功，重新整理頁面
-          window.location.reload();
-        }
-      } catch (err) {
-        console.error("Auth check failed:", err);
-      }
-    }, 500);
+    // 傳遞當前頁面路徑給 OAuth 回調，登入後會回到同一頁面
+    const currentPath = pathname || '/';
+    const authUrl = new URL('/api/auth/google', window.location.origin);
+    authUrl.searchParams.append('returnTo', currentPath);
 
-    setTimeout(() => clearInterval(checkInterval), 30000); // 30秒後停止檢查
-
-    window.location.href = "/api/auth/google";
+    window.location.href = authUrl.toString();
   }
 
   async function handleLogout() {
