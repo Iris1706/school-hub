@@ -499,32 +499,46 @@ function SchoolCard({ school }) {
         boxShadow: "0 2px 8px rgba(99, 102, 241, 0.1)",
       }}
     >
-      {/* 表格式顯示 */}
+      {/* 簡潔顯示搜尋相關資料 */}
       <div style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 12, marginBottom: 12 }}>
-        {[
-          { label: "行政區合併學校名稱", value: school["行政區合併學校名稱"] },
-          { label: "學校代碼", value: school["學校代碼"] },
-          { label: "地址", value: school["地址"] },
-          { label: "負責老師", value: school["負責老師"] },
-          { label: "老師分機電話", value: school["老師分機電話"] },
-          { label: "老師手機電話", value: school["老師手機電話"] },
-          { label: "老師Email", value: school["老師Email"] },
-          { label: "Jamf Pro URL", value: school["Jamf Pro URL"] },
-        ].map((item) =>
-          item.value ? (
-            <div key={item.label} style={{ display: "flex", gap: 12 }}>
-              <span style={{ fontWeight: 500, color: "var(--text-muted)", minWidth: 120 }}>
-                {item.label}
-              </span>
-              <span style={{ color: "var(--text-primary)", wordBreak: "break-all" }}>
-                {item.value}
-              </span>
-            </div>
-          ) : null
+        {school["行政區合併學校名稱"] && (
+          <div style={{ fontWeight: 500, color: "var(--text-primary)" }}>
+            {school["行政區合併學校名稱"]}
+          </div>
+        )}
+        {school["學校代碼"] && (
+          <div style={{ fontSize: 11, color: "var(--text-muted)" }}>
+            {school["學校代碼"]}
+          </div>
+        )}
+        {school["地址"] && (
+          <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
+            {school["地址"]}
+          </div>
+        )}
+        {school["負責老師"] && (
+          <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
+            {school["負責老師"]}
+          </div>
+        )}
+        {school["老師分機電話"] && (
+          <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
+            {school["老師分機電話"]}
+          </div>
+        )}
+        {school["老師手機電話"] && (
+          <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
+            {school["老師手機電話"]}
+          </div>
+        )}
+        {school["老師Email"] && (
+          <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
+            {school["老師Email"]}
+          </div>
         )}
       </div>
 
-      {/* 按鈕區域 */}
+      {/* 按鈕區域 - 功能跟學校資訊頁籤相同 */}
       <div style={{ display: "flex", gap: 8, borderTop: "1px solid var(--border)", paddingTop: 12 }}>
         <Link
           href={`/school-info?schoolCode=${school["學校代碼"]}`}
@@ -552,7 +566,8 @@ function SchoolCard({ school }) {
         >
           編輯
         </Link>
-        <button
+        <Link
+          href={`/school-info?schoolCode=${school["學校代碼"]}&tab=history`}
           style={{
             flex: 1,
             padding: "8px 12px",
@@ -562,12 +577,21 @@ function SchoolCard({ school }) {
             fontSize: 12,
             cursor: "pointer",
             color: "var(--text-secondary)",
+            textDecoration: "none",
+            textAlign: "center",
+            transition: "all 0.2s",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "var(--surface-2)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "transparent";
           }}
         >
           修改歷程
-        </button>
+        </Link>
         <Link
-          href={`/repair?schoolCode=${school["學校代碼"]}`}
+          href={`/school-info?schoolCode=${school["學校代碼"]}&tab=maintenance`}
           style={{
             flex: 1,
             padding: "8px 12px",
