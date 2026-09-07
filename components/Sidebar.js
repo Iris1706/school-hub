@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Phone, Smartphone, Mail } from "lucide-react";
+import MaintenanceModal from "@/components/MaintenanceModal";
 
 const ICONS = { phone: Phone, mobile: Smartphone, mail: Mail };
 const TITLE_FIELD = "行政區合併學校名稱";
@@ -489,131 +490,307 @@ export default function Sidebar() {
 }
 
 function SchoolCard({ school }) {
+  const [editing, setEditing] = useState(null);
+  const [historyFor, setHistoryFor] = useState(null);
+  const [historyEntries, setHistoryEntries] = useState([]);
+  const [maintenance, setMaintenance] = useState(null);
+
+  async function openHistory() {
+    setHistoryFor(school["學校代碼"]);
+    setHistoryEntries([]);
+    try {
+      const res = await fetch(`/api/school-info/history?code=${encodeURIComponent(school["學校代碼"])}`);
+      const json = await res.json();
+      if (Array.isArray(json)) setHistoryEntries(json);
+    } catch (err) {
+      console.error("Failed to fetch history:", err);
+    }
+  }
+
+  return (
+    <>
+      <div
+        style={{
+          background: "#ffffff",
+          border: "1px solid rgba(99, 102, 241, 0.2)",
+          borderRadius: 8,
+          padding: 12,
+          boxShadow: "0 2px 8px rgba(99, 102, 241, 0.1)",
+        }}
+      >
+        {/* 簡潔顯示搜尋相關資料 */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 12, marginBottom: 12 }}>
+          {school["行政區合併學校名稱"] && (
+            <div style={{ fontWeight: 500, color: "var(--text-primary)" }}>
+              {school["行政區合併學校名稱"]}
+            </div>
+          )}
+          {school["學校代碼"] && (
+            <div style={{ fontSize: 11, color: "var(--text-muted)" }}>
+              {school["學校代碼"]}
+            </div>
+          )}
+          {school["地址"] && (
+            <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
+              {school["地址"]}
+            </div>
+          )}
+          {school["負責老師"] && (
+            <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
+              {school["負責老師"]}
+            </div>
+          )}
+          {school["老師分機電話"] && (
+            <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
+              {school["老師分機電話"]}
+            </div>
+          )}
+          {school["老師手機電話"] && (
+            <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
+              {school["老師手機電話"]}
+            </div>
+          )}
+          {school["老師Email"] && (
+            <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
+              {school["老師Email"]}
+            </div>
+          )}
+          {school["Jamf Pro URL"] && (
+            <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
+              {school["Jamf Pro URL"]}
+            </div>
+          )}
+        </div>
+
+        {/* 按鈕區域 - 功能跟學校資訊頁籤相同 */}
+        <div style={{ display: "flex", gap: 8, borderTop: "1px solid var(--border)", paddingTop: 12 }}>
+          <button
+            onClick={() => setEditing(school)}
+            style={{
+              flex: 1,
+              padding: "8px 12px",
+              background: "transparent",
+              border: "1px solid var(--accent)",
+              borderRadius: 6,
+              fontSize: 12,
+              cursor: "pointer",
+              color: "var(--accent)",
+              transition: "all 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "var(--accent)";
+              e.currentTarget.style.color = "#ffffff";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "transparent";
+              e.currentTarget.style.color = "var(--accent)";
+            }}
+          >
+            編輯
+          </button>
+          <button
+            onClick={openHistory}
+            style={{
+              flex: 1,
+              padding: "8px 12px",
+              background: "transparent",
+              border: "1px solid var(--border)",
+              borderRadius: 6,
+              fontSize: 12,
+              cursor: "pointer",
+              color: "var(--text-secondary)",
+              transition: "all 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "var(--surface-2)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "transparent";
+            }}
+          >
+            修改歷程
+          </button>
+          <button
+            onClick={() => setMaintenance(school)}
+            style={{
+              flex: 1,
+              padding: "8px 12px",
+              background: "transparent",
+              border: "1px solid var(--border)",
+              borderRadius: 6,
+              fontSize: 12,
+              cursor: "pointer",
+              color: "var(--text-secondary)",
+              transition: "all 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "var(--surface-2)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "transparent";
+            }}
+          >
+            維護紀錄
+          </button>
+        </div>
+      </div>
+
+      {/* 編輯 Modal */}
+      {editing && (
+        <EditSchoolModal school={editing} onClose={() => setEditing(null)} />
+      )}
+
+      {/* 修改歷程 Modal */}
+      {historyFor && (
+        <HistoryModal code={historyFor} entries={historyEntries} onClose={() => setHistoryFor(null)} />
+      )}
+
+      {/* 維護紀錄 Modal */}
+      {maintenance && (
+        <MaintenanceModal school={maintenance} onClose={() => setMaintenance(null)} />
+      )}
+    </>
+  );
+}
+
+function EditSchoolModal({ school, onClose }) {
+  const [form, setForm] = useState(() => ({ ...school }));
+  const [saving, setSaving] = useState(false);
+
+  const FIELD_GROUPS = [
+    {
+      title: "基本資料",
+      fields: [
+        { key: "學校代碼", label: "學校代碼" },
+        { key: "行政區合併學校名稱", label: "行政區合併學校名稱", full: true },
+        { key: "地址", label: "地址", full: true },
+      ],
+    },
+    {
+      title: "主要負責老師",
+      fields: [
+        { key: "負責老師", label: "負責老師" },
+        { key: "老師分機電話", label: "老師分機電話" },
+        { key: "老師手機電話", label: "老師手機電話" },
+        { key: "老師Email", label: "老師Email", full: true },
+      ],
+    },
+    {
+      title: "系統資訊",
+      fields: [
+        { key: "學校ASM", label: "學校ASM" },
+        { key: "管理員權限", label: "管理員權限" },
+        { key: "Jamf Pro URL", label: "Jamf Pro URL", full: true },
+      ],
+    },
+  ];
+
+  async function handleSave() {
+    setSaving(true);
+    try {
+      const updates = {};
+      FIELD_GROUPS.forEach((g) => {
+        g.fields.forEach((f) => {
+          if (form[f.key] !== school[f.key]) {
+            updates[f.key] = form[f.key];
+          }
+        });
+      });
+      const res = await fetch("/api/school-info", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ row: school.__row, updates }),
+      });
+      const json = await res.json();
+      if (json.error) throw new Error(json.error);
+      onClose();
+      window.location.reload();
+    } catch (err) {
+      alert("儲存失敗：" + err.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
     <div
       style={{
-        background: "#ffffff",
-        border: "1px solid rgba(99, 102, 241, 0.2)",
-        borderRadius: 8,
-        padding: 12,
-        boxShadow: "0 2px 8px rgba(99, 102, 241, 0.1)",
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.4)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 10,
+      }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
       }}
     >
-      {/* 簡潔顯示搜尋相關資料 */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 12, marginBottom: 12 }}>
-        {school["行政區合併學校名稱"] && (
-          <div style={{ fontWeight: 500, color: "var(--text-primary)" }}>
-            {school["行政區合併學校名稱"]}
-          </div>
-        )}
-        {school["學校代碼"] && (
-          <div style={{ fontSize: 11, color: "var(--text-muted)" }}>
-            {school["學校代碼"]}
-          </div>
-        )}
-        {school["地址"] && (
-          <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
-            {school["地址"]}
-          </div>
-        )}
-        {school["負責老師"] && (
-          <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
-            {school["負責老師"]}
-          </div>
-        )}
-        {school["老師分機電話"] && (
-          <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
-            {school["老師分機電話"]}
-          </div>
-        )}
-        {school["老師手機電話"] && (
-          <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
-            {school["老師手機電話"]}
-          </div>
-        )}
-        {school["老師Email"] && (
-          <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
-            {school["老師Email"]}
-          </div>
-        )}
-      </div>
+      <div style={{ width: 480, maxHeight: "80vh", overflow: "auto", background: "var(--surface-1)", borderRadius: 8, padding: 16 }}>
+        <p style={{ fontWeight: 500, fontSize: 14, margin: "0 0 12px" }}>編輯學校資訊</p>
 
-      {/* 按鈕區域 - 功能跟學校資訊頁籤相同 */}
-      <div style={{ display: "flex", gap: 8, borderTop: "1px solid var(--border)", paddingTop: 12 }}>
-        <Link
-          href={`/school-info?schoolCode=${school["學校代碼"]}`}
-          style={{
-            flex: 1,
-            padding: "8px 12px",
-            background: "transparent",
-            border: "1px solid var(--accent)",
-            borderRadius: 6,
-            fontSize: 12,
-            cursor: "pointer",
-            color: "var(--accent)",
-            textDecoration: "none",
-            textAlign: "center",
-            transition: "all 0.2s",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = "var(--accent)";
-            e.currentTarget.style.color = "#ffffff";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = "transparent";
-            e.currentTarget.style.color = "var(--accent)";
-          }}
-        >
-          編輯
-        </Link>
-        <Link
-          href={`/school-info?schoolCode=${school["學校代碼"]}&tab=history`}
-          style={{
-            flex: 1,
-            padding: "8px 12px",
-            background: "transparent",
-            border: "1px solid var(--border)",
-            borderRadius: 6,
-            fontSize: 12,
-            cursor: "pointer",
-            color: "var(--text-secondary)",
-            textDecoration: "none",
-            textAlign: "center",
-            transition: "all 0.2s",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = "var(--surface-2)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = "transparent";
-          }}
-        >
-          修改歷程
-        </Link>
-        <Link
-          href={`/school-info?schoolCode=${school["學校代碼"]}&tab=maintenance`}
-          style={{
-            flex: 1,
-            padding: "8px 12px",
-            background: "transparent",
-            border: "1px solid var(--border)",
-            borderRadius: 6,
-            fontSize: 12,
-            cursor: "pointer",
-            color: "var(--text-secondary)",
-            textDecoration: "none",
-            textAlign: "center",
-            transition: "all 0.2s",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = "var(--surface-2)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = "transparent";
-          }}
-        >
-          維護紀錄
-        </Link>
+        {FIELD_GROUPS.map((group) => (
+          <div key={group.title} style={{ marginBottom: 14 }}>
+            <p style={{ fontSize: 11, color: "var(--text-muted)", margin: "0 0 6px" }}>{group.title}</p>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 12px", fontSize: 12 }}>
+              {group.fields.map((f) => (
+                <label key={f.key} style={{ gridColumn: f.full ? "1 / 3" : "auto" }}>
+                  {f.label}
+                  <input
+                    type="text"
+                    value={form[f.key] || ""}
+                    onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}
+                    style={{ width: "100%", marginTop: 2 }}
+                  />
+                </label>
+              ))}
+            </div>
+          </div>
+        ))}
+
+        <div style={{ display: "flex", gap: 8, marginTop: 12, justifyContent: "flex-end" }}>
+          <button onClick={onClose} style={{ background: "transparent", border: "1px solid var(--border)" }}>
+            取消
+          </button>
+          <button disabled={saving} onClick={handleSave}>
+            {saving ? "儲存中..." : "儲存"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HistoryModal({ code, entries, onClose }) {
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.4)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 10,
+      }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div style={{ width: 420, maxHeight: "80vh", overflow: "auto", background: "var(--surface-1)", borderRadius: 8, padding: 16 }}>
+        <p style={{ fontWeight: 500, fontSize: 14, margin: "0 0 12px" }}>變更紀錄 — {code}</p>
+        {entries.length === 0 && <p style={{ fontSize: 13, color: "var(--text-muted)" }}>目前沒有異動紀錄。</p>}
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {entries.map((e, i) => (
+            <div key={i} style={{ fontSize: 12, borderBottom: "1px solid var(--border)", paddingBottom: 6 }}>
+              <div style={{ color: "var(--text-muted)" }}>{new Date(e.time).toLocaleString("zh-TW")}</div>
+              <div>
+                {e.field}：{e.oldValue || "（空）"} → {e.newValue || "（空）"}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
