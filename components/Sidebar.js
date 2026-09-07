@@ -103,6 +103,13 @@ export default function Sidebar() {
   }
 
   function handleLogin() {
+    // 登入成功後會重新導向回來，設置計時器檢查授權狀態
+    const checkInterval = setInterval(() => {
+      checkAuthStatus();
+    }, 500);
+
+    setTimeout(() => clearInterval(checkInterval), 30000); // 30秒後停止檢查
+
     window.location.href = "/api/auth/google";
   }
 
@@ -235,73 +242,47 @@ export default function Sidebar() {
             </Link>
           ))}
 
-          <div
+          {isAuthorized && userEmail && (
+            <>
+              <div style={{ fontSize: 12, color: "var(--text-muted)", paddingLeft: 18, marginTop: "auto", paddingTop: 12 }}>已登入：</div>
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: "var(--accent)",
+                  paddingLeft: 18,
+                  paddingRight: 18,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+                title={userEmail}
+              >
+                {userEmail}
+              </div>
+            </>
+          )}
+
+          <button
+            onClick={isAuthorized ? handleLogout : handleLogin}
             style={{
-              marginTop: "auto",
-              paddingTop: 16,
-              borderTop: "1px solid var(--border)",
-              display: "flex",
-              flexDirection: "column",
-              gap: 8,
+              width: "calc(100% - 36px)",
+              padding: "11px 12px",
+              marginTop: isAuthorized && userEmail ? 8 : "auto",
+              marginLeft: 18,
+              marginRight: 18,
+              marginBottom: 12,
+              background: isAuthorized ? "transparent" : "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+              border: isAuthorized ? "1px solid var(--border)" : "none",
+              borderRadius: 6,
+              fontSize: 12,
+              fontWeight: 500,
+              cursor: "pointer",
+              color: isAuthorized ? "var(--text-secondary)" : "#ffffff",
             }}
           >
-            {isAuthorized && userEmail ? (
-              <>
-                <div style={{ fontSize: 12, color: "var(--text-muted)", paddingLeft: 12 }}>已登入：</div>
-                <div
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 500,
-                    color: "var(--accent)",
-                    paddingLeft: 12,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                  title={userEmail}
-                >
-                  {userEmail}
-                </div>
-                <button
-                  onClick={handleLogout}
-                  style={{
-                    width: "calc(100% - 16px)",
-                    padding: "11px 12px",
-                    background: "transparent",
-                    border: "1px solid var(--border)",
-                    borderRadius: 6,
-                    fontSize: 12,
-                    cursor: "pointer",
-                    color: "var(--text-secondary)",
-                    marginLeft: 8,
-                    marginRight: 8,
-                    marginTop: 4,
-                  }}
-                >
-                  登出
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={handleLogin}
-                style={{
-                  width: "calc(100% - 16px)",
-                  padding: "11px 12px",
-                  background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
-                  border: "none",
-                  borderRadius: 6,
-                  fontSize: 12,
-                  fontWeight: 500,
-                  cursor: "pointer",
-                  color: "#ffffff",
-                  marginLeft: 8,
-                  marginRight: 8,
-                }}
-              >
-                🔐 Google Drive 登入
-              </button>
-            )}
-          </div>
+            {isAuthorized ? "登出" : "🔐 Google Drive 登入"}
+          </button>
         </nav>
 
         {search && filtered.length > 0 && (
