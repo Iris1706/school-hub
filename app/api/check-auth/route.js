@@ -41,7 +41,7 @@ export async function GET() {
 
     return Response.json({
       authorized: true,
-      email: userEmail || 'user@example.com', // 回退值
+      email: userEmail || null, // 無法取得時返回 null
     });
   } catch (error) {
     console.error('Check auth error:', error);
