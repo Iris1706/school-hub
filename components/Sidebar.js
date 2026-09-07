@@ -494,44 +494,102 @@ function SchoolCard({ school }) {
       style={{
         background: "#ffffff",
         border: "1px solid rgba(99, 102, 241, 0.2)",
-        borderLeft: "3px solid var(--accent)",
         borderRadius: 8,
-        padding: 8,
+        padding: 12,
         boxShadow: "0 2px 8px rgba(99, 102, 241, 0.1)",
       }}
     >
-      <div style={{ marginBottom: 8 }}>
-        <p
-          style={{
-            fontWeight: 500,
-            fontSize: 13,
-            margin: "0 0 2px",
-            color: "var(--text-primary)",
-          }}
-        >
-          {school["行政區合併學校名稱"]}
-        </p>
-        <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
-          {school["學校代碼"]}
-        </span>
+      {/* 表格式顯示 */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 12, marginBottom: 12 }}>
+        {[
+          { label: "行政區合併學校名稱", value: school["行政區合併學校名稱"] },
+          { label: "學校代碼", value: school["學校代碼"] },
+          { label: "地址", value: school["地址"] },
+          { label: "負責老師", value: school["負責老師"] },
+          { label: "老師分機電話", value: school["老師分機電話"] },
+          { label: "老師手機電話", value: school["老師手機電話"] },
+          { label: "老師Email", value: school["老師Email"] },
+          { label: "Jamf Pro URL", value: school["Jamf Pro URL"] },
+        ].map((item) =>
+          item.value ? (
+            <div key={item.label} style={{ display: "flex", gap: 12 }}>
+              <span style={{ fontWeight: 500, color: "var(--text-muted)", minWidth: 120 }}>
+                {item.label}
+              </span>
+              <span style={{ color: "var(--text-primary)", wordBreak: "break-all" }}>
+                {item.value}
+              </span>
+            </div>
+          ) : null
+        )}
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: 11 }}>
-        {school["負責老師"] && (
-          <div style={{ color: "var(--text-secondary)" }}>
-            👤 {school["負責老師"]}
-          </div>
-        )}
-        {school["老師手機電話"] && (
-          <div style={{ color: "var(--text-secondary)" }}>
-            📱 {school["老師手機電話"]}
-          </div>
-        )}
-        {school["地址"] && (
-          <div style={{ color: "var(--text-secondary)" }}>
-            📍 {school["地址"]}
-          </div>
-        )}
+      {/* 按鈕區域 */}
+      <div style={{ display: "flex", gap: 8, borderTop: "1px solid var(--border)", paddingTop: 12 }}>
+        <Link
+          href={`/school-info?schoolCode=${school["學校代碼"]}`}
+          style={{
+            flex: 1,
+            padding: "8px 12px",
+            background: "transparent",
+            border: "1px solid var(--accent)",
+            borderRadius: 6,
+            fontSize: 12,
+            cursor: "pointer",
+            color: "var(--accent)",
+            textDecoration: "none",
+            textAlign: "center",
+            transition: "all 0.2s",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "var(--accent)";
+            e.currentTarget.style.color = "#ffffff";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "transparent";
+            e.currentTarget.style.color = "var(--accent)";
+          }}
+        >
+          編輯
+        </Link>
+        <button
+          style={{
+            flex: 1,
+            padding: "8px 12px",
+            background: "transparent",
+            border: "1px solid var(--border)",
+            borderRadius: 6,
+            fontSize: 12,
+            cursor: "pointer",
+            color: "var(--text-secondary)",
+          }}
+        >
+          修改歷程
+        </button>
+        <Link
+          href={`/repair?schoolCode=${school["學校代碼"]}`}
+          style={{
+            flex: 1,
+            padding: "8px 12px",
+            background: "transparent",
+            border: "1px solid var(--border)",
+            borderRadius: 6,
+            fontSize: 12,
+            cursor: "pointer",
+            color: "var(--text-secondary)",
+            textDecoration: "none",
+            textAlign: "center",
+            transition: "all 0.2s",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "var(--surface-2)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "transparent";
+          }}
+        >
+          維護紀錄
+        </Link>
       </div>
     </div>
   );
