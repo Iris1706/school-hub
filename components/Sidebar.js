@@ -810,11 +810,8 @@ function EditSchoolModal({ school, onClose }) {
         ))}
 
         <div style={{ display: "flex", gap: 8, marginTop: 12, justifyContent: "flex-end" }}>
-          <button onClick={onClose} style={{ background: "transparent", border: "1px solid var(--border)" }}>
-            取消
-          </button>
-          <button disabled={saving} onClick={handleSave}>
-            {saving ? "儲存中..." : "儲存"}
+          <button disabled={saving} onClick={handleSave} style={{ background: "var(--accent)", color: "#ffffff", border: "none" }}>
+            {saving ? "儲存中..." : "💾 儲存"}
           </button>
         </div>
       </div>
