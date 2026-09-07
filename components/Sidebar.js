@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Phone, Smartphone, Mail, ChevronLeft, ChevronRight } from "lucide-react";
+import { Phone, Smartphone, Mail } from "lucide-react";
 
 const ICONS = { phone: Phone, mobile: Smartphone, mail: Mail };
 const TITLE_FIELD = "行政區合併學校名稱";
@@ -104,8 +104,18 @@ export default function Sidebar() {
 
   function handleLogin() {
     // 登入成功後會重新導向回來，設置計時器檢查授權狀態
-    const checkInterval = setInterval(() => {
-      checkAuthStatus();
+    const checkInterval = setInterval(async () => {
+      try {
+        const res = await fetch("/api/check-auth");
+        const data = await res.json();
+        if (data.authorized && data.email) {
+          clearInterval(checkInterval);
+          // 登入成功，重新整理頁面
+          window.location.reload();
+        }
+      } catch (err) {
+        console.error("Auth check failed:", err);
+      }
     }, 500);
 
     setTimeout(() => clearInterval(checkInterval), 30000); // 30秒後停止檢查
@@ -194,13 +204,6 @@ export default function Sidebar() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  const scroll = (direction) => {
-    if (navScrollRef.current) {
-      const scrollAmount = 150;
-      navScrollRef.current.scrollLeft += direction === "left" ? -scrollAmount : scrollAmount;
-    }
-  };
 
   if (!isMobile) {
     return (
@@ -370,34 +373,19 @@ export default function Sidebar() {
           display: "flex",
           alignItems: "center",
           zIndex: 100,
-          padding: "0 8px",
+          padding: "0 12px",
           gap: 8,
         }}
       >
-        <button
-          onClick={() => scroll("left")}
-          style={{
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            padding: "8px",
-            display: "flex",
-            alignItems: "center",
-            color: "var(--text-secondary)",
-            flexShrink: 0,
-          }}
-        >
-          <ChevronLeft size={18} />
-        </button>
-
         <div
           ref={navScrollRef}
           style={{
             display: "flex",
             gap: 4,
-            overflow: "hidden",
+            overflow: "auto",
             flex: 1,
             scrollBehavior: "smooth",
+            WebkitOverflowScrolling: "touch",
           }}
         >
           {/* 登入/登出區域 - 放在導覽項目前面 */}
@@ -474,22 +462,6 @@ export default function Sidebar() {
             </Link>
           ))}
         </div>
-
-        <button
-          onClick={() => scroll("right")}
-          style={{
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            padding: "8px",
-            display: "flex",
-            alignItems: "center",
-            color: "var(--text-secondary)",
-            flexShrink: 0,
-          }}
-        >
-          <ChevronRight size={18} />
-        </button>
       </nav>
 
       {search && filtered.length > 0 && (
