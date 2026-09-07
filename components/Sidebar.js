@@ -494,6 +494,7 @@ function SchoolCard({ school }) {
   const [historyFor, setHistoryFor] = useState(null);
   const [historyEntries, setHistoryEntries] = useState([]);
   const [maintenance, setMaintenance] = useState(null);
+  const [isHovered, setIsHovered] = useState(false);
 
   async function openHistory() {
     setHistoryFor(school["學校代碼"]);
@@ -511,126 +512,185 @@ function SchoolCard({ school }) {
     <>
       <div
         style={{
-          background: "#ffffff",
-          border: "1px solid rgba(99, 102, 241, 0.2)",
-          borderRadius: 8,
-          padding: 12,
-          boxShadow: "0 2px 8px rgba(99, 102, 241, 0.1)",
+          background: "linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%)",
+          border: "1px solid rgba(99, 102, 241, 0.15)",
+          borderLeft: isHovered ? "4px solid var(--accent)" : "4px solid rgba(99, 102, 241, 0.3)",
+          borderRadius: 12,
+          padding: 16,
+          boxShadow: isHovered
+            ? "0 12px 24px rgba(99, 102, 241, 0.15), 0 0 0 1px rgba(99, 102, 241, 0.1)"
+            : "0 4px 12px rgba(99, 102, 241, 0.08), 0 0 1px rgba(99, 102, 241, 0.1)",
+          transition: "all 0.3s ease",
+          cursor: "default",
         }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
         {/* 簡潔顯示搜尋相關資料 */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 12, marginBottom: 12 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: 12, marginBottom: 14 }}>
           {school["行政區合併學校名稱"] && (
-            <div style={{ fontWeight: 500, color: "var(--text-primary)" }}>
+            <div style={{
+              fontWeight: 600,
+              color: "var(--text-primary)",
+              fontSize: 14,
+              letterSpacing: "0.3px"
+            }}>
               {school["行政區合併學校名稱"]}
             </div>
           )}
           {school["學校代碼"] && (
-            <div style={{ fontSize: 11, color: "var(--text-muted)" }}>
-              {school["學校代碼"]}
+            <div style={{
+              fontSize: 11,
+              color: "var(--text-muted)",
+              background: "rgba(99, 102, 241, 0.05)",
+              padding: "2px 8px",
+              borderRadius: 4,
+              width: "fit-content"
+            }}>
+              📌 {school["學校代碼"]}
             </div>
           )}
           {school["地址"] && (
-            <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
-              {school["地址"]}
+            <div style={{ fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.5 }}>
+              📍 {school["地址"]}
             </div>
           )}
           {school["負責老師"] && (
             <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
-              {school["負責老師"]}
+              👤 {school["負責老師"]}
             </div>
           )}
           {school["老師分機電話"] && (
             <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
-              {school["老師分機電話"]}
+              ☎️ {school["老師分機電話"]}
             </div>
           )}
           {school["老師手機電話"] && (
             <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
-              {school["老師手機電話"]}
+              📱 {school["老師手機電話"]}
             </div>
           )}
           {school["老師Email"] && (
             <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
-              {school["老師Email"]}
+              ✉️ {school["老師Email"]}
             </div>
           )}
           {school["Jamf Pro URL"] && (
-            <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
-              {school["Jamf Pro URL"]}
+            <div style={{ fontSize: 11 }}>
+              🔗{" "}
+              <a
+                href={school["Jamf Pro URL"]}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  color: "var(--accent)",
+                  textDecoration: "none",
+                  fontWeight: 500,
+                  borderBottom: "1px dashed rgba(99, 102, 241, 0.3)",
+                  transition: "all 0.2s"
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderBottomStyle = "solid";
+                  e.currentTarget.style.borderBottomColor = "var(--accent)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderBottomStyle = "dashed";
+                  e.currentTarget.style.borderBottomColor = "rgba(99, 102, 241, 0.3)";
+                }}
+              >
+                {school["Jamf Pro URL"]}
+              </a>
             </div>
           )}
         </div>
 
         {/* 按鈕區域 - 功能跟學校資訊頁籤相同 */}
-        <div style={{ display: "flex", gap: 8, borderTop: "1px solid var(--border)", paddingTop: 12 }}>
+        <div style={{
+          display: "flex",
+          gap: 8,
+          borderTop: "1px solid rgba(99, 102, 241, 0.1)",
+          paddingTop: 14,
+          marginTop: 2
+        }}>
           <button
             onClick={() => setEditing(school)}
             style={{
               flex: 1,
-              padding: "8px 12px",
-              background: "transparent",
+              padding: "10px 12px",
+              background: "linear-gradient(135deg, var(--accent) 0%, rgba(99, 102, 241, 0.8) 100%)",
               border: "1px solid var(--accent)",
-              borderRadius: 6,
+              borderRadius: 8,
               fontSize: 12,
+              fontWeight: 500,
               cursor: "pointer",
-              color: "var(--accent)",
-              transition: "all 0.2s",
+              color: "#ffffff",
+              transition: "all 0.3s ease",
+              boxShadow: "0 2px 8px rgba(99, 102, 241, 0.2)",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = "var(--accent)";
-              e.currentTarget.style.color = "#ffffff";
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow = "0 6px 16px rgba(99, 102, 241, 0.3)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = "transparent";
-              e.currentTarget.style.color = "var(--accent)";
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 2px 8px rgba(99, 102, 241, 0.2)";
             }}
           >
-            編輯
+            ✏️ 編輯
           </button>
           <button
             onClick={openHistory}
             style={{
               flex: 1,
-              padding: "8px 12px",
-              background: "transparent",
-              border: "1px solid var(--border)",
-              borderRadius: 6,
+              padding: "10px 12px",
+              background: "rgba(99, 102, 241, 0.08)",
+              border: "1px solid rgba(99, 102, 241, 0.2)",
+              borderRadius: 8,
               fontSize: 12,
+              fontWeight: 500,
               cursor: "pointer",
-              color: "var(--text-secondary)",
-              transition: "all 0.2s",
+              color: "var(--accent)",
+              transition: "all 0.3s ease",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = "var(--surface-2)";
+              e.currentTarget.style.background = "rgba(99, 102, 241, 0.15)";
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow = "0 4px 12px rgba(99, 102, 241, 0.15)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = "transparent";
+              e.currentTarget.style.background = "rgba(99, 102, 241, 0.08)";
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "none";
             }}
           >
-            修改歷程
+            📋 歷程
           </button>
           <button
             onClick={() => setMaintenance(school)}
             style={{
               flex: 1,
-              padding: "8px 12px",
-              background: "transparent",
-              border: "1px solid var(--border)",
-              borderRadius: 6,
+              padding: "10px 12px",
+              background: "rgba(99, 102, 241, 0.08)",
+              border: "1px solid rgba(99, 102, 241, 0.2)",
+              borderRadius: 8,
               fontSize: 12,
+              fontWeight: 500,
               cursor: "pointer",
-              color: "var(--text-secondary)",
-              transition: "all 0.2s",
+              color: "var(--accent)",
+              transition: "all 0.3s ease",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = "var(--surface-2)";
+              e.currentTarget.style.background = "rgba(99, 102, 241, 0.15)";
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow = "0 4px 12px rgba(99, 102, 241, 0.15)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = "transparent";
+              e.currentTarget.style.background = "rgba(99, 102, 241, 0.08)";
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "none";
             }}
           >
-            維護紀錄
+            🔧 維護
           </button>
         </div>
       </div>
