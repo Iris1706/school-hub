@@ -37,6 +37,7 @@ export default function TodoPage() {
     進度: '待處理',
     備註: '',
     優先級: '一般',
+    完成: '',
   });
 
   // 編輯表單狀態
@@ -50,6 +51,7 @@ export default function TodoPage() {
     進度: '待處理',
     備註: '',
     優先級: '一般',
+    完成: '',
   });
 
   // 載入待辦事項
@@ -102,6 +104,7 @@ export default function TodoPage() {
         進度: '待處理',
         備註: '',
         優先級: '一般',
+        完成: '',
       });
       await fetchTodos();
     } catch (err) {
@@ -124,6 +127,7 @@ export default function TodoPage() {
       進度: todo.進度,
       備註: todo.備註,
       優先級: todo.優先級,
+      完成: todo.完成,
     });
     setShowEditModal(true);
   };
