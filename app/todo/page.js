@@ -245,9 +245,9 @@ export default function TodoPage() {
     return orderA - orderB;
   };
 
-  // 待辦事項：進度為「待處理」或「已處理待追蹤」
+  // 待辦事項：進度為「待處理」或「已處理待追蹤」或為空（預設待處理）
   const pendingTodos = todos
-    .filter((t) => t.進度 === '待處理' || t.進度 === '已處理待追蹤')
+    .filter((t) => !t.進度 || t.進度 === '待處理' || t.進度 === '已處理待追蹤')
     .sort(sortByPriority);
 
   // 已完成事項：進度為「完成」
