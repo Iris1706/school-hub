@@ -22,7 +22,7 @@ function getInspectSheetsClient() {
   return google.sheets({ version: "v4", auth });
 }
 
-// GET: 從巡檢 Sheet 讀取 W:AD 欄位的資料（標題+資料）
+// GET: 從巡檢 Sheet 讀取 W:AD 欄位的資料
 export async function GET() {
   try {
     const INSPECT_SHEET_ID = process.env.Inspect_SHEET_ID;
@@ -44,22 +44,34 @@ export async function GET() {
     const rows = res.data.values || [];
 
     if (rows.length === 0) {
-      return NextResponse.json({ headers: [], data: [] });
+      return NextResponse.json({ headers: [], data: [], message: "無資料" });
     }
 
     // 第一行作為標題
-    const headers = rows[0] || [];
+    const headers = (rows[0] || []).map(h => String(h || "").trim());
 
-    // 從第二行開始作為數據，並移除空行
+    // 從第二行開始作為數據
     const data = rows.slice(1)
+      // 過濾掉完全空白的行
       .filter(row => row && row.some(cell => cell && String(cell).trim() !== ""))
       .map((row, idx) => {
         const obj = { __row: idx + 2 };
-        headers.forEach((h, i) => {
-          obj[h] = row[i] || "";
+
+        // 確保每個欄位都被正確對應
+        headers.forEach((header, colIdx) => {
+          if (header) {  // 只處理有標題的欄位
+            obj[header] = (row[colIdx] || "").toString().trim();
+          }
         });
+
         return obj;
       });
+
+    console.log("API 返回:", {
+      headers: headers,
+      dataCount: data.length,
+      firstRow: data[0] || null,
+    });
 
     return NextResponse.json({ headers, data });
   } catch (err) {
