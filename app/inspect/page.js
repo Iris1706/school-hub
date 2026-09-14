@@ -9,7 +9,6 @@ export default function InspectPage() {
   const [error, setError] = useState(null);
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
-  const [filterType, setFilterType] = useState("unchecked"); // 'all', 'unchecked'
 
   // 防抖搜尋
   useEffect(() => {
@@ -47,32 +46,67 @@ export default function InspectPage() {
     return str === "true" || str === "✓" || str === "☑" || str === "✔" || str === "v";
   };
 
-  // 篩選邏輯
-  const filteredData = useMemo(() => {
-    let filtered = allData;
+  // 隱藏的欄位列表
+  const hiddenColumns = [
+    "週次",
+    "實際預約日期",
+    "備註",
+    "巡檢單上傳",
+    "巡檢單email給老師",
+  ];
 
-    // 根據篩選類型篩選
-    if (filterType === "unchecked") {
-      // U 和 V 都沒有打勾
-      filtered = filtered.filter(row => {
-        const uChecked = isChecked(row["巡檢單上傳"]);
-        const vChecked = isChecked(row["巡檢單email給老師"]);
-        return !uChecked && !vChecked;
-      });
+  // 顯示的欄位
+  const visibleHeaders = useMemo(() => {
+    return headers.filter(h => !hiddenColumns.includes(h) && h.trim() !== "");
+  }, [headers]);
+
+  // 正規化標題
+  const normalizeHeader = (header) => {
+    if (header === "學校代碼 (藍色代表已完成)") {
+      return "學校代碼";
     }
+    return header;
+  };
+
+  // 篩選邏輯：只顯示 U 和 V 都沒有打勾的
+  const filteredData = useMemo(() => {
+    let filtered = allData.filter(row => {
+      const uChecked = isChecked(row["巡檢單上傳"]);
+      const vChecked = isChecked(row["巡檢單email給老師"]);
+      return !uChecked && !vChecked;
+    });
 
     // 搜尋篩選
     if (search) {
       const lowerSearch = search.toLowerCase();
       filtered = filtered.filter((row) => {
-        return headers.some(header =>
+        return visibleHeaders.some(header =>
           String(row[header] || "").toLowerCase().includes(lowerSearch)
         );
       });
     }
 
     return filtered;
-  }, [allData, headers, search, filterType]);
+  }, [allData, visibleHeaders, search]);
+
+  // 渲染單元格內容
+  const renderCellContent = (header, value) => {
+    // Jamf 欄位變成超連結
+    if (header === "jamf" && value && value.trim()) {
+      return (
+        <a
+          href={`https://jamfpro.com/search?query=${encodeURIComponent(value)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: "#4F46E5", textDecoration: "underline", cursor: "pointer" }}
+        >
+          {value}
+        </a>
+      );
+    }
+
+    return value || "-";
+  };
 
   return (
     <div style={{ background: "#F9FAFB", minHeight: "100vh", padding: "32px" }}>
@@ -94,23 +128,15 @@ export default function InspectPage() {
           letter-spacing: 0.8px;
         }
 
-        .controls {
-          display: flex;
-          gap: 16px;
-          margin-bottom: 24px;
-          align-items: center;
-          flex-wrap: wrap;
-        }
-
         input[type="search"] {
-          flex: 1;
-          min-width: 200px;
+          width: 100%;
           padding: 10px 14px;
           border: 1px solid #D1D5DB;
           border-radius: 6px;
           font-size: 14px;
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
           color: #111827;
+          margin-bottom: 16px;
           box-sizing: border-box;
         }
 
@@ -118,33 +144,6 @@ export default function InspectPage() {
           outline: none;
           border-color: #4F46E5;
           box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
-
-        .button-group {
-          display: flex;
-          gap: 8px;
-        }
-
-        button {
-          padding: 8px 16px;
-          border-radius: 6px;
-          border: 1px solid #D1D5DB;
-          background: white;
-          color: #374151;
-          cursor: pointer;
-          font-weight: 600;
-          font-size: 13px;
-          transition: all 0.2s ease;
-        }
-
-        button:hover {
-          background: #F3F4F6;
-        }
-
-        button.active {
-          background: #DC2626;
-          color: white;
-          border-color: #DC2626;
         }
 
         .table-wrapper {
@@ -220,18 +219,17 @@ export default function InspectPage() {
           text-align: center;
         }
 
-        .checkbox-cell {
-          text-align: center;
-          font-weight: 600;
-          color: #059669;
+        a {
+          color: #4F46E5;
+          text-decoration: underline;
         }
 
-        .checkbox-cell.unchecked {
-          color: #DC2626;
+        a:hover {
+          color: #4338CA;
         }
       `}</style>
 
-      <h1 className="page-title">巡檢管理</h1>
+      <h1 className="page-title">巡檢管理 - 未完成清單</h1>
 
       {loading && <div className="loading-box">讀取中...</div>}
 
@@ -247,71 +245,41 @@ export default function InspectPage() {
 
       {!loading && !error && headers.length > 0 && (
         <>
-          {/* 控制區塊 */}
+          {/* 搜尋區塊 */}
           <div style={{ marginBottom: 40 }}>
-            <div className="section-title">篩選與搜尋</div>
-
-            <div className="controls">
-              <div className="button-group">
-                <button
-                  className={filterType === "unchecked" ? "active" : ""}
-                  onClick={() => setFilterType("unchecked")}
-                >
-                  未完成 (U&V都未勾)
-                </button>
-                <button
-                  className={filterType === "all" ? "active" : ""}
-                  onClick={() => setFilterType("all")}
-                >
-                  全部資料
-                </button>
-              </div>
-
-              <input
-                type="search"
-                placeholder="搜尋任何欄位內容..."
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-              />
-            </div>
+            <div className="section-title">搜尋</div>
+            <input
+              type="search"
+              placeholder="搜尋任何欄位內容..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
           </div>
 
           {/* 資料表格 */}
           {filteredData.length > 0 ? (
             <>
               <p className="data-count">
-                {filterType === "unchecked"
-                  ? `未完成的巡檢：${filteredData.length} 筆`
-                  : `全部資料：${filteredData.length} 筆`
-                }
+                未完成巡檢：{filteredData.length} 筆
               </p>
 
               <div className="table-wrapper">
                 <table>
                   <thead>
                     <tr>
-                      {headers.map((header, idx) => (
-                        <th key={idx}>{header}</th>
+                      {visibleHeaders.map((header, idx) => (
+                        <th key={idx}>{normalizeHeader(header)}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {filteredData.map((row, rowIdx) => (
                       <tr key={rowIdx}>
-                        {headers.map((header, colIdx) => {
-                          const value = row[header] || "-";
-                          const isCheckColumn = header === "巡檢單上傳" || header === "巡檢單email給老師";
-                          const checked = isChecked(value);
-
-                          return (
-                            <td
-                              key={colIdx}
-                              className={isCheckColumn ? (checked ? "checkbox-cell" : "checkbox-cell unchecked") : ""}
-                            >
-                              {isCheckColumn ? (checked ? "✓" : "✗") : value}
-                            </td>
-                          );
-                        })}
+                        {visibleHeaders.map((header, colIdx) => (
+                          <td key={colIdx}>
+                            {renderCellContent(header, row[header])}
+                          </td>
+                        ))}
                       </tr>
                     ))}
                   </tbody>
@@ -320,10 +288,7 @@ export default function InspectPage() {
             </>
           ) : (
             <p className="empty-state">
-              {filterType === "unchecked"
-                ? "所有巡檢都已完成！"
-                : "尚未載入任何資料。"
-              }
+              所有巡檢都已完成！
             </p>
           )}
         </>
