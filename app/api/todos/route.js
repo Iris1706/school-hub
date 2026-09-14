@@ -33,6 +33,17 @@ export async function GET() {
     const headers = rows[0] || [];
 
     console.log("Google Sheets 表頭:", headers);
+    console.log("總行數:", rows.length);
+
+    // 檢查表頭是否存在
+    if (!headers || headers.length === 0) {
+      console.error("ERROR: Google Sheets 表頭為空");
+      return NextResponse.json({
+        error: "Google Sheets 表頭為空，請檢查 TODO_TAB 是否設置正確",
+        headers: [],
+        data: []
+      });
+    }
 
     // 建立表頭 → 欄位索引的映射
     const headerIndex = {};
@@ -40,6 +51,7 @@ export async function GET() {
       headerIndex[headerName] = idx;
     });
     console.log("表頭映射:", headerIndex);
+    console.log("預期欄位:", ["優先級", "日期", "學校", "事件", "聯絡人", "電話", "郵件", "進度", "備註", "完成"]);
 
     // 解析資料行（過濾掉空行，保留正確的行號）
     const data = rows.slice(1).map((row, originalIdx) => {
