@@ -22,7 +22,7 @@ function getInspectSheetsClient() {
   return google.sheets({ version: "v4", auth });
 }
 
-// GET: 從巡檢 Sheet 讀取 W:AD 欄位的資料
+// GET: 從巡檢 Sheet 讀取 G:V 欄位的資料
 export async function GET() {
   try {
     const INSPECT_SHEET_ID = process.env.Inspect_SHEET_ID;
@@ -38,7 +38,7 @@ export async function GET() {
     const sheets = getInspectSheetsClient();
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId: INSPECT_SHEET_ID,
-      range: `'${INSPECT_TAB}'!W1:AD500`,
+      range: `'${INSPECT_TAB}'!G1:V500`,
     });
 
     const rows = res.data.values || [];
@@ -66,12 +66,6 @@ export async function GET() {
 
         return obj;
       });
-
-    console.log("API 返回:", {
-      headers: headers,
-      dataCount: data.length,
-      firstRow: data[0] || null,
-    });
 
     return NextResponse.json({ headers, data });
   } catch (err) {
