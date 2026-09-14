@@ -22,7 +22,7 @@ function getInspectSheetsClient() {
   return google.sheets({ version: "v4", auth });
 }
 
-// GET: 從巡檢 Sheet 讀取 W:AD 欄位的數據
+// GET: 從巡檢 Sheet 讀取 W:AD 欄位的資料（標題+資料）
 export async function GET() {
   try {
     const INSPECT_SHEET_ID = process.env.Inspect_SHEET_ID;
@@ -38,18 +38,28 @@ export async function GET() {
     const sheets = getInspectSheetsClient();
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId: INSPECT_SHEET_ID,
-      range: `'${INSPECT_TAB}'!W1:AD1000`,
+      range: `'${INSPECT_TAB}'!W1:AD500`,
     });
 
     const rows = res.data.values || [];
+
+    if (rows.length === 0) {
+      return NextResponse.json({ headers: [], data: [] });
+    }
+
+    // 第一行作為標題
     const headers = rows[0] || [];
-    const data = rows.slice(1).map((row, idx) => {
-      const obj = { __row: idx + 2 };
-      headers.forEach((h, i) => {
-        obj[h] = row[i] || "";
+
+    // 從第二行開始作為數據，並移除空行
+    const data = rows.slice(1)
+      .filter(row => row && row.some(cell => cell && String(cell).trim() !== ""))
+      .map((row, idx) => {
+        const obj = { __row: idx + 2 };
+        headers.forEach((h, i) => {
+          obj[h] = row[i] || "";
+        });
+        return obj;
       });
-      return obj;
-    });
 
     return NextResponse.json({ headers, data });
   } catch (err) {
