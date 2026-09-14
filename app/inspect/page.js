@@ -3,8 +3,10 @@
 import { useEffect, useState, useMemo } from "react";
 
 export default function InspectPage() {
-  const [allData, setAllData] = useState([]);
-  const [headers, setHeaders] = useState([]);
+  const [staffData, setStaffData] = useState([]);
+  const [staffHeaders, setStaffHeaders] = useState([]);
+  const [inspectData, setInspectData] = useState([]);
+  const [inspectHeaders, setInspectHeaders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchInput, setSearchInput] = useState("");
@@ -25,11 +27,16 @@ export default function InspectPage() {
       const json = await res.json();
       if (json.error) throw new Error(json.error);
 
-      setHeaders(json.headers || []);
-      setAllData(json.data || []);
+      // 人員統計資料
+      setStaffHeaders(json.staff?.headers || []);
+      setStaffData(json.staff?.data || []);
+
+      // 巡檢未完成清單
+      setInspectHeaders(json.inspect?.headers || []);
+      setInspectData(json.inspect?.data || []);
     } catch (err) {
       setError(err.message);
-      console.error("載入巡檢數據失敗:", err);
+      console.error("載入數據失敗:", err);
     } finally {
       setLoading(false);
     }
@@ -53,30 +60,24 @@ export default function InspectPage() {
     "備註",
     "巡檢單上傳",
     "巡檢單email給老師",
-    "THSD",
   ];
 
   // 顯示的欄位
   const visibleHeaders = useMemo(() => {
-    return headers.filter(h => {
-      const trimmed = h.trim();
-      // 排除隱藏欄位和空欄位
-      return trimmed !== "" && !hiddenColumns.includes(trimmed) && !hiddenColumns.some(hidden => trimmed.includes(hidden));
-    });
-  }, [headers]);
+    return inspectHeaders.filter(h => !hiddenColumns.includes(h) && h.trim() !== "");
+  }, [inspectHeaders]);
 
   // 正規化標題
   const normalizeHeader = (header) => {
-    // 將「學校代碼 (藍色代表已完成)」改成「學校代碼」
-    if (header.includes("學校代碼")) {
+    if (header === "學校代碼 (藍色代表已完成)") {
       return "學校代碼";
     }
     return header;
   };
 
   // 篩選邏輯：只顯示 U 和 V 都沒有打勾的
-  const filteredData = useMemo(() => {
-    let filtered = allData.filter(row => {
+  const filteredInspectData = useMemo(() => {
+    let filtered = inspectData.filter(row => {
       const uChecked = isChecked(row["巡檢單上傳"]);
       const vChecked = isChecked(row["巡檢單email給老師"]);
       return !uChecked && !vChecked;
@@ -93,7 +94,7 @@ export default function InspectPage() {
     }
 
     return filtered;
-  }, [allData, visibleHeaders, search]);
+  }, [inspectData, visibleHeaders, search]);
 
   // 判斷是否為 Jamf 欄位
   const isJamfColumn = (header) => {
@@ -269,9 +270,19 @@ export default function InspectPage() {
         a:hover {
           color: #4338CA;
         }
+
+        .divider {
+          height: 1px;
+          background: #E5E7EB;
+          margin: 40px 0;
+        }
+
+        .staff-section {
+          margin-bottom: 40px;
+        }
       `}</style>
 
-      <h1 className="page-title">巡檢管理 - 未完成清單</h1>
+      <h1 className="page-title">巡檢管理</h1>
 
       {loading && <div className="loading-box">讀取中...</div>}
 
@@ -281,57 +292,96 @@ export default function InspectPage() {
         </div>
       )}
 
-      {!loading && !error && headers.length === 0 && (
-        <p className="empty-state">無法取得表頭資訊，請檢查 Google Sheet 設定。</p>
-      )}
-
-      {!loading && !error && headers.length > 0 && (
+      {!loading && !error && (
         <>
-          {/* 搜尋區塊 */}
-          <div style={{ marginBottom: 40 }}>
-            <div className="section-title">搜尋</div>
-            <input
-              type="search"
-              placeholder="搜尋任何欄位內容..."
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-            />
-          </div>
+          {/* 人員統計區塊 */}
+          {staffHeaders.length > 0 && (
+            <div className="staff-section">
+              <div className="section-title">人員統計</div>
 
-          {/* 資料表格 */}
-          {filteredData.length > 0 ? (
-            <>
-              <p className="data-count">
-                未完成巡檢：{filteredData.length} 筆
-              </p>
-
-              <div className="table-wrapper">
-                <table>
-                  <thead>
-                    <tr>
-                      {visibleHeaders.map((header, idx) => (
-                        <th key={idx}>{normalizeHeader(header)}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredData.map((row, rowIdx) => (
-                      <tr key={rowIdx}>
-                        {visibleHeaders.map((header, colIdx) => (
-                          <td key={colIdx}>
-                            {renderCellContent(header, row[header])}
-                          </td>
+              {staffData.length > 0 ? (
+                <div className="table-wrapper">
+                  <table>
+                    <thead>
+                      <tr>
+                        {staffHeaders.map((header, idx) => (
+                          <th key={idx}>{header}</th>
                         ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </>
+                    </thead>
+                    <tbody>
+                      {staffData.map((row, rowIdx) => (
+                        <tr key={rowIdx}>
+                          {staffHeaders.map((header, colIdx) => (
+                            <td key={colIdx}>{row[header] || "-"}</td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="empty-state">暫無人員統計資料。</p>
+              )}
+            </div>
+          )}
+
+          {staffHeaders.length > 0 && inspectHeaders.length > 0 && (
+            <div className="divider"></div>
+          )}
+
+          {/* 巡檢未完成清單 */}
+          {inspectHeaders.length === 0 ? (
+            <p className="empty-state">無法取得表頭資訊，請檢查 Google Sheet 設定。</p>
           ) : (
-            <p className="empty-state">
-              所有巡檢都已完成！
-            </p>
+            <>
+              {/* 搜尋區塊 */}
+              <div style={{ marginBottom: 40 }}>
+                <div className="section-title">搜尋</div>
+                <input
+                  type="search"
+                  placeholder="搜尋任何欄位內容..."
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                />
+              </div>
+
+              {/* 資料表格 */}
+              {filteredInspectData.length > 0 ? (
+                <>
+                  <p className="data-count">
+                    未完成巡檢：{filteredInspectData.length} 筆
+                  </p>
+
+                  <div className="table-wrapper">
+                    <table>
+                      <thead>
+                        <tr>
+                          {visibleHeaders.map((header, idx) => (
+                            <th key={idx}>{normalizeHeader(header)}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredInspectData.map((row, rowIdx) => (
+                          <tr key={rowIdx}>
+                            {visibleHeaders.map((header, colIdx) => (
+                              <td key={colIdx}>
+                                {renderCellContent(header, row[header])}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              ) : (
+                <p className="empty-state">
+                  所有巡檢都已完成！
+                </p>
+              )}
+            </>
           )}
         </>
       )}

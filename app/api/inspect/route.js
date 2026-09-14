@@ -22,7 +22,7 @@ function getInspectSheetsClient() {
   return google.sheets({ version: "v4", auth });
 }
 
-// GET: 從巡檢 Sheet 讀取 G:V 欄位的資料
+// GET: 從巡檢 Sheet 讀取資料
 export async function GET() {
   try {
     const INSPECT_SHEET_ID = process.env.Inspect_SHEET_ID;
@@ -36,38 +36,68 @@ export async function GET() {
     }
 
     const sheets = getInspectSheetsClient();
-    const res = await sheets.spreadsheets.values.get({
+
+    // 同時讀取兩個範圍
+    const res = await sheets.spreadsheets.values.batchGet({
       spreadsheetId: INSPECT_SHEET_ID,
-      range: `'${INSPECT_TAB}'!G1:V500`,
+      ranges: [
+        `'${INSPECT_TAB}'!G1:V500`,    // 巡檢未完成清單
+        `'${INSPECT_TAB}'!W1:AD10`,    // 人員統計
+      ],
     });
 
-    const rows = res.data.values || [];
+    const batchResults = res.data.valueRanges || [];
 
-    if (rows.length === 0) {
-      return NextResponse.json({ headers: [], data: [], message: "無資料" });
+    // 處理巡檢資料 (G:V)
+    const inspectRows = batchResults[0]?.values || [];
+    let inspectHeaders = [];
+    let inspectData = [];
+
+    if (inspectRows.length > 0) {
+      inspectHeaders = (inspectRows[0] || []).map(h => String(h || "").trim());
+      inspectData = inspectRows.slice(1)
+        .filter(row => row && row.some(cell => cell && String(cell).trim() !== ""))
+        .map((row, idx) => {
+          const obj = { __row: idx + 2 };
+          inspectHeaders.forEach((header, colIdx) => {
+            if (header) {
+              obj[header] = (row[colIdx] || "").toString().trim();
+            }
+          });
+          return obj;
+        });
     }
 
-    // 第一行作為標題
-    const headers = (rows[0] || []).map(h => String(h || "").trim());
+    // 處理人員統計資料 (W:AD)
+    const staffRows = batchResults[1]?.values || [];
+    let staffHeaders = [];
+    let staffData = [];
 
-    // 從第二行開始作為數據
-    const data = rows.slice(1)
-      // 過濾掉完全空白的行
-      .filter(row => row && row.some(cell => cell && String(cell).trim() !== ""))
-      .map((row, idx) => {
-        const obj = { __row: idx + 2 };
-
-        // 確保每個欄位都被正確對應
-        headers.forEach((header, colIdx) => {
-          if (header) {  // 只處理有標題的欄位
-            obj[header] = (row[colIdx] || "").toString().trim();
-          }
+    if (staffRows.length > 0) {
+      staffHeaders = (staffRows[0] || []).map(h => String(h || "").trim());
+      staffData = staffRows.slice(1)
+        .filter(row => row && row.some(cell => cell && String(cell).trim() !== ""))
+        .map((row, idx) => {
+          const obj = { __row: idx + 2 };
+          staffHeaders.forEach((header, colIdx) => {
+            if (header) {
+              obj[header] = (row[colIdx] || "").toString().trim();
+            }
+          });
+          return obj;
         });
+    }
 
-        return obj;
-      });
-
-    return NextResponse.json({ headers, data });
+    return NextResponse.json({
+      inspect: {
+        headers: inspectHeaders,
+        data: inspectData,
+      },
+      staff: {
+        headers: staffHeaders,
+        data: staffData,
+      },
+    });
   } catch (err) {
     console.error("巡檢 API 錯誤:", err);
     return NextResponse.json(
