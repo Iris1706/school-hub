@@ -53,16 +53,22 @@ export default function InspectPage() {
     "備註",
     "巡檢單上傳",
     "巡檢單email給老師",
+    "THSD",
   ];
 
   // 顯示的欄位
   const visibleHeaders = useMemo(() => {
-    return headers.filter(h => !hiddenColumns.includes(h) && h.trim() !== "");
+    return headers.filter(h => {
+      const trimmed = h.trim();
+      // 排除隱藏欄位和空欄位
+      return trimmed !== "" && !hiddenColumns.includes(trimmed) && !hiddenColumns.some(hidden => trimmed.includes(hidden));
+    });
   }, [headers]);
 
   // 正規化標題
   const normalizeHeader = (header) => {
-    if (header === "學校代碼 (藍色代表已完成)") {
+    // 將「學校代碼 (藍色代表已完成)」改成「學校代碼」
+    if (header.includes("學校代碼")) {
       return "學校代碼";
     }
     return header;
@@ -89,23 +95,59 @@ export default function InspectPage() {
     return filtered;
   }, [allData, visibleHeaders, search]);
 
+  // 判斷是否為 Jamf 欄位
+  const isJamfColumn = (header) => {
+    return header.toLowerCase().includes("jamf");
+  };
+
+  // 判斷是否為有效的 URL
+  const isValidUrl = (str) => {
+    try {
+      new URL(str);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
   // 渲染單元格內容
   const renderCellContent = (header, value) => {
-    // Jamf 欄位變成超連結
-    if (header === "jamf" && value && value.trim()) {
+    if (!value || !String(value).trim()) {
+      return "-";
+    }
+
+    const strValue = String(value).trim();
+
+    // Jamf 欄位處理
+    if (isJamfColumn(header)) {
+      // 如果已經是完整 URL，直接使用
+      if (isValidUrl(strValue)) {
+        return (
+          <a
+            href={strValue}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "#4F46E5", textDecoration: "underline", cursor: "pointer" }}
+          >
+            {strValue}
+          </a>
+        );
+      }
+      // 否則當作 Jamf ID，組合成 URL
       return (
         <a
-          href={`https://jamfpro.com/search?query=${encodeURIComponent(value)}`}
+          href={`https://jamfpro.com`}
           target="_blank"
           rel="noopener noreferrer"
+          title={`Jamf: ${strValue}`}
           style={{ color: "#4F46E5", textDecoration: "underline", cursor: "pointer" }}
         >
-          {value}
+          {strValue}
         </a>
       );
     }
 
-    return value || "-";
+    return strValue;
   };
 
   return (
